@@ -1,0 +1,8 @@
+{
+    "mdb.presetConnections": [
+        {
+            "name": "Jaguar Atlas",
+            "connectionString": "mongodb+srv://jpdigitalmarketing2k23_db_user:YOUR_PASSWORD@jaguarproperties.wxv1ovz.mongodb.net/jaguarDB?retryWrites=true&w=majority"
+        }
+    ]
+}
