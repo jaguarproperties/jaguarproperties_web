@@ -1,10 +1,10 @@
 "use server";
 
 import { mkdir, writeFile } from "fs/promises";
-import { UserRole } from "@prisma/client";
+import { MediaEntityType, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import * as XLSX from "xlsx";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import path from "path";
 import { randomUUID } from "crypto";
@@ -131,6 +131,14 @@ function getHrmLetterheadStorageDir() {
   return path.join(process.cwd(), "public", "uploads", "hrm-letterheads");
 }
 
+function getPropertyImageStorageDir() {
+  return path.join(process.cwd(), "public", "uploads", "properties");
+}
+
+function getNewsImageStorageDir() {
+  return path.join(process.cwd(), "public", "uploads", "news");
+}
+
 function isAllowedResumeType(file: File) {
   return [
     "application/pdf",
@@ -141,6 +149,112 @@ function isAllowedResumeType(file: File) {
 
 function isAllowedLetterheadType(file: File) {
   return ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/svg+xml"].includes(file.type);
+}
+
+function isAllowedPropertyImageType(file: File) {
+  return ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"].includes(file.type);
+}
+
+function sanitizeFilenameSegment(value: string) {
+  const trimmed = value.trim().toLowerCase();
+  const sanitized = trimmed.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  return sanitized || "property-image";
+}
+
+async function savePropertyImage(file: File, propertyTitle: string) {
+  if (!isAllowedPropertyImageType(file)) {
+    throw new Error("Please upload JPG, PNG, WebP, or GIF images for properties.");
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    throw new Error("Property images must be smaller than 8 MB each.");
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const extension = path.extname(file.name) || ".jpg";
+  const storageDir = getPropertyImageStorageDir();
+  const filename = `${sanitizeFilenameSegment(propertyTitle)}-${randomUUID()}${extension.toLowerCase()}`;
+
+  await mkdir(storageDir, { recursive: true });
+  await writeFile(path.join(storageDir, filename), buffer);
+
+  return `/uploads/properties/${filename}`;
+}
+
+async function saveNewsImage(file: File, articleTitle: string) {
+  if (!isAllowedPropertyImageType(file)) {
+    throw new Error("Please upload JPG, PNG, WebP, or GIF images for news articles.");
+  }
+
+  if (file.size > 8 * 1024 * 1024) {
+    throw new Error("News article images must be smaller than 8 MB each.");
+  }
+
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+  const extension = path.extname(file.name) || ".jpg";
+  const storageDir = getNewsImageStorageDir();
+  const filename = `${sanitizeFilenameSegment(articleTitle)}-${randomUUID()}${extension.toLowerCase()}`;
+
+  await mkdir(storageDir, { recursive: true });
+  await writeFile(path.join(storageDir, filename), buffer);
+
+  return `/uploads/news/${filename}`;
+}
+
+function dedupeImageList(images: string[]) {
+  return Array.from(new Set(images.map((image) => image.trim()).filter(Boolean)));
+}
+
+async function syncPropertyMedia(propertyId: string, coverImage: string, gallery: string[]) {
+  const urls = dedupeImageList([coverImage, ...gallery]);
+
+  await prisma.media.deleteMany({
+    where: {
+      propertyId
+    }
+  });
+
+  if (!urls.length) return;
+
+  await Promise.all(
+    urls.map((url, index) =>
+      prisma.media.create({
+        data: {
+          url,
+          alt: index === 0 ? "Featured property image" : "Property gallery image",
+          entityType: MediaEntityType.PROPERTY,
+          propertyId
+        }
+      })
+    )
+  );
+}
+
+async function syncBlogPostMedia(blogPostId: string, coverImage: string, gallery: string[]) {
+  const urls = dedupeImageList([coverImage, ...gallery]);
+
+  await prisma.media.deleteMany({
+    where: {
+      blogPostId
+    }
+  });
+
+  if (!urls.length) return;
+
+  await Promise.all(
+    urls.map((url, index) =>
+      prisma.media.create({
+        data: {
+          url,
+          alt: index === 0 ? "Featured news image" : "News gallery image",
+          entityType: MediaEntityType.BLOG_POST,
+          blogPostId
+        }
+      })
+    )
+  );
 }
 
 function getTransporter() {
@@ -341,8 +455,10 @@ export async function createOrUpdateProject(formData: FormData) {
 
   if (!parsed.success) throw new Error("Invalid project payload");
 
+  const { id: _projectId, ...projectValues } = parsed.data;
+
   const data = {
-    ...parsed.data,
+    ...projectValues,
     slug: slugify(parsed.data.title),
     gallery: safeSplitGallery(parsed.data.gallery ?? ""),
     completionDate: parsed.data.completionDate ? new Date(parsed.data.completionDate) : null
@@ -372,9 +488,30 @@ export async function deleteProject(formData: FormData) {
 export async function createOrUpdateProperty(formData: FormData) {
   await requireRoleAccess(canEditProperties);
   ensureDatabase();
+
+  const id = String(formData.get("id") || "").trim() || undefined;
+  const title = String(formData.get("title") || "").trim();
+  const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
+  const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
+  const mainImageFile = formData.get("mainImageFile");
+  const galleryFiles = formData
+    .getAll("galleryFiles")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  const coverImage =
+    mainImageFile instanceof File && mainImageFile.size > 0
+      ? await savePropertyImage(mainImageFile, title || "property")
+      : existingCoverImage;
+
+  const uploadedGallery = await Promise.all(
+    galleryFiles.map((file, index) => savePropertyImage(file, `${title || "property"}-${index + 1}`))
+  );
+
+  const normalizedGallery = dedupeImageList([coverImage, ...retainedGallery, ...uploadedGallery]);
+
   const parsed = propertySchema.safeParse({
-    id: formData.get("id") || undefined,
-    title: formData.get("title"),
+    id,
+    title,
     description: formData.get("description"),
     city: formData.get("city"),
     location: formData.get("location"),
@@ -385,19 +522,30 @@ export async function createOrUpdateProperty(formData: FormData) {
     areaSqFt: formData.get("areaSqFt") || undefined,
     status: formData.get("status"),
     featured: parseBoolean(formData.get("featured")),
-    coverImage: formData.get("coverImage"),
-    gallery: formData.get("gallery") || undefined,
+    coverImage,
+    gallery: normalizedGallery.join(", "),
     projectId: formData.get("projectId") || undefined
   });
 
   if (!parsed.success) throw new Error("Invalid property payload");
 
+  const previousProperty = parsed.data.id
+    ? await prisma.property.findUnique({
+        where: { id: parsed.data.id },
+        select: { id: true, slug: true }
+      })
+    : null;
+
+  const { id: _propertyFormId, ...propertyValues } = parsed.data;
+
   const data = {
-    ...parsed.data,
+    ...propertyValues,
     slug: slugify(parsed.data.title),
-    gallery: safeSplitGallery(parsed.data.gallery ?? ""),
+    gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
     projectId: parsed.data.projectId || null
   };
+
+  let propertyId = parsed.data.id;
 
   if (parsed.data.id) {
     await prisma.property.update({
@@ -405,34 +553,79 @@ export async function createOrUpdateProperty(formData: FormData) {
       data
     });
   } else {
-    await prisma.property.create({ data });
+    const property = await prisma.property.create({ data });
+    propertyId = property.id;
   }
 
+  if (propertyId) {
+    await syncPropertyMedia(propertyId, data.coverImage, data.gallery);
+  }
+
+  revalidateTag("properties");
   revalidatePath("/");
   revalidatePath("/properties");
+  revalidatePath(`/properties/${data.slug}`);
+  if (previousProperty?.slug && previousProperty.slug !== data.slug) {
+    revalidatePath(`/properties/${previousProperty.slug}`);
+  }
   revalidatePath("/admin");
   revalidatePath("/admin/properties");
+
+  if (parsed.data.id) {
+    redirect(`/admin/properties/${propertyId}?updated=1`);
+  }
+
+  redirect("/admin/properties?created=1");
 }
 
 export async function deleteProperty(formData: FormData) {
   await requireRoleAccess(canEditProperties);
   ensureDatabase();
   const id = String(formData.get("id"));
+  const property = await prisma.property.findUnique({
+    where: { id },
+    select: { slug: true }
+  });
   await prisma.property.delete({ where: { id } });
+  revalidateTag("properties");
   revalidatePath("/");
   revalidatePath("/properties");
+  if (property?.slug) {
+    revalidatePath(`/properties/${property.slug}`);
+  }
   revalidatePath("/admin/properties");
 }
 
 export async function createOrUpdateBlogPost(formData: FormData) {
   await requireRoleAccess(canManageNews);
   ensureDatabase();
+
+  const id = String(formData.get("id") || "").trim() || undefined;
+  const title = String(formData.get("title") || "").trim();
+  const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
+  const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
+  const mainImageFile = formData.get("mainImageFile");
+  const galleryFiles = formData
+    .getAll("galleryFiles")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  const coverImage =
+    mainImageFile instanceof File && mainImageFile.size > 0
+      ? await saveNewsImage(mainImageFile, title || "news")
+      : existingCoverImage;
+
+  const uploadedGallery = await Promise.all(
+    galleryFiles.map((file, index) => saveNewsImage(file, `${title || "news"}-${index + 1}`))
+  );
+
+  const normalizedGallery = dedupeImageList([coverImage, ...retainedGallery, ...uploadedGallery]);
+
   const parsed = blogSchema.safeParse({
-    id: formData.get("id") || undefined,
-    title: formData.get("title"),
+    id,
+    title,
     excerpt: formData.get("excerpt"),
     content: formData.get("content"),
-    coverImage: formData.get("coverImage"),
+    coverImage,
     seoTitle: formData.get("seoTitle") || undefined,
     seoDescription: formData.get("seoDescription") || undefined,
     published: parseBoolean(formData.get("published"))
@@ -440,10 +633,21 @@ export async function createOrUpdateBlogPost(formData: FormData) {
 
   if (!parsed.success) throw new Error("Invalid blog post payload");
 
+  const previousPost = parsed.data.id
+    ? await prisma.blogPost.findUnique({
+        where: { id: parsed.data.id },
+        select: { slug: true }
+      })
+    : null;
+
+  const { id: _postId, ...postValues } = parsed.data;
+
   const data = {
-    ...parsed.data,
+    ...postValues,
     slug: slugify(parsed.data.title)
   };
+
+  let postId = parsed.data.id;
 
   if (parsed.data.id) {
     await prisma.blogPost.update({
@@ -451,21 +655,45 @@ export async function createOrUpdateBlogPost(formData: FormData) {
       data
     });
   } else {
-    await prisma.blogPost.create({ data });
+    const post = await prisma.blogPost.create({ data });
+    postId = post.id;
   }
 
+  if (postId) {
+    await syncBlogPostMedia(postId, coverImage, normalizedGallery);
+  }
+
+  revalidateTag("posts");
   revalidatePath("/");
   revalidatePath("/news");
+  revalidatePath(`/news/${data.slug}`);
+  if (previousPost?.slug && previousPost.slug !== data.slug) {
+    revalidatePath(`/news/${previousPost.slug}`);
+  }
   revalidatePath("/admin");
   revalidatePath("/admin/blog");
+
+  if (parsed.data.id) {
+    redirect(`/admin/blog/${postId}?updated=1`);
+  }
+
+  redirect("/admin/blog?created=1");
 }
 
 export async function deleteBlogPost(formData: FormData) {
   await requireRoleAccess(canManageNews);
   ensureDatabase();
   const id = String(formData.get("id"));
+  const post = await prisma.blogPost.findUnique({
+    where: { id },
+    select: { slug: true }
+  });
   await prisma.blogPost.delete({ where: { id } });
+  revalidateTag("posts");
   revalidatePath("/news");
+  if (post?.slug) {
+    revalidatePath(`/news/${post.slug}`);
+  }
   revalidatePath("/admin/blog");
 }
 

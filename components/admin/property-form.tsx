@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { PropertyImageFields } from "@/components/admin/property-image-fields";
 
 export function PropertyForm({
   property,
@@ -13,7 +14,11 @@ export function PropertyForm({
   projects: Array<{ id: string; title: string }>;
 }) {
   return (
-    <form action={createOrUpdateProperty} className="grid gap-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
+    <form
+      action={createOrUpdateProperty}
+      encType="multipart/form-data"
+      className="grid gap-4 rounded-[28px] border border-white/10 bg-white/5 p-6"
+    >
       <input type="hidden" name="id" defaultValue={property?.id} />
       <div className="grid gap-4 md:grid-cols-2">
         <Input name="title" placeholder="Title" defaultValue={property?.title} required />
@@ -35,20 +40,11 @@ export function PropertyForm({
           <option className="bg-zinc-950">HOLD</option>
         </Select>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <Input
-          id="property-cover-image"
-          name="coverImage"
-          placeholder="Cover image path or URL"
-          defaultValue={property?.coverImage}
-          required
-        />
-        <Input
-          name="gallery"
-          placeholder="Gallery URLs separated by commas"
-          defaultValue={property?.gallery?.join(", ")}
-        />
-      </div>
+      <PropertyImageFields
+        coverImage={property?.coverImage}
+        gallery={property?.gallery}
+        title={property?.title}
+      />
       <div className="grid gap-4 md:grid-cols-[1fr_auto]">
         <Select name="projectId" defaultValue={property?.projectId ?? ""}>
           <option value="" className="bg-zinc-950">

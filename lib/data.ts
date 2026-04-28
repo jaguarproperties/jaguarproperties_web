@@ -493,6 +493,11 @@ export async function getProperties(filters: PropertyFilterParams = {}) {
   return filterProperties(properties, filters);
 }
 
+export async function getPropertyBySlug(slug: string) {
+  const properties = await getCachedProperties();
+  return properties.find((property) => property.slug === slug) ?? null;
+}
+
 export async function getFeaturedProperties() {
   return getCachedFeaturedProperties();
 }
@@ -507,9 +512,17 @@ export async function getBlogPostBySlug(slug: string) {
       withFallback(
         () =>
           prisma.blogPost.findUnique({
-            where: { slug }
+            where: { slug },
+            include: {
+              media: {
+                orderBy: { createdAt: "asc" }
+              }
+            }
           }),
-        demoPosts.find((post) => post.slug === slug) ?? null
+        (() => {
+          const post = demoPosts.find((item) => item.slug === slug);
+          return post ? { ...post, media: [] } : null;
+        })()
       ),
     ["blog-post", slug],
     { revalidate: 300, tags: ["posts"] }
@@ -526,7 +539,14 @@ export async function getAdminCollections() {
       const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
         prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
         prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
-        prisma.blogPost.findMany({ orderBy: { createdAt: "desc" } }),
+        prisma.blogPost.findMany({
+          include: {
+            media: {
+              orderBy: { createdAt: "asc" }
+            }
+          },
+          orderBy: { createdAt: "desc" }
+        }),
         prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
         prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
         getSiteContent()
@@ -537,7 +557,7 @@ export async function getAdminCollections() {
     {
       projects: demoProjects,
       properties: demoProperties,
-      posts: demoPosts,
+      posts: demoPosts.map((post) => ({ ...post, media: [] })),
       leads: demoLeads,
       applications: demoApplications,
       siteContent: demoSiteContent

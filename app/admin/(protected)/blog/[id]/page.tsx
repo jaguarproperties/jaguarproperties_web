@@ -9,9 +9,14 @@ export default async function EditBlogPostPage({
   params: { id: string };
 }) {
   const { posts } = await getAdminCollections();
-  const post = posts.find((item) => item.id === params.id);
+  const postRecord = posts.find((item) => item.id === params.id);
 
-  if (!post) notFound();
+  if (!postRecord) notFound();
+
+  const post = {
+    ...postRecord,
+    gallery: (postRecord.media ?? []).map((item) => item.url).filter((url) => url !== postRecord.coverImage)
+  };
 
   return (
     <div className="space-y-8">
