@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { shouldBypassImageOptimization } from "@/lib/image";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 
 function dedupeImages(images: string[]) {
   return Array.from(new Set(images.map((image) => image.trim()).filter(Boolean)));
@@ -19,17 +19,18 @@ export function PropertyGallery({
   title: string;
 }) {
   const gallery = useMemo(() => dedupeImages(images), [images]);
+  const resolvedGallery = useMemo(() => gallery.map((image) => resolveImageSrc(image)), [gallery]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  if (!gallery.length) return null;
+  if (!resolvedGallery.length) return null;
 
   function goToPrevious() {
-    setActiveIndex((current) => (current === 0 ? gallery.length - 1 : current - 1));
+    setActiveIndex((current) => (current === 0 ? resolvedGallery.length - 1 : current - 1));
   }
 
   function goToNext() {
-    setActiveIndex((current) => (current === gallery.length - 1 ? 0 : current + 1));
+    setActiveIndex((current) => (current === resolvedGallery.length - 1 ? 0 : current + 1));
   }
 
   function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
@@ -57,16 +58,16 @@ export function PropertyGallery({
         onTouchEnd={handleTouchEnd}
       >
         <Image
-          src={gallery[activeIndex]}
+          src={resolvedGallery[activeIndex]}
           alt={`${title} image ${activeIndex + 1}`}
           fill
           sizes="(max-width: 1024px) 100vw, 60vw"
           className="object-cover"
           priority
-          unoptimized={shouldBypassImageOptimization(gallery[activeIndex])}
+          unoptimized={shouldBypassImageOptimization(resolvedGallery[activeIndex])}
         />
 
-        {gallery.length > 1 ? (
+        {resolvedGallery.length > 1 ? (
           <>
             <Button
               type="button"
@@ -89,7 +90,7 @@ export function PropertyGallery({
               <ChevronRight className="h-4 w-4" />
             </Button>
             <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2 rounded-full bg-black/55 px-3 py-2">
-              {gallery.map((image, index) => (
+              {resolvedGallery.map((image, index) => (
                 <button
                   key={image}
                   type="button"
@@ -105,9 +106,9 @@ export function PropertyGallery({
         ) : null}
       </div>
 
-      {gallery.length > 1 ? (
+      {resolvedGallery.length > 1 ? (
         <div className="grid grid-cols-4 gap-3 sm:grid-cols-5">
-          {gallery.map((image, index) => (
+          {resolvedGallery.map((image, index) => (
             <button
               key={image}
               type="button"

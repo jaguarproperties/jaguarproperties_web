@@ -6,7 +6,7 @@ import { ArrowRight, Ruler } from "lucide-react";
 import { Translate } from "@/components/site/translate";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { shouldBypassImageOptimization } from "@/lib/image";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 import { propertyShowcaseBySlug } from "@/lib/property-showcase";
 
 export function PropertyCard({
@@ -14,6 +14,7 @@ export function PropertyCard({
 }: {
   property: Property & { project?: Project | null };
 }) {
+  const coverImageSrc = resolveImageSrc(property.coverImage);
   const details = propertyShowcaseBySlug[property.slug];
   const areaLabel = details?.areaLabel ?? (property.areaSqFt ? `${property.areaSqFt} sq.ft.` : "Size on request");
   const categoryLabel = details?.categoryLabel ?? "Premium Listing";
@@ -25,12 +26,12 @@ export function PropertyCard({
     <Card className="overflow-hidden">
       <div className="relative h-72">
         <Image
-          src={property.coverImage}
+          src={coverImageSrc}
           alt={property.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="object-cover"
-          unoptimized={shouldBypassImageOptimization(property.coverImage)}
+          unoptimized={shouldBypassImageOptimization(coverImageSrc)}
         />
         <div className="absolute left-5 top-5 rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-primary-foreground">
           <Translate id={badge} defaultText={badge} />

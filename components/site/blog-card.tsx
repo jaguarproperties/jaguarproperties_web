@@ -5,19 +5,21 @@ import { format } from "date-fns";
 
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
-import { shouldBypassImageOptimization } from "@/lib/image";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 
 export function BlogCard({ post }: { post: BlogPost }) {
+  const coverImageSrc = resolveImageSrc(post.coverImage);
+
   return (
     <Card className="overflow-hidden">
       <div className="relative h-64">
         <Image
-          src={post.coverImage}
+          src={coverImageSrc}
           alt={post.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="object-cover"
-          unoptimized={shouldBypassImageOptimization(post.coverImage)}
+          unoptimized={shouldBypassImageOptimization(coverImageSrc)}
         />
       </div>
       <div className="p-6">

@@ -5,7 +5,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ImagePlus, Trash2, Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { shouldBypassImageOptimization } from "@/lib/image";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 
 type PropertyImageFieldsProps = {
   coverImage?: string | null;
@@ -118,7 +118,7 @@ export function PropertyImageFields({
     }
   }
 
-  const mainImageUrl = coverPreviewUrl ?? coverImage ?? null;
+  const mainImageUrl = resolveImageSrc(coverPreviewUrl ?? coverImage ?? null);
   const shouldUnoptimizeMainImage = shouldBypassImageOptimization(mainImageUrl);
 
   return (
@@ -226,12 +226,12 @@ export function PropertyImageFields({
               <div key={image} className="overflow-hidden rounded-[20px] border border-white/10 bg-white/5">
                 <div className="relative aspect-[4/3]">
                   <Image
-                    src={image}
+                    src={resolveImageSrc(image)}
                     alt={title ? `${title} gallery image` : "Property gallery image"}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"
-                    unoptimized={shouldBypassImageOptimization(image)}
+                    unoptimized={shouldBypassImageOptimization(resolveImageSrc(image))}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3 px-3 py-2">
