@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
+import { allowedPropertyTitles } from "@/lib/property-showcase";
 import {
   demoApplications,
   demoLeads,
@@ -63,6 +64,11 @@ type DashboardOverview = {
 };
 
 type PropertyRecord = (typeof demoProperties)[number];
+const allowedPropertyTitleSet = new Set<string>(allowedPropertyTitles.map((title) => title.toLowerCase()));
+
+function normalizePropertyTitle(title: string) {
+  return title.trim().toLowerCase();
+}
 
 function getFallbackAdminJobPostings(): AdminJobPosting[] {
   return careerOpenings.map((job, index) => ({
@@ -132,9 +138,9 @@ const getCachedFeaturedProperties = unstable_cache(
 
         const mergedProperties = mergePropertyRecords(properties, demoProperties as PropertyRecord[]);
 
-        return mergedProperties.filter((property) => property.featured).slice(0, 3);
+        return restrictToAllowedProperties(mergedProperties.filter((property) => property.featured)).slice(0, 3);
       },
-      demoProperties.filter((property) => property.featured).slice(0, 3)
+      restrictToAllowedProperties(demoProperties.filter((property) => property.featured)).slice(0, 3)
     ),
   ["featured-properties"],
   { revalidate: 300, tags: ["properties"] }
@@ -482,15 +488,64 @@ function sortPropertiesByNewest<T extends { createdAt?: Date | string | null }>(
   });
 }
 
+function isAllowedPropertyTitle(title: string) {
+  return allowedPropertyTitleSet.has(normalizePropertyTitle(title));
+}
+
+function sortPropertiesByAllowedOrder<T extends { title: string; createdAt?: Date | string | null }>(properties: T[]) {
+  return [...properties].sort((left, right) => {
+    const leftIndex = allowedPropertyTitles.findIndex((title) => title === left.title);
+    const rightIndex = allowedPropertyTitles.findIndex((title) => title === right.title);
+
+    if (leftIndex !== -1 && rightIndex !== -1 && leftIndex !== rightIndex) {
+      return leftIndex - rightIndex;
+    }
+
+    if (leftIndex !== -1 && rightIndex === -1) return -1;
+    if (leftIndex === -1 && rightIndex !== -1) return 1;
+
+    const leftTime = left.createdAt ? new Date(left.createdAt).getTime() : 0;
+    const rightTime = right.createdAt ? new Date(right.createdAt).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
+function restrictToAllowedProperties<T extends { title: string; createdAt?: Date | string | null }>(properties: T[]) {
+  const deduped = new Map<string, T>();
+
+  for (const property of sortPropertiesByAllowedOrder(properties)) {
+    if (!isAllowedPropertyTitle(property.title)) continue;
+
+    const key = normalizePropertyTitle(property.title);
+    if (!deduped.has(key)) {
+      deduped.set(key, property);
+    }
+  }
+
+  return Array.from(deduped.values());
+}
+
 function mergePropertyRecords<T extends { slug: string; createdAt?: Date | string | null }>(primary: T[], secondary: T[]) {
   const merged = new Map<string, T>();
 
-  for (const item of secondary) {
-    merged.set(item.slug, item);
+  for (const item of sortPropertiesByNewest(primary)) {
+    const key = "title" in item && typeof item.title === "string" && isAllowedPropertyTitle(item.title)
+      ? `title:${normalizePropertyTitle(item.title)}`
+      : `slug:${item.slug}`;
+
+    if (!merged.has(key)) {
+      merged.set(key, item);
+    }
   }
 
-  for (const item of primary) {
-    merged.set(item.slug, item);
+  for (const item of sortPropertiesByNewest(secondary)) {
+    const key = "title" in item && typeof item.title === "string" && isAllowedPropertyTitle(item.title)
+      ? `title:${normalizePropertyTitle(item.title)}`
+      : `slug:${item.slug}`;
+
+    if (!merged.has(key)) {
+      merged.set(key, item);
+    }
   }
 
   return sortPropertiesByNewest(Array.from(merged.values()));
@@ -498,12 +553,12 @@ function mergePropertyRecords<T extends { slug: string; createdAt?: Date | strin
 
 export async function getProperties(filters: PropertyFilterParams = {}) {
   const properties = await getCachedProperties();
-  return filterProperties(properties, filters);
+  return filterProperties(restrictToAllowedProperties(properties), filters);
 }
 
 export async function getPropertyBySlug(slug: string) {
   const properties = await getCachedProperties();
-  return properties.find((property) => property.slug === slug) ?? null;
+  return restrictToAllowedProperties(properties).find((property) => property.slug === slug) ?? null;
 }
 
 export async function getFeaturedProperties() {
@@ -562,7 +617,7 @@ export async function getAdminCollections() {
 
       return {
         projects,
-        properties: sortPropertiesByNewest(properties),
+        properties: restrictToAllowedProperties(properties),
         posts,
         leads,
         applications,

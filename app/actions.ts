@@ -542,28 +542,34 @@ export async function createOrUpdateProperty(formData: FormData) {
     redirect(id ? `/admin/properties/${id}?error=1` : "/admin/properties?error=1");
   }
 
-  const previousProperty = parsed.data.id
+  const nextSlug = slugify(parsed.data.title);
+  const propertyById = parsed.data.id
     ? await prisma.property.findUnique({
         where: { id: parsed.data.id },
         select: { id: true, slug: true }
       })
     : null;
+  const propertyBySlug = await prisma.property.findUnique({
+    where: { slug: nextSlug },
+    select: { id: true, slug: true }
+  });
+  const previousProperty = propertyById ?? propertyBySlug;
 
   const { id: _propertyFormId, ...propertyValues } = parsed.data;
 
   const data = {
     ...propertyValues,
-    slug: slugify(parsed.data.title),
+    slug: nextSlug,
     gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
     projectId: parsed.data.projectId || null
   };
 
   const isExistingDatabaseProperty = Boolean(previousProperty);
-  let propertyId = isExistingDatabaseProperty ? parsed.data.id : undefined;
+  let propertyId = isExistingDatabaseProperty ? previousProperty?.id : undefined;
 
-  if (parsed.data.id && isExistingDatabaseProperty) {
+  if (previousProperty?.id) {
     await prisma.property.update({
-      where: { id: parsed.data.id },
+      where: { id: previousProperty.id },
       data
     });
   } else {

@@ -19,38 +19,20 @@ export type PropertyShowcaseEntry = {
   gallery: string[];
 };
 
+export const allowedPropertyTitles = [
+  "Jaguar Diamond City",
+  "Jaguar Platinum City",
+  "Jaguar Highway Residency",
+  "Commercial Converted Plots",
+  "Emirates City",
+  "Jaguar Farm Lands",
+  "Jaguar City Towers",
+  "Jaguar Urban Reserve",
+  "Jaguar Horizon",
+  "Jaguar Greens"
+] as const;
+
 export const propertyShowcase: PropertyShowcaseEntry[] = [
-  {
-    slug: "jaguar-city-doddaballapura",
-    title: "Jaguar City",
-    location: "Doddaballapur",
-    city: "Bengaluru",
-    address: "Attached to NH-648 at Doddaballapura Town, Bangalore North",
-    price: "Price on request",
-    areaSqFt: 2400,
-    areaLabel: "100-acre township · 4 blocks",
-    categoryLabel: "Ready For Registration",
-    locationLabel: "NH-648, Doddaballapura",
-    badge: "Flagship",
-    summary:
-      "A flagship 100-acre plotted township divided into four blocks at Doddaballapura town limits.",
-    description:
-      "Jaguar City is a large-format plotted development attached to NH-648 in Doddaballapura, planned for buyers looking for registration-ready plots inside a township-scale land opportunity.",
-    detailTitle: "Jaguar City, Doddaballapura",
-    detailBody:
-      "Jaguar City is presented as a 100-acre project divided into four blocks and positioned directly on NH-648 at Doddaballapura Town, Bangalore North. It is suited for buyers who want a township-scale plotted opportunity with immediate registration readiness and strong North Bengaluru connectivity.",
-    highlights: [
-      "100-acre project divided into 4 blocks",
-      "Ready for registration plots",
-      "Attached to NH-648 at Doddaballapura Town",
-      "Positioned in Bangalore North growth corridor"
-    ],
-    image: "/images/projects/jaguar-city-cover.png",
-    gallery: [
-      "/images/projects/jaguar-city-cover.png",
-      "/images/projects/jaguar-city-community.jpeg"
-    ]
-  },
   {
     slug: "jaguar-diamond-city-doddaballapura",
     title: "Jaguar Diamond City",
@@ -266,6 +248,99 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     gallery: [
       "/images/projects/jaguar-city-growth.jpeg",
       "/images/brand/jaguar-brochure-cover.png"
+    ]
+  },
+  {
+    slug: "jaguar-urban-reserve-doddaballapura",
+    title: "Jaguar Urban Reserve",
+    location: "Doddaballapur",
+    city: "Bengaluru",
+    address: "Near the Doddaballapura growth corridor, Bangalore North",
+    price: "Price on request",
+    areaSqFt: 1500,
+    areaLabel: "Urban plotted community",
+    categoryLabel: "Residential Plots",
+    locationLabel: "Doddaballapura, Bangalore North",
+    badge: "Urban Plots",
+    summary:
+      "A residential plotted layout positioned for buyers seeking a compact urban land option in North Bengaluru.",
+    description:
+      "Jaguar Urban Reserve is positioned for buyers who want plotted inventory in a developing North Bengaluru corridor with practical road access and a residential community setting.",
+    detailTitle: "Jaguar Urban Reserve, Doddaballapura",
+    detailBody:
+      "Jaguar Urban Reserve is presented as a residential plotted development in the Doddaballapura corridor, suited to buyers who want a city-connected land opportunity with room for long-term appreciation.",
+    highlights: [
+      "Residential plotted development",
+      "North Bengaluru growth corridor positioning",
+      "Designed for end-users and investors",
+      "City-connected road access"
+    ],
+    image: "/images/projects/jaguar-city-community.jpeg",
+    gallery: [
+      "/images/projects/jaguar-city-community.jpeg",
+      "/images/projects/jaguar-city-cover.png"
+    ]
+  },
+  {
+    slug: "jaguar-horizon-doddaballapura",
+    title: "Jaguar Horizon",
+    location: "Doddaballapur",
+    city: "Bengaluru",
+    address: "Doddaballapura growth belt, Bangalore North",
+    price: "Price on request",
+    areaSqFt: 1800,
+    areaLabel: "Premium plotted layout",
+    categoryLabel: "Residential Plots",
+    locationLabel: "Bangalore North corridor",
+    badge: "Premium Plots",
+    summary:
+      "A premium plotted layout aimed at buyers looking for a land-led opportunity in a growing northern corridor.",
+    description:
+      "Jaguar Horizon is planned for buyers who want premium residential plots backed by access-led growth, location clarity, and long-term development potential.",
+    detailTitle: "Jaguar Horizon, Doddaballapura",
+    detailBody:
+      "Jaguar Horizon is introduced as a premium plotted project within the Doddaballapura belt, positioned for buyers seeking a future-focused land investment with North Bengaluru connectivity.",
+    highlights: [
+      "Premium residential plots",
+      "Positioned in an access-led corridor",
+      "Suitable for long-term land buyers",
+      "North Bengaluru growth exposure"
+    ],
+    image: "/images/projects/jaguar-city-growth.jpeg",
+    gallery: [
+      "/images/projects/jaguar-city-growth.jpeg",
+      "/images/projects/jaguar-city-community.jpeg"
+    ]
+  },
+  {
+    slug: "jaguar-greens-doddaballapura",
+    title: "Jaguar Greens",
+    location: "Doddaballapur",
+    city: "Bengaluru",
+    address: "Greenfield layout zone near Doddaballapura, Bangalore North",
+    price: "Price on request",
+    areaSqFt: 1500,
+    areaLabel: "Residential plotted project",
+    categoryLabel: "Green Community Plots",
+    locationLabel: "Doddaballapura green belt",
+    badge: "Green Living",
+    summary:
+      "A plotted community designed around open surroundings for buyers prioritizing a greener residential setting.",
+    description:
+      "Jaguar Greens is shaped for buyers who want residential plots in a quieter, green-led setting while remaining connected to the wider Doddaballapura growth corridor.",
+    detailTitle: "Jaguar Greens, Doddaballapura",
+    detailBody:
+      "Jaguar Greens is presented as a residential plotted development with a greener project character, intended for families and investors looking for balanced lifestyle and land value potential.",
+    highlights: [
+      "Residential plots in a green-led setting",
+      "Designed for families and long-hold buyers",
+      "Access to the Doddaballapura corridor",
+      "Lifestyle and investment potential"
+    ],
+    image: "/images/brand/jaguar-brochure-cover.png",
+    gallery: [
+      "/images/brand/jaguar-brochure-cover.png",
+      "/images/projects/jaguar-city-cover.png"
     ]
   }
 ];

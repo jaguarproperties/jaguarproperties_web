@@ -17,7 +17,10 @@ export default async function AdminPropertiesPage() {
 
       <PropertyForm projects={projects.map((project) => ({ id: project.id, title: project.title }))} />
 
-      <TableCard title="Property Inventory">
+      <TableCard
+        title="Property Inventory"
+        contentClassName={properties.length > 4 ? "max-h-[26rem] overflow-y-auto" : undefined}
+      >
         <table className="w-full text-left text-sm">
           <thead className="text-zinc-500">
             <tr>
