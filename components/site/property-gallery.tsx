@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { shouldBypassImageOptimization } from "@/lib/image";
 
 function dedupeImages(images: string[]) {
   return Array.from(new Set(images.map((image) => image.trim()).filter(Boolean)));
@@ -62,6 +63,7 @@ export function PropertyGallery({
           sizes="(max-width: 1024px) 100vw, 60vw"
           className="object-cover"
           priority
+          unoptimized={shouldBypassImageOptimization(gallery[activeIndex])}
         />
 
         {gallery.length > 1 ? (
@@ -122,6 +124,7 @@ export function PropertyGallery({
                 fill
                 sizes="160px"
                 className="object-cover"
+                unoptimized={shouldBypassImageOptimization(image)}
               />
             </button>
           ))}

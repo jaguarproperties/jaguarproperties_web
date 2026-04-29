@@ -5,6 +5,7 @@ import { format } from "date-fns";
 
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
+import { shouldBypassImageOptimization } from "@/lib/image";
 
 export function BlogCard({ post }: { post: BlogPost }) {
   return (
@@ -16,6 +17,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="object-cover"
+          unoptimized={shouldBypassImageOptimization(post.coverImage)}
         />
       </div>
       <div className="p-6">

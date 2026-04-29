@@ -5,6 +5,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ImagePlus, Trash2, Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { shouldBypassImageOptimization } from "@/lib/image";
 
 type PropertyImageFieldsProps = {
   coverImage?: string | null;
@@ -118,6 +119,7 @@ export function PropertyImageFields({
   }
 
   const mainImageUrl = coverPreviewUrl ?? coverImage ?? null;
+  const shouldUnoptimizeMainImage = shouldBypassImageOptimization(mainImageUrl);
 
   return (
     <div className="space-y-6 rounded-[28px] border border-white/10 bg-black/10 p-5">
@@ -173,6 +175,7 @@ export function PropertyImageFields({
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
+                unoptimized={shouldUnoptimizeMainImage}
               />
             ) : (
               <div className="flex h-full items-center justify-center text-zinc-500">
@@ -228,6 +231,7 @@ export function PropertyImageFields({
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"
+                    unoptimized={shouldBypassImageOptimization(image)}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3 px-3 py-2">
@@ -253,7 +257,7 @@ export function PropertyImageFields({
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"
-                    unoptimized
+                    unoptimized={shouldBypassImageOptimization(preview.url)}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3 px-3 py-2">
