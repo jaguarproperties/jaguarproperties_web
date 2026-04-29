@@ -164,7 +164,6 @@ export function PropertyImageFields({
             accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
             className="hidden"
             onChange={handleCoverChange}
-            required={!coverImage}
           />
 
           <div className="relative aspect-[4/3] overflow-hidden rounded-[24px] border border-white/10 bg-white/5">

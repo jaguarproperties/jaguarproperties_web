@@ -1,3 +1,8 @@
+"use client";
+
+import { useCallback } from "react";
+import { useFormStatus } from "react-dom";
+
 import { createOrUpdateProperty } from "@/app/actions";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -5,6 +10,17 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PropertyImageFields } from "@/components/admin/property-image-fields";
+import { toast } from "@/components/ui/sonner";
+
+function SubmitButton({ isEditing }: { isEditing: boolean }) {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" className="w-fit" disabled={pending}>
+      {pending ? "Saving..." : isEditing ? "Update Property" : "Create Property"}
+    </Button>
+  );
+}
 
 export function PropertyForm({
   property,
@@ -13,9 +29,22 @@ export function PropertyForm({
   property?: Record<string, any>;
   projects: Array<{ id: string; title: string }>;
 }) {
+  const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+    const existingCoverImage = (form.elements.namedItem("existingCoverImage") as HTMLInputElement | null)?.value.trim();
+    const mainImageFileInput = form.elements.namedItem("mainImageFile") as HTMLInputElement | null;
+    const hasNewCoverImage = Boolean(mainImageFileInput?.files?.length);
+
+    if (!existingCoverImage && !hasNewCoverImage) {
+      event.preventDefault();
+      toast.error("Please upload a main image before saving this property.");
+    }
+  }, []);
+
   return (
     <form
       action={createOrUpdateProperty}
+      onSubmit={handleSubmit}
       encType="multipart/form-data"
       className="grid gap-4 rounded-[28px] border border-white/10 bg-white/5 p-6"
     >
@@ -61,9 +90,7 @@ export function PropertyForm({
           Featured
         </label>
       </div>
-      <Button type="submit" className="w-fit">
-        {property ? "Update Property" : "Create Property"}
-      </Button>
+      <SubmitButton isEditing={Boolean(property)} />
     </form>
   );
 }

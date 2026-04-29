@@ -11,11 +11,11 @@ function getToastConfig(params: URLSearchParams) {
   }
 
   if (params.get("created")) {
-    return { type: "success" as const, message: "Created successfully." };
+    return { type: "success" as const, message: "Saved successfully." };
   }
 
   if (params.get("updated")) {
-    return { type: "success" as const, message: "Updated successfully." };
+    return { type: "success" as const, message: "Saved successfully." };
   }
 
   if (params.get("deleted")) {
