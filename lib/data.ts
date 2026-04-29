@@ -474,7 +474,15 @@ function filterProperties<T extends {
   });
 }
 
-function mergePropertyRecords<T extends { slug: string }>(primary: T[], secondary: T[]) {
+function sortPropertiesByNewest<T extends { createdAt?: Date | string | null }>(properties: T[]) {
+  return [...properties].sort((left, right) => {
+    const leftTime = left.createdAt ? new Date(left.createdAt).getTime() : 0;
+    const rightTime = right.createdAt ? new Date(right.createdAt).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
+function mergePropertyRecords<T extends { slug: string; createdAt?: Date | string | null }>(primary: T[], secondary: T[]) {
   const merged = new Map<string, T>();
 
   for (const item of secondary) {
@@ -485,7 +493,7 @@ function mergePropertyRecords<T extends { slug: string }>(primary: T[], secondar
     merged.set(item.slug, item);
   }
 
-  return Array.from(merged.values());
+  return sortPropertiesByNewest(Array.from(merged.values()));
 }
 
 export async function getProperties(filters: PropertyFilterParams = {}) {
@@ -552,11 +560,18 @@ export async function getAdminCollections() {
         getSiteContent()
       ]);
 
-      return { projects, properties, posts, leads, applications, siteContent };
+      return {
+        projects,
+        properties: sortPropertiesByNewest(properties),
+        posts,
+        leads,
+        applications,
+        siteContent
+      };
     },
     {
       projects: demoProjects,
-      properties: demoProperties,
+      properties: [],
       posts: demoPosts.map((post) => ({ ...post, media: [] })),
       leads: demoLeads,
       applications: demoApplications,

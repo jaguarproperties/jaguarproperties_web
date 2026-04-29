@@ -491,6 +491,13 @@ export async function createOrUpdateProperty(formData: FormData) {
 
   const id = String(formData.get("id") || "").trim() || undefined;
   const title = String(formData.get("title") || "").trim();
+  const description = String(formData.get("description") || "").trim();
+  const city = String(formData.get("city") || "").trim();
+  const location = String(formData.get("location") || "").trim();
+  const address = String(formData.get("address") || "").trim();
+  const price = String(formData.get("price") || "").trim();
+  const status = String(formData.get("status") || "").trim();
+  const projectId = String(formData.get("projectId") || "").trim() || undefined;
   const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
   const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
   const mainImageFile = formData.get("mainImageFile");
@@ -512,22 +519,28 @@ export async function createOrUpdateProperty(formData: FormData) {
   const parsed = propertySchema.safeParse({
     id,
     title,
-    description: formData.get("description"),
-    city: formData.get("city"),
-    location: formData.get("location"),
-    address: formData.get("address"),
-    price: formData.get("price"),
+    description,
+    city,
+    location,
+    address,
+    price,
     bedrooms: formData.get("bedrooms") || undefined,
     bathrooms: formData.get("bathrooms") || undefined,
     areaSqFt: formData.get("areaSqFt") || undefined,
-    status: formData.get("status"),
+    status,
     featured: parseBoolean(formData.get("featured")),
     coverImage,
     gallery: normalizedGallery.join(", "),
-    projectId: formData.get("projectId") || undefined
+    projectId
   });
 
-  if (!parsed.success) throw new Error("Invalid property payload");
+  if (!parsed.success) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Invalid property payload", parsed.error.flatten().fieldErrors);
+    }
+
+    redirect(id ? `/admin/properties/${id}?error=1` : "/admin/properties?error=1");
+  }
 
   const previousProperty = parsed.data.id
     ? await prisma.property.findUnique({
@@ -545,9 +558,10 @@ export async function createOrUpdateProperty(formData: FormData) {
     projectId: parsed.data.projectId || null
   };
 
-  let propertyId = parsed.data.id;
+  const isExistingDatabaseProperty = Boolean(previousProperty);
+  let propertyId = isExistingDatabaseProperty ? parsed.data.id : undefined;
 
-  if (parsed.data.id) {
+  if (parsed.data.id && isExistingDatabaseProperty) {
     await prisma.property.update({
       where: { id: parsed.data.id },
       data
@@ -571,7 +585,7 @@ export async function createOrUpdateProperty(formData: FormData) {
   revalidatePath("/admin");
   revalidatePath("/admin/properties");
 
-  if (parsed.data.id) {
+  if (isExistingDatabaseProperty && propertyId) {
     redirect(`/admin/properties/${propertyId}?updated=1`);
   }
 
@@ -586,7 +600,11 @@ export async function deleteProperty(formData: FormData) {
     where: { id },
     select: { slug: true }
   });
-  await prisma.property.delete({ where: { id } });
+
+  if (property) {
+    await prisma.property.delete({ where: { id } });
+  }
+
   revalidateTag("properties");
   revalidatePath("/");
   revalidatePath("/properties");
@@ -594,6 +612,7 @@ export async function deleteProperty(formData: FormData) {
     revalidatePath(`/properties/${property.slug}`);
   }
   revalidatePath("/admin/properties");
+  redirect("/admin/properties?deleted=1");
 }
 
 export async function createOrUpdateBlogPost(formData: FormData) {

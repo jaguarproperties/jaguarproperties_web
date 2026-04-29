@@ -113,10 +113,7 @@ async function main() {
   });
 
   if (existingSiteContent) {
-    await prisma.siteContent.update({
-      where: { id: "default-site-content" },
-      data: siteContentSeed
-    });
+    console.log("Site content already exists; keeping the current backend record.");
   } else {
     await prisma.siteContent.create({
       data: {
@@ -185,122 +182,46 @@ async function main() {
     }
   });
 
-  await prisma.property.upsert({
-    where: { id: "seed-property-jaguar-greens" },
-    update: {
-      title: propertyShowcase[0].title,
-      slug: propertyShowcase[0].slug,
-      description: propertyShowcase[0].description,
-      city: propertyShowcase[0].city,
-      location: propertyShowcase[0].location,
-      address: propertyShowcase[0].address,
-      price: propertyShowcase[0].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[0].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[0].image,
-      gallery: propertyShowcase[0].gallery,
-      projectId: project.id
-    },
-    create: {
-      id: "seed-property-jaguar-greens",
-      title: propertyShowcase[0].title,
-      slug: propertyShowcase[0].slug,
-      description: propertyShowcase[0].description,
-      city: propertyShowcase[0].city,
-      location: propertyShowcase[0].location,
-      address: propertyShowcase[0].address,
-      price: propertyShowcase[0].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[0].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[0].image,
-      gallery: propertyShowcase[0].gallery,
-      projectId: project.id
-    }
-  });
-
-  await prisma.property.upsert({
-    where: { id: "seed-property-jaguar-horizon" },
-    update: {
-      title: propertyShowcase[1].title,
-      slug: propertyShowcase[1].slug,
-      description: propertyShowcase[1].description,
-      city: propertyShowcase[1].city,
-      location: propertyShowcase[1].location,
-      address: propertyShowcase[1].address,
-      price: propertyShowcase[1].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[1].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[1].image,
-      gallery: propertyShowcase[1].gallery,
-      projectId: project.id
-    },
-    create: {
-      id: "seed-property-jaguar-horizon",
-      title: propertyShowcase[1].title,
-      slug: propertyShowcase[1].slug,
-      description: propertyShowcase[1].description,
-      city: propertyShowcase[1].city,
-      location: propertyShowcase[1].location,
-      address: propertyShowcase[1].address,
-      price: propertyShowcase[1].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[1].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[1].image,
-      gallery: propertyShowcase[1].gallery,
-      projectId: project.id
-    }
-  });
-
-  await prisma.property.upsert({
-    where: { id: "seed-property-jaguar-urban-reserve" },
-    update: {
-      title: propertyShowcase[2].title,
-      slug: propertyShowcase[2].slug,
-      description: propertyShowcase[2].description,
-      city: propertyShowcase[2].city,
-      location: propertyShowcase[2].location,
-      address: propertyShowcase[2].address,
-      price: propertyShowcase[2].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[2].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[2].image,
-      gallery: propertyShowcase[2].gallery,
-      projectId: project.id
-    },
-    create: {
-      id: "seed-property-jaguar-urban-reserve",
-      title: propertyShowcase[2].title,
-      slug: propertyShowcase[2].slug,
-      description: propertyShowcase[2].description,
-      city: propertyShowcase[2].city,
-      location: propertyShowcase[2].location,
-      address: propertyShowcase[2].address,
-      price: propertyShowcase[2].price,
-      bedrooms: null,
-      bathrooms: null,
-      areaSqFt: propertyShowcase[2].areaSqFt,
-      status: PropertyStatus.AVAILABLE,
-      featured: true,
-      coverImage: propertyShowcase[2].image,
-      gallery: propertyShowcase[2].gallery,
-      projectId: project.id
-    }
-  });
+  await Promise.all(
+    propertyShowcase.map((entry, index) =>
+      prisma.property.upsert({
+        where: { slug: entry.slug },
+        update: {
+          title: entry.title,
+          description: entry.description,
+          city: entry.city,
+          location: entry.location,
+          address: entry.address,
+          price: entry.price,
+          bedrooms: null,
+          bathrooms: null,
+          areaSqFt: entry.areaSqFt,
+          status: PropertyStatus.AVAILABLE,
+          featured: index < 3,
+          coverImage: entry.image,
+          gallery: entry.gallery,
+          projectId: entry.city === "Bengaluru" ? project.id : null
+        },
+        create: {
+          title: entry.title,
+          slug: entry.slug,
+          description: entry.description,
+          city: entry.city,
+          location: entry.location,
+          address: entry.address,
+          price: entry.price,
+          bedrooms: null,
+          bathrooms: null,
+          areaSqFt: entry.areaSqFt,
+          status: PropertyStatus.AVAILABLE,
+          featured: index < 3,
+          coverImage: entry.image,
+          gallery: entry.gallery,
+          projectId: entry.city === "Bengaluru" ? project.id : null
+        }
+      })
+    )
+  );
 
   await prisma.blogPost.upsert({
     where: { id: "seed-post-jaguar-city-growth-drivers" },

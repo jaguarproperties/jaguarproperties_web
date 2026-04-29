@@ -3,6 +3,12 @@ import { cache } from "react";
 
 import { prisma } from "@/lib/prisma";
 
+function passthroughCache<CachedFunction extends Function>(fn: CachedFunction): CachedFunction {
+  return fn;
+}
+
+const cacheFn = (typeof cache === "function" ? cache : passthroughCache) as typeof cache;
+
 export const permissionList = [
   "canManageUsers",
   "canManageRoles",
@@ -280,7 +286,7 @@ function extractPermissionsFromLegacyRole(role: LegacyRolePermissionRecord | nul
   return merged.length > 0 ? merged : fallback;
 }
 
-const getRolePermissionsCached = cache(async (role: UserRole): Promise<Permission[]> => {
+const getRolePermissionsCached = cacheFn(async (role: UserRole): Promise<Permission[]> => {
   if (!process.env.DATABASE_URL) {
     return defaultRolePermissions[role] ?? [];
   }
