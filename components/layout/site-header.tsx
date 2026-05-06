@@ -4,6 +4,7 @@ import Image from "next/image";
 import { LanguageSelector } from "@/components/site/language-selector";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Translate } from "@/components/site/translate";
+import { siteMedia } from "@/lib/site-media";
 
 const navItems = [
   { href: "/", id: "nav.home", label: "Home" },
@@ -28,7 +29,7 @@ export async function SiteHeader() {
       <div className="container flex min-h-[88px] items-center justify-between gap-6 py-3 md:min-h-[96px]">
         <Link href="/" className="flex items-center">
           <Image
-            src="/images/jaguar-properties-logo.svg"
+            src={siteMedia.jaguarPropertiesLogo}
             alt="Jaguar Properties"
             width={935}
             height={424}

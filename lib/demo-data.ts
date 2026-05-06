@@ -1,12 +1,13 @@
 import { LeadStatus, ProjectStatus, PropertyStatus } from "@prisma/client";
 import { propertyShowcase } from "@/lib/property-showcase";
+import { siteMedia } from "@/lib/site-media";
 
 export const demoSiteContent = {
   id: "demo-site-content",
   heroTitle: "Jaguar City opens a new chapter of plotted living in North Bengaluru.",
   heroSubtitle:
     "A 190-hectare integrated township in Doddaballapura with premium plots, modern infrastructure, community amenities, and strong long-term investment potential near Bengaluru's airport growth corridor.",
-  heroImage: "/images/projects/jaguar-city-cover.png",
+  heroImage: siteMedia.jaguarCityCover,
   homePrimaryCtaLabel: "View Properties",
   homePrimaryCtaHref: "/properties",
   homeSecondaryCtaLabel: "Contact Us",
@@ -104,11 +105,11 @@ export const demoProjects = [
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
-    coverImage: "/images/projects/jaguar-city.jpeg",
+    coverImage: siteMedia.jaguarCity,
     gallery: [
-      "/images/projects/jaguar-city.jpeg",
-      "/images/projects/jaguar-city-community.jpeg",
-      "/images/projects/jaguar-city-growth.jpeg"
+      siteMedia.jaguarCity,
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityGrowth
     ],
     seoTitle: "Jaguar City | Integrated Township in Doddaballapura",
     seoDescription: "Explore Jaguar City, a 190-hectare integrated plotted township in North Bengaluru.",
@@ -149,7 +150,7 @@ export const demoPosts = [
       "From KWIN City to the airport-led industrial belt, Jaguar City is positioned close to major catalysts shaping Doddaballapura's future.",
     content:
       "The Jaguar City brochure highlights several regional growth drivers around Doddaballapura and Devanahalli. These include KWIN City, a planned 5,800-acre knowledge and innovation district; the Information Technology Investment Region spanning 12,000 acres; and the Foxconn manufacturing investment in the wider zone. Together, they strengthen the long-term case for plotted developments positioned near North Bengaluru's evolving infrastructure spine.",
-    coverImage: "/images/projects/jaguar-city-growth.jpeg",
+    coverImage: siteMedia.jaguarCityGrowth,
     seoTitle: "Jaguar City Growth Corridor",
     seoDescription:
       "A look at KWIN City, ITIR, Foxconn, and the broader North Bengaluru momentum around Jaguar City.",
@@ -166,7 +167,7 @@ export const demoPosts = [
       "The brochure points to KIADB's industrial area and Science City pipeline as important context for buyers tracking future demand in the region.",
     content:
       "According to the Jaguar City presentation, the KIADB Doddaballapur Industrial Area extends across more than 900 acres in multiple phases near Kempegowda International Airport. The region already supports industrial activity, textile parks, and the upcoming Science City. For plotted buyers, that broader employment and infrastructure ecosystem can be an important long-term demand signal.",
-    coverImage: "/images/projects/jaguar-city-community.jpeg",
+    coverImage: siteMedia.jaguarCityCommunity,
     seoTitle: "KIADB Doddaballapura and Jaguar City",
     seoDescription:
       "How the KIADB industrial area and surrounding infrastructure strengthen the Doddaballapura case.",
@@ -183,7 +184,7 @@ export const demoPosts = [
       "The brochure highlights amenities such as a clubhouse, tennis court, children's play area, basketball, park and jogging space, and Jaguar International School.",
     content:
       "Jaguar City's presentation positions the township as more than a plotted layout. It calls out lifestyle and family infrastructure including a clubhouse, tennis court, children's play area, basketball court, park and jogging area, and Jaguar International School. That amenity-led positioning supports both everyday livability and long-term value perception.",
-    coverImage: "/images/projects/jaguar-city-cover.png",
+    coverImage: siteMedia.jaguarCityCover,
     seoTitle: "Jaguar City Amenities Overview",
     seoDescription:
       "A summary of the township amenities highlighted in the Jaguar City brochure.",

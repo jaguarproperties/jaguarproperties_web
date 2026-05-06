@@ -1,3 +1,5 @@
+import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
+
 export function shouldBypassImageOptimization(src: string | null | undefined) {
   if (!src) return false;
 
@@ -25,7 +27,7 @@ export function resolveImageSrc(src: string | null | undefined) {
   }
 
   if (!normalizedSrc.startsWith("/") && !normalizedSrc.includes("://") && /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(normalizedSrc)) {
-    return `/uploads/properties/${normalizedSrc}`;
+    return `${SITE_MEDIA_BASE_PATH}/${normalizedSrc}`;
   }
 
   return normalizedSrc;

@@ -15,6 +15,7 @@ import { getCareerBySlug } from "@/lib/careers";
 import { replaceHolidayCalendar } from "@/lib/holidays";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
+import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
 import { slugify, safeSplitGallery } from "@/lib/utils";
 import {
   canAccessLeads,
@@ -131,12 +132,8 @@ function getHrmLetterheadStorageDir() {
   return path.join(process.cwd(), "public", "uploads", "hrm-letterheads");
 }
 
-function getPropertyImageStorageDir() {
-  return path.join(process.cwd(), "public", "uploads", "properties");
-}
-
-function getNewsImageStorageDir() {
-  return path.join(process.cwd(), "public", "uploads", "news");
+function getSiteMediaStorageDir() {
+  return path.join(process.cwd(), "public", "uploads", "site-media");
 }
 
 function isAllowedResumeType(file: File) {
@@ -162,45 +159,32 @@ function sanitizeFilenameSegment(value: string) {
 }
 
 async function savePropertyImage(file: File, propertyTitle: string) {
-  if (!isAllowedPropertyImageType(file)) {
-    throw new Error("Please upload JPG, PNG, WebP, or GIF images for properties.");
-  }
-
-  if (file.size > 8 * 1024 * 1024) {
-    throw new Error("Property images must be smaller than 8 MB each.");
-  }
-
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const extension = path.extname(file.name) || ".jpg";
-  const storageDir = getPropertyImageStorageDir();
-  const filename = `${sanitizeFilenameSegment(propertyTitle)}-${randomUUID()}${extension.toLowerCase()}`;
-
-  await mkdir(storageDir, { recursive: true });
-  await writeFile(path.join(storageDir, filename), buffer);
-
-  return `/uploads/properties/${filename}`;
+  return saveSiteImage(file, propertyTitle, "properties");
 }
 
 async function saveNewsImage(file: File, articleTitle: string) {
+  return saveSiteImage(file, articleTitle, "news");
+}
+
+async function saveSiteImage(file: File, baseName: string, contextLabel: string) {
   if (!isAllowedPropertyImageType(file)) {
-    throw new Error("Please upload JPG, PNG, WebP, or GIF images for news articles.");
+    throw new Error(`Please upload JPG, PNG, WebP, or GIF images for ${contextLabel}.`);
   }
 
   if (file.size > 8 * 1024 * 1024) {
-    throw new Error("News article images must be smaller than 8 MB each.");
+    throw new Error(`${contextLabel[0].toUpperCase()}${contextLabel.slice(1)} images must be smaller than 8 MB each.`);
   }
 
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
   const extension = path.extname(file.name) || ".jpg";
-  const storageDir = getNewsImageStorageDir();
-  const filename = `${sanitizeFilenameSegment(articleTitle)}-${randomUUID()}${extension.toLowerCase()}`;
+  const storageDir = getSiteMediaStorageDir();
+  const filename = `${sanitizeFilenameSegment(baseName)}-${randomUUID()}${extension.toLowerCase()}`;
 
   await mkdir(storageDir, { recursive: true });
   await writeFile(path.join(storageDir, filename), buffer);
 
-  return `/uploads/news/${filename}`;
+  return `${SITE_MEDIA_BASE_PATH}/${filename}`;
 }
 
 function dedupeImageList(images: string[]) {
@@ -787,11 +771,18 @@ export async function deleteJobPosting(formData: FormData) {
 export async function updateSiteContent(formData: FormData) {
   await requireRoleAccess(canEditContent);
   ensureDatabase();
+  const existingHeroImage = String(formData.get("existingHeroImage") || "").trim();
+  const heroImageFile = formData.get("heroImageFile");
+  const heroImage =
+    heroImageFile instanceof File && heroImageFile.size > 0
+      ? await saveSiteImage(heroImageFile, "homepage-hero", "homepage")
+      : existingHeroImage;
+
   const parsed = siteContentSchema.safeParse({
     id: formData.get("id") || undefined,
     heroTitle: formData.get("heroTitle"),
     heroSubtitle: formData.get("heroSubtitle"),
-    heroImage: formData.get("heroImage"),
+    heroImage,
     homePrimaryCtaLabel: formData.get("homePrimaryCtaLabel"),
     homePrimaryCtaHref: formData.get("homePrimaryCtaHref"),
     homeSecondaryCtaLabel: formData.get("homeSecondaryCtaLabel"),

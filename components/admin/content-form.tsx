@@ -1,5 +1,6 @@
 import { updateSiteContent } from "@/app/actions";
 import { PortfolioGalleryEditor } from "@/components/admin/portfolio-gallery-editor";
+import { SingleImageUploadField } from "@/components/admin/single-image-upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -42,7 +43,7 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
   ];
 
   return (
-    <form action={updateSiteContent} className="space-y-6">
+    <form action={updateSiteContent} encType="multipart/form-data" className="space-y-6">
       <input type="hidden" name="id" defaultValue={content?.id} />
 
       <div className="rounded-[28px] border border-primary/20 bg-primary/10 p-5">
@@ -71,16 +72,15 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
         <CmsHint>The homepage background image is the large image behind the main banner text.</CmsHint>
         <Input name="heroTitle" placeholder="Hero title" defaultValue={content?.heroTitle} required />
         <Textarea name="heroSubtitle" placeholder="Hero subtitle" defaultValue={content?.heroSubtitle} required />
-        <div className="space-y-3">
-          <Input
-            id="hero-image"
-            name="heroImage"
-            placeholder="Homepage background image path or URL"
-            defaultValue={content?.heroImage}
-            required
-          />
-          <CmsHint>Use a static path like `/images/example.jpg` or a full image URL.</CmsHint>
-        </div>
+        <SingleImageUploadField
+          existingImage={content?.heroImage}
+          existingInputName="existingHeroImage"
+          fileInputName="heroImageFile"
+          label="Homepage background image"
+          description="Saved into the shared website media folder and used behind the hero section."
+          emptyText="No homepage image selected"
+          alt="Homepage background image preview"
+        />
         <div className="grid gap-4 md:grid-cols-2">
           <Input
             name="homePrimaryCtaLabel"

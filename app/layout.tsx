@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/components/layout/language-provider";
+import { siteMedia } from "@/lib/site-media";
 
 export const metadata: Metadata = {
   title: {
@@ -16,8 +17,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
   icons: {
-    icon: "/images/jaguar-properties-logo.svg",
-    apple: "/images/jaguar-properties-logo.svg"
+    icon: siteMedia.jaguarPropertiesLogo,
+    apple: siteMedia.jaguarPropertiesLogo
   }
 };
 

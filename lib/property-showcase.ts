@@ -1,3 +1,5 @@
+import { siteMedia } from "@/lib/site-media";
+
 export type PropertyShowcaseEntry = {
   slug: string;
   title: string;
@@ -58,10 +60,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to SH-74",
       "Doddaballapura towards Nelamangala connectivity"
     ],
-    image: "/images/projects/jaguar-city.jpeg",
+    image: siteMedia.jaguarCity,
     gallery: [
-      "/images/projects/jaguar-city-growth.jpeg",
-      "/images/projects/jaguar-city-cover.png"
+      siteMedia.jaguarCityGrowth,
+      siteMedia.jaguarCityCover
     ]
   },
   {
@@ -89,10 +91,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to Jaguar City on NH-648",
       "Located at Doddaballapura Town, Bangalore North"
     ],
-    image: "/images/projects/emirates-city.jpeg",
+    image: siteMedia.emiratesCity,
     gallery: [
-      "/images/projects/jaguar-city-community.jpeg",
-      "/images/projects/jaguar-city-cover.png"
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityCover
     ]
   },
   {
@@ -120,10 +122,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to SH-09",
       "Located at Doddaballapura Town, Bangalore North"
     ],
-    image: "/images/projects/jaguar-city.jpeg",
+    image: siteMedia.jaguarCity,
     gallery: [
-      "/images/projects/jaguar-city-growth.jpeg",
-      "/images/projects/jaguar-city-community.jpeg"
+      siteMedia.jaguarCityGrowth,
+      siteMedia.jaguarCityCommunity
     ]
   },
   {
@@ -151,10 +153,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to Davanagere City",
       "Regional Karnataka growth opportunity"
     ],
-    image: "/images/projects/jaguar-city.jpeg",
+    image: siteMedia.jaguarCity,
     gallery: [
-      "/images/brand/jaguar-brochure-cover.png",
-      "/images/projects/jaguar-city-cover.png"
+      siteMedia.jaguarBrochureCover,
+      siteMedia.jaguarCityCover
     ]
   },
   {
@@ -182,10 +184,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Approx. 6000 to 12000 sq.ft. sizes",
       "Connects to Dabaspet via National Highway-648"
     ],
-    image: "/images/projects/jaguar-city-community.jpeg",
+    image: siteMedia.jaguarCityCommunity,
     gallery: [
-      "/images/projects/jaguar-city-community.jpeg",
-      "/images/projects/jaguar-city-growth.jpeg"
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityGrowth
     ]
   },
   {
@@ -213,10 +215,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Located inside Jaguar City Township",
       "Attached to NH-648, Doddaballapura"
     ],
-    image: "/images/projects/jaguar-city-cover.png",
+    image: siteMedia.jaguarCityCover,
     gallery: [
-      "/images/projects/jaguar-city-cover.png",
-      "/images/brand/jaguar-brochure-cover.png"
+      siteMedia.jaguarCityCover,
+      siteMedia.jaguarBrochureCover
     ]
   },
   {
@@ -244,10 +246,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to State Highway-09",
       "Located at Doddaballapura, Bangalore North"
     ],
-    image: "/images/projects/jaguar-city-growth.jpeg",
+    image: siteMedia.jaguarCityGrowth,
     gallery: [
-      "/images/projects/jaguar-city-growth.jpeg",
-      "/images/brand/jaguar-brochure-cover.png"
+      siteMedia.jaguarCityGrowth,
+      siteMedia.jaguarBrochureCover
     ]
   },
   {
@@ -275,10 +277,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Designed for end-users and investors",
       "City-connected road access"
     ],
-    image: "/images/projects/jaguar-city-community.jpeg",
+    image: siteMedia.jaguarCityCommunity,
     gallery: [
-      "/images/projects/jaguar-city-community.jpeg",
-      "/images/projects/jaguar-city-cover.png"
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityCover
     ]
   },
   {
@@ -306,10 +308,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Suitable for long-term land buyers",
       "North Bengaluru growth exposure"
     ],
-    image: "/images/projects/jaguar-city-growth.jpeg",
+    image: siteMedia.jaguarCityGrowth,
     gallery: [
-      "/images/projects/jaguar-city-growth.jpeg",
-      "/images/projects/jaguar-city-community.jpeg"
+      siteMedia.jaguarCityGrowth,
+      siteMedia.jaguarCityCommunity
     ]
   },
   {
@@ -337,10 +339,10 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Access to the Doddaballapura corridor",
       "Lifestyle and investment potential"
     ],
-    image: "/images/brand/jaguar-brochure-cover.png",
+    image: siteMedia.jaguarBrochureCover,
     gallery: [
-      "/images/brand/jaguar-brochure-cover.png",
-      "/images/projects/jaguar-city-cover.png"
+      siteMedia.jaguarBrochureCover,
+      siteMedia.jaguarCityCover
     ]
   }
 ];

@@ -97,7 +97,7 @@ export function PortfolioGalleryEditor({ defaultValue }: { defaultValue?: string
           Add gallery image
         </Button>
         <p className="text-xs leading-6 text-zinc-400">
-          Each card updates the public Portfolio page. Use a static path like `/images/example.jpg` or a full URL, then add the title and description.
+          Each card updates the public Portfolio page. Prefer the shared media folder path like `/uploads/site-media/example.jpg` or use a full URL, then add the title and description.
         </p>
       </div>
     </div>
