@@ -138,9 +138,9 @@ async function main() {
       priceRange: "Price on request",
       status: ProjectStatus.LAUNCHING,
       featured: true,
-      coverImage: "/images/projects/jaguar-city-cover.png",
+      coverImage: "/images/projects/jaguar-city.jpeg",
       gallery: [
-        "/images/projects/jaguar-city-cover.png",
+        "/images/projects/jaguar-city.jpeg",
         "/images/projects/jaguar-city-community.jpeg",
         "/images/projects/jaguar-city-growth.jpeg"
       ],
@@ -162,9 +162,9 @@ async function main() {
       priceRange: "Price on request",
       status: ProjectStatus.LAUNCHING,
       featured: true,
-      coverImage: "/images/projects/jaguar-city-cover.png",
+      coverImage: "/images/projects/jaguar-city.jpeg",
       gallery: [
-        "/images/projects/jaguar-city-cover.png",
+        "/images/projects/jaguar-city.jpeg",
         "/images/projects/jaguar-city-community.jpeg",
         "/images/projects/jaguar-city-growth.jpeg"
       ],

@@ -58,7 +58,7 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to SH-74",
       "Doddaballapura towards Nelamangala connectivity"
     ],
-    image: "/images/projects/jaguar-city-growth.jpeg",
+    image: "/images/projects/jaguar-city.jpeg",
     gallery: [
       "/images/projects/jaguar-city-growth.jpeg",
       "/images/projects/jaguar-city-cover.png"
@@ -89,7 +89,7 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to Jaguar City on NH-648",
       "Located at Doddaballapura Town, Bangalore North"
     ],
-    image: "/images/projects/jaguar-city-community.jpeg",
+    image: "/images/projects/emirates-city.jpeg",
     gallery: [
       "/images/projects/jaguar-city-community.jpeg",
       "/images/projects/jaguar-city-cover.png"
@@ -120,7 +120,7 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to SH-09",
       "Located at Doddaballapura Town, Bangalore North"
     ],
-    image: "/images/projects/jaguar-city-growth.jpeg",
+    image: "/images/projects/jaguar-city.jpeg",
     gallery: [
       "/images/projects/jaguar-city-growth.jpeg",
       "/images/projects/jaguar-city-community.jpeg"
@@ -151,7 +151,7 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
       "Attached to Davanagere City",
       "Regional Karnataka growth opportunity"
     ],
-    image: "/images/brand/jaguar-brochure-cover.png",
+    image: "/images/projects/jaguar-city.jpeg",
     gallery: [
       "/images/brand/jaguar-brochure-cover.png",
       "/images/projects/jaguar-city-cover.png"
