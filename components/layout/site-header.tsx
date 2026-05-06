@@ -5,6 +5,7 @@ import { LanguageSelector } from "@/components/site/language-selector";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Translate } from "@/components/site/translate";
 import { siteMedia } from "@/lib/site-media";
+import { shouldBypassImageOptimization } from "@/lib/image";
 
 const navItems = [
   { href: "/", id: "nav.home", label: "Home" },
@@ -35,6 +36,7 @@ export async function SiteHeader() {
             height={424}
             priority
             className="h-auto w-auto max-h-[64px] object-contain md:max-h-[78px]"
+            unoptimized={shouldBypassImageOptimization(siteMedia.jaguarPropertiesLogo)}
           />
         </Link>
         <nav className="hidden items-center gap-6 lg:flex xl:gap-8">

@@ -6,6 +6,7 @@ import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/data";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 import { parseGalleryItems, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
@@ -31,7 +32,13 @@ export default async function PortfolioPage() {
           {portfolioImages.map((item, index) => (
             <Card key={item.image} className="overflow-hidden">
               <div className="relative h-[420px]">
-                <Image src={item.image} alt={`Jaguar portfolio ${index + 1}`} fill className="object-cover" />
+                <Image
+                  src={resolveImageSrc(item.image)}
+                  alt={`Jaguar portfolio ${index + 1}`}
+                  fill
+                  className="object-cover"
+                  unoptimized={shouldBypassImageOptimization(resolveImageSrc(item.image))}
+                />
               </div>
               <div className="p-6">
                 <h3 className="font-display text-3xl text-foreground dark:text-white">{item.title}</h3>

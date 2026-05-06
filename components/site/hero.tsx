@@ -5,6 +5,7 @@ import { Building2, MapPin, Sparkles } from "lucide-react";
 import { Translate } from "@/components/site/translate";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
+import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 
 export function Hero({
   title,
@@ -30,7 +31,8 @@ export function Hero({
     price: string;
   };
 }) {
-  const isAnimatedAsset = /\.(gif|webp|apng)(\?.*)?$/i.test(image);
+  const resolvedImage = resolveImageSrc(image);
+  const isAnimatedAsset = /\.(gif|webp|apng)(\?.*)?$/i.test(resolvedImage);
 
   return (
     <section className="relative isolate overflow-hidden bg-[#12110f]">
@@ -51,17 +53,18 @@ export function Hero({
       />
       {isAnimatedAsset ? (
         <img
-          src={image}
+          src={resolvedImage}
           alt="Luxury real estate development"
           className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-screen"
         />
       ) : (
         <Image
-          src={image}
+          src={resolvedImage}
           alt="Luxury real estate development"
           fill
           className="object-cover opacity-32 mix-blend-screen"
           priority
+          unoptimized={shouldBypassImageOptimization(resolvedImage)}
         />
       )}
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,13,12,0.86)_0%,rgba(20,19,17,0.66)_45%,rgba(30,27,24,0.42)_100%)]" />
