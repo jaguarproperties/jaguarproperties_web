@@ -1,23 +1,32 @@
 export function shouldBypassImageOptimization(src: string | null | undefined) {
   if (!src) return false;
 
-  return src.startsWith("blob:") || src.startsWith("data:") || src.startsWith("/uploads/") || src.startsWith("/media/");
+  const normalizedSrc = src.trim();
+
+  return (
+    normalizedSrc.startsWith("blob:") ||
+    normalizedSrc.startsWith("data:") ||
+    normalizedSrc.startsWith("/uploads/") ||
+    normalizedSrc.startsWith("/media/")
+  );
 }
 
 export function resolveImageSrc(src: string | null | undefined) {
   if (!src) return "";
 
-  if (src.startsWith("/uploads/")) {
-    return `/media/${src.slice("/uploads/".length)}`;
+  const normalizedSrc = src.trim();
+
+  if (normalizedSrc.startsWith("/uploads/")) {
+    return normalizedSrc;
   }
 
-  if (src.startsWith("uploads/")) {
-    return `/media/${src.slice("uploads/".length)}`;
+  if (normalizedSrc.startsWith("uploads/")) {
+    return `/${normalizedSrc}`;
   }
 
-  if (!src.startsWith("/") && !src.includes("://") && /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(src)) {
-    return `/media/properties/${src}`;
+  if (!normalizedSrc.startsWith("/") && !normalizedSrc.includes("://") && /\.(avif|gif|jpe?g|png|svg|webp)$/i.test(normalizedSrc)) {
+    return `/uploads/properties/${normalizedSrc}`;
   }
 
-  return src;
+  return normalizedSrc;
 }
