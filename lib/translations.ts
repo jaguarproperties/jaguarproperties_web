@@ -46,7 +46,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "contact.eyebrow": "Contact",
     "contact.title": "Discuss a residence, an investment, or a collaboration.",
     "contact.description": "Share your requirements and our advisory team will guide you to the right Jaguar opportunity.",
-    "contact.offices": "Offices",
+    "contact.offices": "OUR BRANCHES",
     "contact.connect": "Connect",
     "footer.adminLogin": "Admin Login",
     "footer.copyright": "© 2026 JAGUAR PROPERTIES. Premium real estate developer for Bengaluru, Qatar, and Dubai.",

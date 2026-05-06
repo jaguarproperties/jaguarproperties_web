@@ -8,6 +8,10 @@ import { resolveSiteContent } from "@/lib/site-content";
 
 export async function SiteFooter() {
   const content = resolveSiteContent(await getSiteContent());
+  const officeBranches = content.officeAddress
+    .split(/\n\s*\n/)
+    .map((branch) => branch.split("\n").map((line) => line.trim()).filter(Boolean))
+    .filter((branch) => branch.length > 0);
   const socialLinks = [
     { label: "Instagram", href: content?.instagramUrl, icon: Instagram },
     { label: "LinkedIn", href: content?.linkedinUrl, icon: Linkedin },
@@ -27,11 +31,20 @@ export async function SiteFooter() {
         </div>
         <div className="rounded-[28px] border border-black/10 bg-white/40 p-6 dark:border-white/10 dark:bg-white/5">
           <p className="text-sm uppercase tracking-[0.25em] text-primary">
-            <Translate id="contact.offices" defaultText="Offices" />
+            <Translate id="contact.offices" defaultText="OUR BRANCHES" />
           </p>
-          <div className="mt-4 whitespace-pre-line text-sm leading-7 text-zinc-700 dark:text-zinc-300">
-            {content.officeAddress}
-          </div>
+          <ul className="mt-4 space-y-5 text-sm leading-7 text-zinc-700 dark:text-zinc-300">
+            {officeBranches.map((branch, index) => (
+              <li key={`${branch[0]}-${index}`} className="flex gap-3">
+                <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                <div className="space-y-1">
+                  {branch.map((line) => (
+                    <p key={line}>{line}</p>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
         <div className="rounded-[28px] border border-black/10 bg-white/40 p-6 dark:border-white/10 dark:bg-white/5">
           <p className="text-sm uppercase tracking-[0.25em] text-primary">

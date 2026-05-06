@@ -30,7 +30,7 @@ async function syncDefaultAdminUser({
     role: "ADMIN" as const,
     name: "Jaguar Admin",
     department: "Administration",
-    defaultWorkType: "OFFICE" as const,
+    defaultWorkType: "BRANCHES" as const,
     casualLeaveBalance: 0,
     sickLeaveBalance: 0,
     paidLeaveBalance: 24,
