@@ -21,6 +21,36 @@ import { TableCard } from "@/components/admin/table-card";
 import { Button } from "@/components/ui/button";
 import { AttendanceMarker } from "@/components/admin/attendance-marker";
 
+const emptyDashboardOverview = {
+  leads: 0,
+  properties: 0,
+  projects: 0,
+  posts: 0,
+  applications: 0,
+  jobs: 0,
+  openings: 0
+};
+
+const emptyDashboardPreview = {
+  recentLeads: [] as Array<{ id: string; name: string; email: string; phone: string }>,
+  leadCount: 0,
+  siteContent: {
+    heroTitle: "Website content unavailable",
+    contactEmail: "Unavailable",
+    contactPhone: "Unavailable",
+    footerBlurb: "Dashboard is showing fallback content because the database is currently unreachable."
+  },
+  jobPostingCount: 0,
+  recentJobPostings: [] as Array<{
+    id: string;
+    title: string;
+    department: string;
+    location: string;
+    openings: number;
+    type: string;
+  }>
+};
+
 export default async function AdminDashboardPage() {
   const session = await auth();
   const role = session?.user?.role ?? "ADMIN";
@@ -48,12 +78,26 @@ export default async function AdminDashboardPage() {
     canViewApplications(role)
   ]);
   const [overview, dashboardPreview, attendanceSummary, todayRecord] = await Promise.all([
-    getDashboardOverview(),
-    getAdminDashboardPreview(),
+    getDashboardOverview().catch((error) => {
+      console.warn("Falling back to empty dashboard overview because the database is unreachable.", error);
+      return emptyDashboardOverview;
+    }),
+    getAdminDashboardPreview().catch((error) => {
+      console.warn("Falling back to empty dashboard preview because the database is unreachable.", error);
+      return emptyDashboardPreview;
+    }),
     canAccessAttendancePermission && session?.user
-      ? getAttendanceSummary({ id: session.user.id, role: session.user.role })
+      ? getAttendanceSummary({ id: session.user.id, role: session.user.role }).catch((error) => {
+          console.warn("Attendance summary is unavailable because the database is unreachable.", error);
+          return null;
+        })
       : Promise.resolve(null),
-    canAccessAttendancePermission && session?.user ? getTodayAttendanceForUser(session.user.id) : Promise.resolve(null)
+    canAccessAttendancePermission && session?.user
+      ? getTodayAttendanceForUser(session.user.id).catch((error) => {
+          console.warn("Today's attendance record is unavailable because the database is unreachable.", error);
+          return null;
+        })
+      : Promise.resolve(null)
   ]);
   const quickActions = [
     {

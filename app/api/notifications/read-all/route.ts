@@ -11,6 +11,14 @@ export async function POST() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await markAllNotificationsRead(session.user.id);
-  return NextResponse.json({ success: true });
+  try {
+    await markAllNotificationsRead(session.user.id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.warn("Notifications read-all fallback: database is unavailable.", error);
+    return NextResponse.json(
+      { success: false, error: "Notifications are temporarily unavailable." },
+      { status: 503 }
+    );
+  }
 }

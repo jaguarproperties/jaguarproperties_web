@@ -1,18 +1,21 @@
 import { unstable_cache } from "next/cache";
 
+import { isDatabaseEnabled } from "@/lib/database-url";
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
 import { allowedPropertyTitles } from "@/lib/property-showcase";
+import { listAllTestimonials, listPublishedTestimonials } from "@/lib/testimonials";
 import {
   demoApplications,
   demoLeads,
   demoPosts,
   demoProjects,
   demoProperties,
-  demoSiteContent
+  demoSiteContent,
+  demoTestimonials
 } from "@/lib/demo-data";
 
-const hasDatabase = Boolean(process.env.DATABASE_URL);
+const hasDatabase = isDatabaseEnabled() && Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL);
 
 export type AdminUserRecord = {
   id: string;
@@ -158,6 +161,16 @@ const getCachedBlogPosts = unstable_cache(
     ),
   ["blog-posts"],
   { revalidate: 300, tags: ["posts"] }
+);
+
+const getCachedTestimonials = unstable_cache(
+  async () =>
+    withFallback(
+      () => listPublishedTestimonials(),
+      demoTestimonials.filter((testimonial) => testimonial.published)
+    ),
+  ["testimonials"],
+  { revalidate: 300, tags: ["testimonials"] }
 );
 
 const getCachedProperties = unstable_cache(
@@ -569,6 +582,10 @@ export async function getBlogPosts() {
   return getCachedBlogPosts();
 }
 
+export async function getTestimonials() {
+  return getCachedTestimonials();
+}
+
 export async function getBlogPostBySlug(slug: string) {
   return unstable_cache(
     async () =>
@@ -615,10 +632,13 @@ export async function getAdminCollections() {
         getSiteContent()
       ]);
 
+      const testimonials = await listAllTestimonials();
+
       return {
         projects,
         properties: restrictToAllowedProperties(properties),
         posts,
+        testimonials,
         leads,
         applications,
         siteContent
@@ -628,6 +648,7 @@ export async function getAdminCollections() {
       projects: demoProjects,
       properties: [],
       posts: demoPosts.map((post) => ({ ...post, media: [] })),
+      testimonials: demoTestimonials,
       leads: demoLeads,
       applications: demoApplications,
       siteContent: demoSiteContent

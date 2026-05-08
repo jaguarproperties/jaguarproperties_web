@@ -11,11 +11,19 @@ export async function PATCH(_request: Request, { params }: { params: { id: strin
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const notification = await markNotificationRead(session.user.id, params.id);
+  try {
+    const notification = await markNotificationRead(session.user.id, params.id);
 
-  if (!notification) {
-    return NextResponse.json({ error: "Notification not found" }, { status: 404 });
+    if (!notification) {
+      return NextResponse.json({ error: "Notification not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, notification });
+  } catch (error) {
+    console.warn("Notification read fallback: database is unavailable.", error);
+    return NextResponse.json(
+      { success: false, error: "Notifications are temporarily unavailable." },
+      { status: 503 }
+    );
   }
-
-  return NextResponse.json({ success: true, notification });
 }

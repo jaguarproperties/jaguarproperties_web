@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import { z } from "zod";
 
+import { isDatabaseEnabled } from "@/lib/database-url";
 import { ensureMongoConnection } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 
@@ -71,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const identifierUpper = identifier.toUpperCase();
         const envAdminUser = getEnvAdminUser(identifier, parsed.data.password);
 
-        if (!process.env.DATABASE_URL) {
+        if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
           if (!envAdminUser) {
             console.error("[Auth] Login failed because DATABASE_URL is missing and fallback admin env credentials are not configured.", {
               identifier,
@@ -138,7 +139,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         } catch (error) {
           console.error("[Auth] Database lookup failed during admin authorization.", {
             identifier,
-            hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+            hasDatabaseUrl: Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL),
             nextAuthUrl: process.env.NEXTAUTH_URL ?? null,
             hasAdminFallback:
               Boolean(process.env.ADMIN_USERNAME) &&

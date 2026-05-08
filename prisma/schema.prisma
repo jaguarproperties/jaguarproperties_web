@@ -334,6 +334,16 @@ model BlogPost {
   media          Media[]
 }
 
+model Testimonial {
+  id          String   @id @default(cuid()) @map("_id")
+  name        String
+  message     String
+  image       String
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Lead {
   id          String     @id @default(cuid()) @map("_id")
   name        String
@@ -419,6 +429,7 @@ model SiteContent {
   homeFeaturedProjectsDescription String?
   homeFeaturedPropertiesTitle       String?
   homeFeaturedPropertiesDescription String?
+  homePropertyShowcaseSlugs         String[]  @default([])
   homePortfolioTitle       String?
   homePortfolioDescription String?
   homePortfolioItems       String?

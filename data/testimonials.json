@@ -1,0 +1,38 @@
+[
+  {
+    "id": "b19a7c29-84ce-4d8f-b2db-4f8fa2d2b547",
+    "name": "Manoj Kumar",
+    "message": "We are very happy with price they offered at Jaguar Properties to own a home. We are very much satisfied with the service they provide. We Wish you good luck for all your future endeavor.",
+    "image": "/uploads/site-media/manoj-kumar-2d1bc4a8-22c0-4ed4-bc57-03e147a966dc.png",
+    "published": true,
+    "createdAt": "2026-05-08T06:39:33.862Z",
+    "updatedAt": "2026-05-08T06:39:33.862Z"
+  },
+  {
+    "id": "350c0f78-291e-46d6-b04f-a6c0849b9fe2",
+    "name": "Haritha Reddy",
+    "message": "Very recently we brought a property in Jaguar and it was an excellent journey from discussion with seller till the registration. Every interaction was transparent & I sincerely Thank You.",
+    "image": "/uploads/site-media/haritha-reddy-de3878f1-f456-4cc3-b385-f7a275ad9ddd.png",
+    "published": true,
+    "createdAt": "2026-05-08T06:38:55.686Z",
+    "updatedAt": "2026-05-08T06:38:55.686Z"
+  },
+  {
+    "id": "85125649-6ebd-4612-8151-8a7dda84f330",
+    "name": "Joseph Geethan",
+    "message": "We are happy to deal with the company who understands direct selling. They are professional in his outlook and extremely helpful. This is very busy place in Bangalore and I love it.",
+    "image": "/uploads/site-media/joseph-geethan-5461cf1e-8a69-486c-908f-1fbe9f7445f7.png",
+    "published": true,
+    "createdAt": "2026-05-08T06:37:49.579Z",
+    "updatedAt": "2026-05-08T06:37:49.579Z"
+  },
+  {
+    "id": "013c31fe-f221-4e53-b540-f31b006a3adc",
+    "name": "Akash Sharma",
+    "message": "I have buy a plot in Jaguar properties. I Got possesion with all leagal documents. Never face any issues. They have Provide good service also there plots pricing and location are good.",
+    "image": "/uploads/site-media/akash-sharma-afc7da27-6004-4b22-9f0a-dd26a300f5e0.png",
+    "published": true,
+    "createdAt": "2026-05-08T06:18:06.229Z",
+    "updatedAt": "2026-05-08T06:18:06.229Z"
+  }
+]

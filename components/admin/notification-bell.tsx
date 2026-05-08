@@ -29,7 +29,13 @@ export function NotificationBell({ canSendAnnouncements }: { canSendAnnouncement
     async function loadNotifications() {
       try {
         const response = await fetch("/api/notifications?limit=8", { cache: "no-store" });
-        if (!response.ok) return;
+        if (!response.ok) {
+          if (active) {
+            setNotifications([]);
+            setUnreadCount(0);
+          }
+          return;
+        }
 
         const payload = await response.json();
         if (!active) return;
@@ -65,7 +71,11 @@ export function NotificationBell({ canSendAnnouncements }: { canSendAnnouncement
     async function loadNotifications() {
       try {
         const response = await fetch("/api/notifications?limit=8", { cache: "no-store" });
-        if (!response.ok) return;
+        if (!response.ok) {
+          setNotifications([]);
+          setUnreadCount(0);
+          return;
+        }
 
         const payload = await response.json();
         setNotifications(payload.notifications ?? []);

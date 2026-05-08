@@ -5,6 +5,7 @@ import { MediaEntityType, UserRole } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import * as XLSX from "xlsx";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { isRedirectError } from "next/dist/client/components/redirect";
 import { redirect } from "next/navigation";
 import path from "path";
 import { randomUUID } from "crypto";
@@ -12,10 +13,12 @@ import nodemailer from "nodemailer";
 
 import { auth } from "@/lib/auth";
 import { getCareerBySlug } from "@/lib/careers";
+import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
+import { createTestimonial, deleteTestimonialById, updateTestimonial } from "@/lib/testimonials";
 import { slugify, safeSplitGallery } from "@/lib/utils";
 import {
   canAccessLeads,
@@ -44,6 +47,7 @@ import {
   roleProfileSchema,
   propertySchema,
   siteContentSchema,
+  testimonialSchema,
   userManagementSchema,
   userUpdateSchema
 } from "@/lib/validations";
@@ -69,8 +73,10 @@ async function requireJobPostingManager() {
 }
 
 function ensureDatabase() {
-  if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL is not configured. Add your MongoDB Atlas connection string to use live admin mutations.");
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
+    throw new Error(
+      "DATABASE_URL is not configured. Add your MongoDB connection string to use live admin mutations."
+    );
   }
 }
 
@@ -164,6 +170,10 @@ async function savePropertyImage(file: File, propertyTitle: string) {
 
 async function saveNewsImage(file: File, articleTitle: string) {
   return saveSiteImage(file, articleTitle, "news");
+}
+
+async function saveTestimonialImage(file: File, clientName: string) {
+  return saveSiteImage(file, clientName, "testimonials");
 }
 
 async function saveSiteImage(file: File, baseName: string, contextLabel: string) {
@@ -300,7 +310,7 @@ export async function submitLead(
     return { success: false, message: "Please complete all required fields correctly." };
   }
 
-  if (!process.env.DATABASE_URL) {
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     return {
       success: false,
       message: "Lead capture is in demo mode. Add DATABASE_URL to store inquiries in MongoDB Atlas."
@@ -356,7 +366,7 @@ export async function submitCareerApplication(
   await writeFile(filePath, buffer);
   const resumeUrl = filename;
 
-  if (process.env.DATABASE_URL) {
+  if (isDatabaseEnabled() && (process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     await prisma.jobApplication.create({
       data: {
         role: parsed.data.role,
@@ -704,6 +714,103 @@ export async function deleteBlogPost(formData: FormData) {
     revalidatePath(`/news/${post.slug}`);
   }
   revalidatePath("/admin/blog");
+}
+
+export async function createOrUpdateTestimonial(formData: FormData) {
+  await requireRoleAccess(canEditContent);
+  ensureDatabase();
+  const id = String(formData.get("id") || "").trim() || undefined;
+
+  try {
+    const name = String(formData.get("name") || "").trim();
+    const existingImage = String(formData.get("existingImage") || "").trim();
+    const imageFile = formData.get("imageFile");
+
+    const image =
+      imageFile instanceof File && imageFile.size > 0
+        ? await saveTestimonialImage(imageFile, name || "testimonial")
+        : existingImage;
+
+    const parsed = testimonialSchema.safeParse({
+      id,
+      name,
+      message: formData.get("message"),
+      image,
+      published: parseBoolean(formData.get("published"))
+    });
+
+    if (!parsed.success) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Invalid testimonial payload", parsed.error.flatten().fieldErrors);
+      }
+
+      redirect(id ? `/admin/testimonials/${id}?error=1` : "/admin/testimonials?error=1");
+    }
+
+    const { id: _testimonialId, ...data } = parsed.data;
+
+    if (parsed.data.id) {
+      await updateTestimonial(parsed.data.id, data);
+      revalidateTag("testimonials");
+      revalidatePath("/");
+      revalidatePath("/admin");
+      revalidatePath("/admin/testimonials");
+      redirect(`/admin/testimonials/${parsed.data.id}?updated=1`);
+    }
+
+    await createTestimonial(data);
+    revalidateTag("testimonials");
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/testimonials");
+    redirect("/admin/testimonials?created=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to save testimonial.", error);
+    }
+
+    const message = formatDatabaseConnectionError(error);
+
+    redirect(
+      id
+        ? `/admin/testimonials/${id}?error=${encodeURIComponent(message)}`
+        : `/admin/testimonials?error=${encodeURIComponent(message)}`
+    );
+  }
+}
+
+export async function deleteTestimonial(formData: FormData) {
+  await requireRoleAccess(canEditContent);
+  ensureDatabase();
+  const id = String(formData.get("id") || "").trim();
+
+  try {
+    if (id) {
+      await deleteTestimonialById(id);
+    }
+
+    revalidateTag("testimonials");
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/testimonials");
+    redirect("/admin/testimonials?deleted=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to delete testimonial.", error);
+    }
+
+    const message = formatDatabaseConnectionError(error);
+
+    redirect(`/admin/testimonials?error=${encodeURIComponent(message)}`);
+  }
 }
 
 export async function createOrUpdateJobPosting(formData: FormData) {
@@ -1280,7 +1387,7 @@ export async function uploadHrmLetterhead(formData: FormData) {
   await mkdir(storageDir, { recursive: true });
   await writeFile(filePath, Buffer.from(bytes));
 
-  if (process.env.DATABASE_URL) {
+  if (isDatabaseEnabled() && (process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     const siteContent = await prisma.siteContent.findFirst({
       orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
       select: { id: true }

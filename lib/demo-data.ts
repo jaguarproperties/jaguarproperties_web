@@ -33,6 +33,7 @@ export const demoSiteContent = {
   homeFeaturedProjectsDescription: "",
   homeFeaturedPropertiesTitle: "Move-in ready opportunities and investment-led inventory.",
   homeFeaturedPropertiesDescription: "Premium listings across Doddaballapur, Devanahalli, and Yelahanka.",
+  homePropertyShowcaseSlugs: propertyShowcase.slice(0, 3).map((property) => property.slug),
   homePortfolioTitle: "Delivered with discipline, curated with care.",
   homePortfolioDescription:
     "Jaguar Properties brings hospitality thinking into every phase of development, from land planning to final handover.",
@@ -190,6 +191,39 @@ export const demoPosts = [
       "A summary of the township amenities highlighted in the Jaguar City brochure.",
     published: true,
     publishedAt: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date()
+  }
+];
+
+export const demoTestimonials = [
+  {
+    id: "demo-testimonial-1",
+    name: "Raghavendra S",
+    message:
+      "Jaguar Properties kept the process clear from site visit to documentation. The team was responsive, transparent, and easy to work with throughout.",
+    image: siteMedia.jaguarCityCommunity,
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "demo-testimonial-2",
+    name: "Farah N",
+    message:
+      "We were looking for a plotted development with long-term value and better road connectivity. Jaguar guided us patiently and answered every question with confidence.",
+    image: siteMedia.emiratesCity,
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "demo-testimonial-3",
+    name: "Vikram Patel",
+    message:
+      "The overall experience felt professional and well-managed. What stood out most was the speed of follow-up and the clarity around the project details.",
+    image: siteMedia.jaguarCityGrowth,
+    published: true,
     createdAt: new Date(),
     updatedAt: new Date()
   }

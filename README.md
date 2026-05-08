@@ -53,6 +53,7 @@ SMTP_FROM=
 - Add the same variables from `.env.example` in your Vercel project settings.
 - Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to your real production domain, for example `https://your-site.vercel.app`.
 - Use a production MongoDB Atlas `DATABASE_URL`.
+- If SRV DNS lookups are blocked in your environment and `mongodb+srv://...` fails, also set `DATABASE_DIRECT_URL` to the non-SRV `mongodb://...` URI from Atlas.
 - Store website images in `public/images` or use external URLs. This project no longer depends on local runtime uploads.
 
 ## Default Admin Credentials
@@ -65,4 +66,4 @@ SMTP_FROM=
 
 - Public website content updates immediately after admin saves because pages are revalidated through server actions.
 - Career applications can be emailed to your recruitment inbox when SMTP is configured.
-- `DATABASE_URL` should be a MongoDB Atlas URI.
+- `DATABASE_URL` can be a MongoDB Atlas URI. If you use the SRV form (`mongodb+srv://...`), keep a non-SRV `DATABASE_DIRECT_URL` available as a fallback for restricted DNS environments.

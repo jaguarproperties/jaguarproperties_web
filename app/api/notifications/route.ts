@@ -11,10 +11,19 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  await ensureAttendanceAlerts({ id: session.user.id, role: session.user.role });
+  try {
+    await ensureAttendanceAlerts({ id: session.user.id, role: session.user.role });
 
-  const limit = Number(new URL(request.url).searchParams.get("limit") ?? "8");
-  const summary = await getNotificationSummary(session.user.id, Number.isFinite(limit) ? limit : 8);
+    const limit = Number(new URL(request.url).searchParams.get("limit") ?? "8");
+    const summary = await getNotificationSummary(session.user.id, Number.isFinite(limit) ? limit : 8);
 
-  return NextResponse.json(summary);
+    return NextResponse.json(summary);
+  } catch (error) {
+    console.warn("Notifications API fallback: database is unavailable.", error);
+    return NextResponse.json({
+      notifications: [],
+      unreadCount: 0,
+      degraded: true
+    });
+  }
 }

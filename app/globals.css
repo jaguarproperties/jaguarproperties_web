@@ -142,6 +142,15 @@ a {
   }
 }
 
+@keyframes testimonial-marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(calc(-50% - 0.75rem), 0, 0);
+  }
+}
+
 .animate-float-soft {
   animation: float-soft 5.5s ease-in-out infinite;
 }
@@ -152,6 +161,15 @@ a {
 
 .animate-pulse-glow {
   animation: pulse-glow 6s ease-in-out infinite;
+}
+
+.testimonial-marquee-track {
+  animation: testimonial-marquee 34s linear infinite;
+  will-change: transform;
+}
+
+.testimonial-marquee-track:hover {
+  animation-play-state: paused;
 }
 
 .hero-animated-backdrop {
@@ -184,7 +202,8 @@ a {
   .hero-animated-sweep,
   .animate-float-soft,
   .animate-property-float,
-  .animate-pulse-glow {
+  .animate-pulse-glow,
+  .testimonial-marquee-track {
     animation: none !important;
   }
 

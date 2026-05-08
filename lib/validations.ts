@@ -194,6 +194,14 @@ export const blogSchema = z.object({
   published: z.boolean().default(true)
 });
 
+export const testimonialSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().trim().min(2),
+  message: z.string().trim().min(10),
+  image: imageSourceSchema,
+  published: z.boolean().default(true)
+});
+
 export const siteContentSchema = z.object({
   id: z.string().optional(),
   heroTitle: z.string().min(5),

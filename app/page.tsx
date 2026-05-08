@@ -4,13 +4,14 @@ import { PageShell } from "@/components/layout/page-shell";
 import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
 import { PropertyCard } from "@/components/site/property-card";
+import { TestimonialsMarquee } from "@/components/site/testimonials-marquee";
 import { BlogCard } from "@/components/site/blog-card";
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { HoverLift } from "@/components/motion/hover-lift";
-import { getBlogPosts, getFeaturedProperties, getSiteContent } from "@/lib/data";
+import { getBlogPosts, getFeaturedProperties, getSiteContent, getTestimonials } from "@/lib/data";
 import {
   parseLocationItems,
   parsePortfolioItems,
@@ -21,10 +22,11 @@ import {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [rawSiteContent, properties, posts] = await Promise.all([
+  const [rawSiteContent, properties, posts, testimonials] = await Promise.all([
     getSiteContent(),
     getFeaturedProperties(),
-    getBlogPosts()
+    getBlogPosts(),
+    getTestimonials()
   ]);
   const siteContent = resolveSiteContent(rawSiteContent);
 
@@ -163,6 +165,27 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {testimonials.length ? (
+        <section id="client-testimonials" className="container scroll-mt-32 py-16 md:py-20">
+          <SectionHeading
+            eyebrow={<Translate id="section.testimonials.eyebrow" defaultText="Testimonials" />}
+            title={
+              <Translate
+                id="section.testimonials.title"
+                defaultText="What clients say after working with Jaguar."
+              />
+            }
+            description={
+              <Translate
+                id="section.testimonials.description"
+                defaultText="Real client feedback, managed from the Client Testimonials section in your admin panel."
+              />
+            }
+          />
+          <TestimonialsMarquee testimonials={testimonials} />
+        </section>
+      ) : null}
 
       <section id="latest-news" className="container scroll-mt-32 py-16 md:py-20">
         <SectionHeading

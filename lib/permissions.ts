@@ -1,6 +1,7 @@
 import { UserRole } from "@prisma/client";
 import { cache } from "react";
 
+import { isDatabaseEnabled } from "@/lib/database-url";
 import { prisma } from "@/lib/prisma";
 
 function passthroughCache<CachedFunction extends Function>(fn: CachedFunction): CachedFunction {
@@ -242,7 +243,7 @@ export function toLegacyPermissionFlags(permissions: Permission[]) {
 }
 
 export async function ensureSystemRoles() {
-  if (!process.env.DATABASE_URL) return;
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) return;
 
   try {
     await Promise.all(
@@ -287,7 +288,7 @@ function extractPermissionsFromLegacyRole(role: LegacyRolePermissionRecord | nul
 }
 
 const getRolePermissionsCached = cacheFn(async (role: UserRole): Promise<Permission[]> => {
-  if (!process.env.DATABASE_URL) {
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     return defaultRolePermissions[role] ?? [];
   }
 
@@ -326,7 +327,7 @@ export async function getRolePermissions(role: UserRole): Promise<Permission[]> 
 }
 
 export async function getAllRolePermissions(): Promise<Record<UserRole, Permission[]>> {
-  if (!process.env.DATABASE_URL) {
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     return (Object.keys(systemRoleDetails) as UserRole[]).reduce(
       (acc, role) => {
         acc[role] = defaultRolePermissions[role];
@@ -382,7 +383,7 @@ export async function getAllRolePermissions(): Promise<Record<UserRole, Permissi
 export async function getManageableRoles(): Promise<Array<AdminRoleDefinition & { permissions: Permission[] }>> {
   const systemRoleNames = Object.keys(systemRoleDetails) as UserRole[];
 
-  if (!process.env.DATABASE_URL) {
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
     return systemRoleNames.map((role) => ({
       name: role,
       label: systemRoleDetails[role].label,

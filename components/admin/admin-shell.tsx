@@ -66,6 +66,12 @@ const navGroups = [
         label: "News Management",
         detail: "Articles, updates, and editorial publishing for the news section.",
         permission: "canManageNews"
+      },
+      {
+        href: "/admin/testimonials",
+        label: "Client Testimonials",
+        detail: "Add, edit, remove, and publish client testimonial cards for the homepage.",
+        permission: "canEditContent"
       }
     ]
   },

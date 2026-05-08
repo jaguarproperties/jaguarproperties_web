@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { formatDatabaseConnectionError, getDatabaseUrl } from "@/lib/database-url";
 import { prisma } from "@/lib/prisma";
 import { getMongoDb } from "@/lib/mongo";
 
@@ -22,7 +23,7 @@ function toErrorDetails(error: unknown) {
   if (error instanceof Error) {
     return {
       name: error.name,
-      message: error.message
+      message: formatDatabaseConnectionError(error)
     };
   }
 
@@ -33,7 +34,7 @@ function toErrorDetails(error: unknown) {
 }
 
 export async function GET() {
-  const databaseUrl = process.env.DATABASE_URL;
+  const databaseUrl = process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL;
 
   if (!databaseUrl) {
     return NextResponse.json(
@@ -57,6 +58,7 @@ export async function GET() {
   };
 
   try {
+    getDatabaseUrl();
     const db = await getMongoDb();
     await db.admin().command({ ping: 1 });
     diagnostics.checks.mongoDriver.ok = true;
