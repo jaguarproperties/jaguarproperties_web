@@ -46,6 +46,9 @@ SMTP_PORT=
 SMTP_USER=
 SMTP_PASS=
 SMTP_FROM=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ## Vercel Deployment
@@ -54,6 +57,7 @@ SMTP_FROM=
 - Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to your real production domain, for example `https://your-site.vercel.app`.
 - Use a production MongoDB Atlas `DATABASE_URL`.
 - If SRV DNS lookups are blocked in your environment and `mongodb+srv://...` fails, also set `DATABASE_DIRECT_URL` to the non-SRV `mongodb://...` URI from Atlas.
+- Configure Cloudinary for testimonial image uploads in production. Testimonial images are stored remotely and the saved database value is the returned Cloudinary URL.
 - Store website images in `public/images` or use external URLs. This project no longer depends on local runtime uploads.
 
 ## Default Admin Credentials

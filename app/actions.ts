@@ -172,10 +172,6 @@ async function saveNewsImage(file: File, articleTitle: string) {
   return saveSiteImage(file, articleTitle, "news");
 }
 
-async function saveTestimonialImage(file: File, clientName: string) {
-  return saveSiteImage(file, clientName, "testimonials");
-}
-
 async function saveSiteImage(file: File, baseName: string, contextLabel: string) {
   if (!isAllowedPropertyImageType(file)) {
     throw new Error(`Please upload JPG, PNG, WebP, or GIF images for ${contextLabel}.`);
@@ -724,18 +720,12 @@ export async function createOrUpdateTestimonial(formData: FormData) {
   try {
     const name = String(formData.get("name") || "").trim();
     const existingImage = String(formData.get("existingImage") || "").trim();
-    const imageFile = formData.get("imageFile");
-
-    const image =
-      imageFile instanceof File && imageFile.size > 0
-        ? await saveTestimonialImage(imageFile, name || "testimonial")
-        : existingImage;
 
     const parsed = testimonialSchema.safeParse({
       id,
       name,
       message: formData.get("message"),
-      image,
+      image: existingImage,
       published: parseBoolean(formData.get("published"))
     });
 

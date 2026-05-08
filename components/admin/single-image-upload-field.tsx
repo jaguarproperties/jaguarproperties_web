@@ -6,6 +6,7 @@ import { ImagePlus, Upload, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
+import { cn } from "@/lib/utils";
 
 type SingleImageUploadFieldProps = {
   existingImage?: string | null;
@@ -15,6 +16,8 @@ type SingleImageUploadFieldProps = {
   description: string;
   emptyText: string;
   alt: string;
+  uploadEndpoint?: string;
+  onUploadStateChange?: (isUploading: boolean) => void;
 };
 
 export function SingleImageUploadField({
@@ -24,12 +27,25 @@ export function SingleImageUploadField({
   label,
   description,
   emptyText,
-  alt
+  alt,
+  uploadEndpoint,
+  onUploadStateChange
 }: SingleImageUploadFieldProps) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string | null>(null);
+  const [currentImage, setCurrentImage] = useState<string>(existingImage ?? "");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setCurrentImage(existingImage ?? "");
+  }, [existingImage]);
+
+  useEffect(() => {
+    onUploadStateChange?.(isUploading);
+  }, [isUploading, onUploadStateChange]);
 
   useEffect(() => {
     return () => {
@@ -39,7 +55,7 @@ export function SingleImageUploadField({
     };
   }, [previewUrl]);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  async function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (!file) {
@@ -48,6 +64,7 @@ export function SingleImageUploadField({
       }
       setPreviewUrl(null);
       setPreviewName(null);
+      setUploadError(null);
       return;
     }
 
@@ -58,6 +75,36 @@ export function SingleImageUploadField({
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
     setPreviewName(file.name);
+    setUploadError(null);
+
+    if (!uploadEndpoint) {
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch(uploadEndpoint, {
+        method: "POST",
+        body: formData
+      });
+
+      const payload = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok || !payload.url) {
+        throw new Error(payload.error || "Could not upload the selected image.");
+      }
+
+      setCurrentImage(payload.url);
+    } catch (error) {
+      setCurrentImage(existingImage ?? "");
+      setUploadError(error instanceof Error ? error.message : "Could not upload the selected image.");
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   function clearSelection() {
@@ -71,13 +118,15 @@ export function SingleImageUploadField({
 
     setPreviewUrl(null);
     setPreviewName(null);
+    setCurrentImage(existingImage ?? "");
+    setUploadError(null);
   }
 
-  const imageUrl = resolveImageSrc(previewUrl ?? existingImage ?? null);
+  const imageUrl = resolveImageSrc(previewUrl ?? currentImage ?? null);
 
   return (
     <div className="space-y-4 rounded-[24px] border border-white/10 bg-black/10 p-5">
-      <input type="hidden" name={existingInputName} value={existingImage ?? ""} />
+      <input type="hidden" name={existingInputName} value={currentImage} />
 
       <div className="flex items-center justify-between gap-3">
         <div>
@@ -86,13 +135,13 @@ export function SingleImageUploadField({
         </div>
         <div className="flex gap-2">
           <Button asChild type="button" variant="secondary" size="sm">
-            <label htmlFor={inputId} className="cursor-pointer">
+            <label htmlFor={inputId} className={cn("cursor-pointer", isUploading && "pointer-events-none opacity-70")}>
               <Upload className="h-4 w-4" />
-              Upload
+              {isUploading ? "Uploading..." : "Upload"}
             </label>
           </Button>
           {previewName ? (
-            <Button type="button" variant="ghost" size="sm" onClick={clearSelection}>
+            <Button type="button" variant="ghost" size="sm" onClick={clearSelection} disabled={isUploading}>
               <X className="h-4 w-4" />
               Reset
             </Button>
@@ -103,7 +152,7 @@ export function SingleImageUploadField({
       <input
         ref={inputRef}
         id={inputId}
-        name={fileInputName}
+        name={uploadEndpoint ? undefined : fileInputName}
         type="file"
         accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
         className="hidden"
@@ -131,11 +180,17 @@ export function SingleImageUploadField({
       </div>
 
       <p className="text-xs text-zinc-400">
-        {previewName
-          ? `Ready to upload: ${previewName}`
-          : existingImage
-            ? "Keeping the current image until you choose a replacement."
-            : "Choose an image before saving."}
+        {uploadError
+          ? uploadError
+          : isUploading
+            ? "Uploading image to Cloudinary..."
+            : previewName
+              ? uploadEndpoint
+                ? `Uploaded: ${previewName}`
+                : `Ready to upload: ${previewName}`
+              : currentImage
+                ? "Keeping the current image until you choose a replacement."
+                : "Choose an image before saving."}
       </p>
     </div>
   );

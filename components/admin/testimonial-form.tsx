@@ -1,3 +1,7 @@
+"use client";
+
+import { useState } from "react";
+
 import { createOrUpdateTestimonial } from "@/app/actions";
 import { SingleImageUploadField } from "@/components/admin/single-image-upload-field";
 import { Button } from "@/components/ui/button";
@@ -6,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 export function TestimonialForm({ testimonial }: { testimonial?: Record<string, any> }) {
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   return (
     <form action={createOrUpdateTestimonial} className="grid gap-4 rounded-[28px] border border-white/10 bg-white/5 p-6">
       <input type="hidden" name="id" defaultValue={testimonial?.id} />
@@ -29,9 +35,15 @@ export function TestimonialForm({ testimonial }: { testimonial?: Record<string, 
         description="Shown on the testimonial card on the homepage."
         emptyText="No client image selected"
         alt="Client testimonial image preview"
+        uploadEndpoint="/api/testimonials/upload"
+        onUploadStateChange={setIsUploadingImage}
       />
-      <Button type="submit" className="w-fit">
-        {testimonial ? "Update Testimonial" : "Add Testimonial"}
+      <Button type="submit" className="w-fit" disabled={isUploadingImage}>
+        {isUploadingImage
+          ? "Uploading image..."
+          : testimonial
+            ? "Update Testimonial"
+            : "Add Testimonial"}
       </Button>
     </form>
   );

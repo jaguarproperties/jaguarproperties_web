@@ -14,7 +14,7 @@ const imageSourceSchema = z
   .trim()
   .min(1, "Image is required.")
   .refine((value) => value.startsWith("/") || isValidUrl(value), {
-    message: "Use a public image path like /uploads/site-media/file.jpg or a full image URL."
+    message: "Use a public image path or a full image URL."
   });
 
 export const leadSchema = z.object({
