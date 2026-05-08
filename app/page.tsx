@@ -14,7 +14,6 @@ import { HoverLift } from "@/components/motion/hover-lift";
 import { getBlogPosts, getFeaturedProperties, getSiteContent, getTestimonials } from "@/lib/data";
 import {
   parseLocationItems,
-  parsePortfolioItems,
   parseStatItems,
   resolveSiteContent
 } from "@/lib/site-content";
@@ -31,7 +30,6 @@ export default async function HomePage() {
   const siteContent = resolveSiteContent(rawSiteContent);
 
   const marketHighlights = parseStatItems(siteContent.homeStats);
-  const portfolioStories = parsePortfolioItems(siteContent.homePortfolioItems);
   const homeLocations = parseLocationItems(siteContent.homePresenceLocations);
 
   return (
@@ -118,7 +116,7 @@ export default async function HomePage() {
 
       <section id="featured-properties" className="container scroll-mt-32 py-16 md:py-20">
         <SectionHeading
-          eyebrow={<Translate id="section.properties.eyebrow" defaultText="Properties" />}
+          eyebrow={<Translate id="section.featuredProjects.eyebrow" defaultText="Featured Projects" />}
           title={siteContent.homeFeaturedPropertiesTitle}
           description={siteContent.homeFeaturedPropertiesDescription}
         />
@@ -130,39 +128,6 @@ export default async function HomePage() {
               </HoverLift>
             </FadeIn>
           ))}
-        </div>
-      </section>
-
-      <section id="portfolio-highlights" className="container scroll-mt-32 py-16 md:py-20">
-        <div className="grid gap-6 rounded-[32px] border border-black/10 bg-mesh-gold p-10 dark:border-white/10 md:grid-cols-[1.2fr_1fr]">
-          <div>
-            <p className="text-xs uppercase tracking-[0.35em] text-primary">
-              <Translate id="section.portfolio.eyebrow" defaultText="Portfolio" />
-            </p>
-            <h2 className="mt-4 font-display text-5xl text-foreground dark:text-white">
-              {siteContent.homePortfolioTitle}
-            </h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-zinc-700 dark:text-zinc-300">
-              {siteContent.homePortfolioDescription}
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            {portfolioStories.map((item, index) => (
-              <HoverLift key={`${item.label}-${index}`}>
-                <Card className="p-6">
-                  <p className="text-xs uppercase tracking-[0.3em] text-primary">
-                    {item.label}
-                  </p>
-                  <p className="mt-4 font-display text-4xl text-foreground dark:text-white">
-                    {item.value}
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-400">
-                    {item.text}
-                  </p>
-                </Card>
-              </HoverLift>
-            ))}
-          </div>
         </div>
       </section>
 

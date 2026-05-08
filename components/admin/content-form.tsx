@@ -1,5 +1,4 @@
 import { updateSiteContent } from "@/app/actions";
-import { PortfolioGalleryEditor } from "@/components/admin/portfolio-gallery-editor";
 import { SingleImageUploadField } from "@/components/admin/single-image-upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,9 +33,8 @@ function SectionCard({
 export function ContentForm({ content }: { content?: Record<string, any> | null }) {
   const pageSections = [
     ["#homepage-hero", "Homepage"],
-    ["#properties-page", "Properties"],
+    ["#properties-page", "Projects"],
     ["#news-page", "News"],
-    ["#portfolio-page", "Portfolio"],
     ["#contact-page", "Contact"],
     ["#careers-page", "Careers"],
     ["#footer-social", "Footer"]
@@ -156,7 +154,7 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
       <SectionCard
         id="homepage-sections"
         title="Homepage Sections"
-        description="This controls the about section, supporting stats, featured section headings, homepage portfolio cards, and final CTA."
+        description="This controls the about section, supporting stats, featured project headings, and final CTA."
       >
         <Input name="aboutTitle" placeholder="About section title" defaultValue={content?.aboutTitle} required />
         <Textarea name="aboutBody" placeholder="About text" defaultValue={content?.aboutBody} required rows={4} />
@@ -184,27 +182,6 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           required
           rows={3}
         />
-        <Input
-          name="homePortfolioTitle"
-          placeholder="Homepage portfolio title"
-          defaultValue={content?.homePortfolioTitle}
-          required
-        />
-        <Textarea
-          name="homePortfolioDescription"
-          placeholder="Homepage portfolio description"
-          defaultValue={content?.homePortfolioDescription}
-          required
-          rows={3}
-        />
-        <Textarea
-          name="homePortfolioItems"
-          placeholder="Label|Value|Description"
-          defaultValue={content?.homePortfolioItems}
-          required
-          rows={6}
-        />
-        <CmsHint>Use one portfolio card per line in the format `Label|Value|Description`.</CmsHint>
         <Input name="homeNewsTitle" placeholder="Homepage news title" defaultValue={content?.homeNewsTitle} required />
         <Textarea
           name="homeNewsDescription"
@@ -237,18 +214,18 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
 
       <SectionCard
         id="properties-page"
-        title="Properties Page"
-        description="These fields control the public Properties page heading and highlight cards."
+        title="Projects Page"
+        description="These fields control the public Projects page heading and highlight cards."
       >
         <Input
           name="propertiesTitle"
-          placeholder="Properties page title"
+          placeholder="Projects page title"
           defaultValue={content?.propertiesTitle}
           required
         />
         <Textarea
           name="propertiesDescription"
-          placeholder="Properties page description"
+          placeholder="Projects page description"
           defaultValue={content?.propertiesDescription}
           required
           rows={3}
@@ -260,7 +237,7 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           required
           rows={5}
         />
-        <CmsHint>Use one properties highlight per line in the format `Title|Description`.</CmsHint>
+        <CmsHint>Use one project highlight per line in the format `Title|Description`.</CmsHint>
       </SectionCard>
 
       <SectionCard
@@ -284,27 +261,6 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           rows={5}
         />
         <CmsHint>Use one news highlight per line in the format `Title|Description`.</CmsHint>
-      </SectionCard>
-
-      <SectionCard
-        id="portfolio-page"
-        title="Portfolio Page"
-        description="These fields control the public Portfolio page heading and gallery cards. Each gallery row below edits one image card on the website."
-      >
-        <Input
-          name="portfolioTitle"
-          placeholder="Portfolio page title"
-          defaultValue={content?.portfolioTitle}
-          required
-        />
-        <Textarea
-          name="portfolioDescription"
-          placeholder="Portfolio page description"
-          defaultValue={content?.portfolioDescription}
-          required
-          rows={3}
-        />
-        <PortfolioGalleryEditor defaultValue={content?.portfolioGallery} />
       </SectionCard>
 
       <SectionCard

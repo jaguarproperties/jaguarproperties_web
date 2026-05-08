@@ -8,7 +8,7 @@ import {
   canAccessLeads,
   canApproveLeave,
   canEditContent,
-  canEditProperties,
+  canEditProjects,
   canManageJobPostings,
   canManageNews,
   canManageUsers,
@@ -59,7 +59,7 @@ export default async function AdminDashboardPage() {
     canAccessLeadsPermission,
     canApproveLeavePermission,
     canEditContentPermission,
-    canEditPropertiesPermission,
+    canEditProjectsPermission,
     canManageJobPostingsPermission,
     canManageNewsPermission,
     canManageUsersPermission,
@@ -70,7 +70,7 @@ export default async function AdminDashboardPage() {
     canAccessLeads(role),
     canApproveLeave(role),
     canEditContent(role),
-    canEditProperties(role),
+    canEditProjects(role),
     canManageJobPostings(role),
     canManageNews(role),
     canManageUsers(role),
@@ -131,10 +131,10 @@ export default async function AdminDashboardPage() {
       visible: canEditContentPermission
     },
     {
-      href: "/admin/properties",
-      title: "Property Management",
-      text: "Maintain listing inventory, featured records, and public website property content.",
-      visible: canEditPropertiesPermission
+      href: "/admin/projects",
+      title: "Project Management",
+      text: "Create, update, remove, and feature project records from one dedicated workspace.",
+      visible: canEditProjectsPermission
     },
     {
       href: "/admin/blog",
@@ -194,8 +194,8 @@ export default async function AdminDashboardPage() {
         {canAccessLeadsPermission ? (
           <StatCard label="CRM Leads" value={overview.leads} detail="Inbound buyer and investor inquiries." />
         ) : null}
-        {canEditPropertiesPermission ? (
-          <StatCard label="Property Records" value={overview.properties} detail="Live inventory currently listed." />
+        {canEditProjectsPermission ? (
+          <StatCard label="Project Records" value={overview.projects} detail="Live project records currently available." />
         ) : null}
         {canManageNewsPermission ? (
           <StatCard label="Published Posts" value={overview.posts} detail="News and market content published." />

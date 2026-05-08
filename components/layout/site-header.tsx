@@ -9,17 +9,15 @@ import { shouldBypassImageOptimization } from "@/lib/image";
 
 const navItems = [
   { href: "/", id: "nav.home", label: "Home" },
-  { href: "/properties", id: "nav.properties", label: "Properties" },
+  { href: "/properties", id: "nav.projects", label: "Projects" },
   { href: "/careers", id: "nav.careers", label: "Careers" },
-  { href: "/portfolio", id: "nav.portfolio", label: "Portfolio" },
   { href: "/news", id: "nav.news", label: "News" },
   { href: "/contact", id: "nav.contact", label: "Contact" }
 ];
 
 const mobileSectionLinks = [
   { href: "/#about", label: "About" },
-  { href: "/#featured-properties", label: "Featured" },
-  { href: "/#portfolio-highlights", label: "Portfolio" },
+  { href: "/#featured-properties", label: "Projects" },
   { href: "/#latest-news", label: "News Section" },
   { href: "/#concierge", label: "Support" }
 ];

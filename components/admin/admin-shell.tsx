@@ -10,7 +10,7 @@ import {
   canAccessLeave,
   canAccessLeads,
   canEditContent,
-  canEditProperties,
+  canEditProjects,
   canExportAttendance,
   canManageJobPostings,
   canManageCorrections,
@@ -56,10 +56,10 @@ const navGroups = [
         permission: "canEditContent"
       },
       {
-        href: "/admin/properties",
-        label: "Property Management",
-        detail: "Listing inventory, featured records, and public property search content.",
-        permission: "canEditProperties"
+        href: "/admin/projects",
+        label: "Project Management",
+        detail: "Create, edit, delete, and feature project records for the admin and website experience.",
+        permission: "canEditProjects"
       },
       {
         href: "/admin/blog",
@@ -165,7 +165,7 @@ export async function AdminShell({
     accessLeave,
     accessLeads,
     editContent,
-    editProperties,
+    editProjects,
     exportAttendance,
     manageJobPostings,
     manageCorrections,
@@ -179,7 +179,7 @@ export async function AdminShell({
     canAccessLeave(role),
     canAccessLeads(role),
     canEditContent(role),
-    canEditProperties(role),
+    canEditProjects(role),
     canExportAttendance(role),
     canManageJobPostings(role),
     canManageCorrections(role),
@@ -194,7 +194,7 @@ export async function AdminShell({
     canAccessLeave: accessLeave,
     canAccessLeads: accessLeads,
     canEditContent: editContent,
-    canEditProperties: editProperties,
+    canEditProjects: editProjects,
     canExportAttendance: exportAttendance,
     canManageJobPostings: manageJobPostings,
     canManageCorrections: manageCorrections,

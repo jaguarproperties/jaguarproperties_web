@@ -8,7 +8,7 @@ export const demoSiteContent = {
   heroSubtitle:
     "A 190-hectare integrated township in Doddaballapura with premium plots, modern infrastructure, community amenities, and strong long-term investment potential near Bengaluru's airport growth corridor.",
   heroImage: siteMedia.jaguarCityCover,
-  homePrimaryCtaLabel: "View Properties",
+  homePrimaryCtaLabel: "View Projects",
   homePrimaryCtaHref: "/properties",
   homeSecondaryCtaLabel: "Contact Us",
   homeSecondaryCtaHref: "/contact",
@@ -31,7 +31,7 @@ export const demoSiteContent = {
   presenceText: "Bengaluru, Doha, and Dubai with market-specific luxury developments.",
   homeFeaturedProjectsTitle: "",
   homeFeaturedProjectsDescription: "",
-  homeFeaturedPropertiesTitle: "Move-in ready opportunities and investment-led inventory.",
+  homeFeaturedPropertiesTitle: "Featured projects and investment-led opportunities.",
   homeFeaturedPropertiesDescription: "Premium listings across Doddaballapur, Devanahalli, and Yelahanka.",
   homePropertyShowcaseSlugs: propertyShowcase.slice(0, 3).map((property) => property.slug),
   homePortfolioTitle: "Delivered with discipline, curated with care.",
@@ -47,9 +47,9 @@ export const demoSiteContent = {
   projectsTitle: "",
   projectsDescription: "",
   projectsHighlights: "",
-  propertiesTitle: "Luxury residences and plotted opportunities.",
+  propertiesTitle: "Signature projects and plotted opportunities.",
   propertiesDescription:
-    "Search by project or area, then refine by location, budget, plot size, status, and investment category to find the Jaguar Properties fit for your lifestyle or portfolio.",
+    "Search by project or area, then refine by location, budget, plot size, status, and investment category to find the right Jaguar fit for your lifestyle or investment goals.",
   propertiesHighlights:
     "Growth corridors|Listings are concentrated in locations with improving connectivity, planned infrastructure, and strong buyer interest.\nValue clarity|Whether you are an end-user or investor, Jaguar Properties focuses on properties that communicate a clear lifestyle and pricing story.\nPremium standards|Thoughtful master planning, reliable specifications, and future-ready amenities shape each shortlisted opportunity.",
   newsTitle: "News, updates, and real estate perspectives.",
@@ -93,32 +93,119 @@ export const demoSiteContent = {
 export const demoProjects = [
   {
     id: "demo-project-1",
-    title: "Jaguar City",
+    title: "JAGUAR CITY",
     slug: "jaguar-city",
     summary:
-      "A landmark integrated township in Doddaballapura with premium plots, modern infrastructure, and community-first amenities.",
+      "100 acres divided into 4 blocks, ready for registration, attached to NH-648 at Doddaballapura Town in Bangalore North.",
     description:
-      "Jaguar City is a 190-hectare integrated township by Jaguar Properties in Doddaballapura, North Bengaluru. Positioned near the existing and upcoming international airport corridor, the project is designed for families and investors seeking plotted development, smart infrastructure, and long-term value in a fast-growing region.",
+      "JAGUAR CITY is a 100-acre project divided into four blocks and positioned as a ready-for-registration plotted development attached to NH-648 at Doddaballapura Town, Bangalore North. It is designed for buyers who want immediate documentation readiness, strong highway visibility, and a large-format township opportunity in the Doddaballapura growth corridor.",
     city: "Bengaluru",
     location: "Doddaballapura",
     country: "India",
-    priceRange: "Price on request",
+    priceRange: "Ready For Registration",
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
-    coverImage: siteMedia.jaguarCity,
+    coverImage: siteMedia.jaguarCityCover,
     gallery: [
       siteMedia.jaguarCity,
       siteMedia.jaguarCityCommunity,
       siteMedia.jaguarCityGrowth
     ],
-    seoTitle: "Jaguar City | Integrated Township in Doddaballapura",
-    seoDescription: "Explore Jaguar City, a 190-hectare integrated plotted township in North Bengaluru.",
+    seoTitle: "Jaguar City | 100 Acres at NH-648 Doddaballapura",
+    seoDescription: "Explore Jaguar City, a 100-acre four-block project ready for registration at NH-648, Doddaballapura Town, Bangalore North.",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    properties: []
+  },
+  {
+    id: "demo-project-2",
+    title: "EMIRATES CITY",
+    slug: "emirates-city",
+    summary:
+      "100 acres divided into 4 blocks with flexible payment plans between 18 and 36 months, attached to Jaguar City on NH-648.",
+    description:
+      "EMIRATES CITY is a 100-acre project divided into four blocks and attached to the Jaguar City corridor on NH-648 at Doddaballapura Town, Bangalore North. The project is positioned for buyers who want a large plotted development with flexible payment plans structured between 18 and 36 months.",
+    city: "Bengaluru",
+    location: "Doddaballapura",
+    country: "India",
+    priceRange: "Flexible Payment Plans (18 - 36 Months)",
+    status: ProjectStatus.LAUNCHING,
+    completionDate: null,
+    featured: true,
+    coverImage: siteMedia.emiratesCity,
+    gallery: [
+      siteMedia.emiratesCity,
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityCover
+    ],
+    seoTitle: "Emirates City | 100 Acres Beside Jaguar City",
+    seoDescription: "Explore Emirates City, a 100-acre four-block project with flexible 18 to 36 month payment plans at Doddaballapura Town, Bangalore North.",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    properties: []
+  },
+  {
+    id: "demo-project-3",
+    title: "JAGUAR FARM LANDS",
+    slug: "jaguar-farm-lands",
+    summary:
+      "160 acres of farm house villa plots, approximately 6000 to 12000 sq.ft., around 20 minutes from Doddaballapura.",
+    description:
+      "JAGUAR FARM LANDS is a 160-acre project built around larger-format farm house villa plots of approximately 6000 to 12000 sq.ft. The location sits around 20 minutes from Doddaballapura and connects the Dabaspet NH-04 corridor to NH-648, making it suitable for buyers looking for lifestyle-led land holdings with regional connectivity.",
+    city: "Bengaluru",
+    location: "Doddaballapura Corridor",
+    country: "India",
+    priceRange: "Approx. 6000 - 12000 sqft",
+    status: ProjectStatus.LAUNCHING,
+    completionDate: null,
+    featured: true,
+    coverImage: siteMedia.jaguarFarmLands,
+    gallery: [
+      siteMedia.jaguarFarmLands,
+      siteMedia.jaguarCityCommunity,
+      siteMedia.jaguarCityGrowth
+    ],
+    seoTitle: "Jaguar Farm Lands | 160 Acres Farm House Villa Plots",
+    seoDescription: "Explore Jaguar Farm Lands, a 160-acre project with farm house villa plots around 6000 to 12000 sq.ft. near Doddaballapura.",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    properties: []
+  },
+  {
+    id: "demo-project-4",
+    title: "JAGUAR PLATINUM CITY",
+    slug: "jaguar-platinum-city",
+    summary:
+      "A 52-acre township project with flexible payment plans attached to Davanagere High Tech City, Karnataka.",
+    description:
+      "JAGUAR PLATINUM CITY is a 52-acre township project positioned alongside Davanagere High Tech City in Karnataka. It is presented as a land-led development opportunity for buyers who want a larger township format supported by flexible payment plans in an emerging regional growth market.",
+    city: "Davanagere",
+    location: "Davanagere High Tech City",
+    country: "India",
+    priceRange: "Flexible Payment Plans",
+    status: ProjectStatus.UPCOMING,
+    completionDate: null,
+    featured: true,
+    coverImage: siteMedia.jaguarBrochureCover,
+    gallery: [
+      siteMedia.jaguarBrochureCover,
+      siteMedia.jaguarCityCover,
+      siteMedia.jaguarCityGrowth
+    ],
+    seoTitle: "Jaguar Platinum City | 52 Acres at Davanagere High Tech City",
+    seoDescription: "Explore Jaguar Platinum City, a 52-acre township project with flexible payment plans attached to Davanagere High Tech City, Karnataka.",
     createdAt: new Date(),
     updatedAt: new Date(),
     properties: []
   }
 ];
+
+const demoProjectByTitle: Record<string, (typeof demoProjects)[number]> = {
+  "Emirates City": demoProjects[1],
+  "Jaguar Farm Lands": demoProjects[2],
+  "Jaguar Platinum City": demoProjects[3]
+};
 
 export const demoProperties = propertyShowcase.map((entry, index) => ({
   id: `demo-property-${index + 1}`,
@@ -136,10 +223,10 @@ export const demoProperties = propertyShowcase.map((entry, index) => ({
   featured: index < 3,
   coverImage: entry.image,
   gallery: entry.gallery,
-  projectId: "demo-project-1",
+  projectId: demoProjectByTitle[entry.title]?.id ?? demoProjects[0].id,
   createdAt: new Date(),
   updatedAt: new Date(),
-  project: demoProjects[0]
+  project: demoProjectByTitle[entry.title] ?? demoProjects[0]
 }));
 
 export const demoPosts = [

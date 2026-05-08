@@ -11,6 +11,7 @@ type PropertyImageFieldsProps = {
   coverImage?: string | null;
   gallery?: string[] | null;
   title?: string | null;
+  entityLabel?: string;
 };
 
 type PreviewImage = {
@@ -26,7 +27,8 @@ function dedupeImages(images: string[]) {
 export function PropertyImageFields({
   coverImage,
   gallery,
-  title
+  title,
+  entityLabel = "property"
 }: PropertyImageFieldsProps) {
   const coverInputId = useId();
   const galleryInputId = useId();
@@ -121,13 +123,16 @@ export function PropertyImageFields({
   const mainImageUrl = resolveImageSrc(coverPreviewUrl ?? coverImage ?? null);
   const shouldUnoptimizeMainImage = shouldBypassImageOptimization(mainImageUrl);
 
+  const entityLabelLower = entityLabel.trim().toLowerCase() || "property";
+  const entityLabelTitle = entityLabelLower.charAt(0).toUpperCase() + entityLabelLower.slice(1);
+
   return (
     <div className="space-y-6 rounded-[28px] border border-white/10 bg-black/10 p-5">
       <input type="hidden" name="existingCoverImage" value={coverImage ?? ""} />
       <input type="hidden" name="existingGallery" value={retainedGallery.join(", ")} />
 
       <div className="space-y-2">
-        <p className="text-sm font-semibold text-white">Property images</p>
+        <p className="text-sm font-semibold text-white">{entityLabelTitle} images</p>
         <p className="text-xs leading-6 text-zinc-400">
           Upload one featured image and any number of additional gallery images. Supported types: JPG, PNG, WebP, and GIF.
         </p>
@@ -138,7 +143,7 @@ export function PropertyImageFields({
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-white">Main image</p>
-              <p className="text-xs text-zinc-400">Used as the featured property image across the website.</p>
+              <p className="text-xs text-zinc-400">Used as the featured {entityLabelLower} image across the website.</p>
             </div>
             <div className="flex gap-2">
               <Button asChild type="button" variant="secondary" size="sm">
@@ -170,7 +175,7 @@ export function PropertyImageFields({
             {mainImageUrl ? (
               <Image
                 src={mainImageUrl}
-                alt={title ? `${title} main image` : "Property main image"}
+                alt={title ? `${title} main image` : `${entityLabelTitle} main image`}
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
@@ -191,7 +196,7 @@ export function PropertyImageFields({
               ? `Ready to upload: ${coverPreviewName}`
               : coverImage
                 ? "Keeping the current featured image until you choose a replacement."
-                : "Choose a featured image before saving this property."}
+                : `Choose a featured image before saving this ${entityLabelLower}.`}
           </p>
         </div>
 
@@ -199,7 +204,7 @@ export function PropertyImageFields({
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-medium text-white">Additional gallery</p>
-              <p className="text-xs text-zinc-400">These images appear after the featured image on the property page.</p>
+              <p className="text-xs text-zinc-400">These images appear after the featured image on the {entityLabelLower} page.</p>
             </div>
             <Button asChild type="button" variant="secondary" size="sm">
               <label htmlFor={galleryInputId} className="cursor-pointer">
@@ -226,7 +231,7 @@ export function PropertyImageFields({
                 <div className="relative aspect-[4/3]">
                   <Image
                     src={resolveImageSrc(image)}
-                    alt={title ? `${title} gallery image` : "Property gallery image"}
+                    alt={title ? `${title} gallery image` : `${entityLabelTitle} gallery image`}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover"

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 
 import { isDatabaseEnabled } from "@/lib/database-url";
+import { readLocalSiteContent } from "@/lib/local-site-content";
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
 import { allowedPropertyTitles } from "@/lib/property-showcase";
@@ -116,14 +117,23 @@ async function withFallback<T>(query: () => Promise<T>, fallback: T) {
 }
 
 const getCachedSiteContent = unstable_cache(
-  async () =>
-    withFallback(
-      () =>
-        prisma.siteContent.findFirst({
-          orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
-        }),
-      demoSiteContent
-    ),
+  async () => {
+    if (!hasDatabase) {
+      return readLocalSiteContent();
+    }
+
+    try {
+      return await prisma.siteContent.findFirst({
+        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
+      });
+    } catch (error) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Database unavailable, serving local site content instead.", error);
+      }
+
+      return readLocalSiteContent();
+    }
+  },
   ["site-content"],
   { revalidate: 300, tags: ["site-content"] }
 );

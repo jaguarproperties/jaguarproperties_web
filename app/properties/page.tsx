@@ -13,8 +13,8 @@ import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Property Listings",
-  description: "Browse premium property listings across North Bengaluru."
+  title: "Projects",
+  description: "Browse Jaguar projects and premium opportunities across North Bengaluru."
 };
 
 export default async function PropertiesPage({
@@ -49,7 +49,7 @@ export default async function PropertiesPage({
       <section className="container py-16 md:py-20">
         <div className="space-y-8">
           <SectionHeading
-            eyebrow={<Translate id="properties.page.eyebrow" defaultText="Listings" />}
+            eyebrow={<Translate id="projects.page.eyebrow" defaultText="Projects" />}
             title={siteContent.propertiesTitle}
             description={siteContent.propertiesDescription}
           />
@@ -74,8 +74,8 @@ export default async function PropertiesPage({
         <div className="mt-6 text-sm text-zinc-700 dark:text-zinc-400">
           {properties.length}{" "}
           <Translate
-            id={properties.length === 1 ? "filter.propertyFound" : "filter.propertiesFound"}
-            defaultText={properties.length === 1 ? "property found" : "properties found"}
+            id={properties.length === 1 ? "filter.projectFound" : "filter.projectsFound"}
+            defaultText={properties.length === 1 ? "project found" : "projects found"}
           />
         </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
@@ -86,8 +86,8 @@ export default async function PropertiesPage({
         {properties.length === 0 ? (
           <div className="mt-10 rounded-[28px] border border-black/10 bg-black/[0.03] p-8 text-center text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-400">
             <Translate
-              id="filter.noProperties"
-              defaultText="No properties match the selected filters. Try resetting or broadening your search."
+              id="filter.noProjects"
+              defaultText="No projects match the selected filters. Try resetting or broadening your search."
             />
           </div>
         ) : null}

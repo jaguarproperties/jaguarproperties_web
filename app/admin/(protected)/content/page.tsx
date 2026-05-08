@@ -5,11 +5,12 @@ import { resolveSiteContent } from "@/lib/site-content";
 export default async function AdminContentPage({
   searchParams
 }: {
-  searchParams?: { saved?: string; error?: string };
+  searchParams?: { saved?: string; error?: string; mode?: string };
 }) {
   const { siteContent } = await getAdminCollections();
   const resolvedContent = resolveSiteContent(siteContent);
   const wasSaved = searchParams?.saved === "1";
+  const wasSavedLocally = searchParams?.mode === "local";
   const errorMessage = searchParams?.error;
 
   return (
@@ -49,7 +50,9 @@ export default async function AdminContentPage({
 
       {wasSaved ? (
         <div className="rounded-[24px] border border-emerald-400/30 bg-emerald-500/10 px-5 py-4 text-sm font-semibold text-emerald-100">
-          Website content saved. Public website pages have been refreshed with the latest text.
+          {wasSavedLocally
+            ? "Website content saved locally. The public website pages now use the local fallback because the database is currently unreachable."
+            : "Website content saved. Public website pages have been refreshed with the latest text."}
         </div>
       ) : null}
 

@@ -7,6 +7,7 @@ export function toSiteMediaUrl(filename: string) {
 
 export const siteMedia = {
   emiratesCity: toSiteMediaUrl("emirates-city.jpeg"),
+  jaguarFarmLands: toSiteMediaUrl("jaguar-farm-lands-8e280089-13a4-4408-aa70-bc1dd5e463c3.png"),
   jaguarPropertiesLogo: toSiteMediaUrl("jaguar-properties-logo.svg"),
   jaguarBrochureCover: toSiteMediaUrl("jaguar-brochure-cover.png"),
   jaguarCity: toSiteMediaUrl("jaguar-city.jpeg"),

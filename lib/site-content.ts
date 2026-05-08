@@ -41,14 +41,6 @@ export function parseHighlightItems(value: string | null | undefined) {
   }));
 }
 
-export function parsePortfolioItems(value: string | null | undefined) {
-  return parsePipeRows(value, 3).map(([label, valueText, text]) => ({
-    label,
-    value: valueText,
-    text
-  }));
-}
-
 export function parseGalleryItems(value: string | null | undefined) {
   return parsePipeRows(value, 3).map(([image, title, text]) => ({
     image,

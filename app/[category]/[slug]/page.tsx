@@ -131,7 +131,7 @@ export default function FooterContentPage({
               <div className="mt-6 space-y-3">
                 <Button asChild className="w-full justify-between">
                   <Link href="/properties">
-                    <Translate id="button.viewProperties" defaultText="View Properties" />
+                    <Translate id="button.viewProjects" defaultText="View Projects" />
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>

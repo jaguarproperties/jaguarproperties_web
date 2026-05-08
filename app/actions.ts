@@ -15,6 +15,7 @@ import { auth } from "@/lib/auth";
 import { getCareerBySlug } from "@/lib/careers";
 import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
+import { upsertLocalSiteContent } from "@/lib/local-site-content";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
@@ -85,7 +86,7 @@ async function requireHrmWorkspaceManager() {
 }
 
 function revalidatePublicSiteContent() {
-  const publicPaths = ["/", "/contact", "/portfolio", "/news", "/properties", "/careers"];
+  const publicPaths = ["/", "/contact", "/news", "/properties", "/careers"];
 
   for (const publicPath of publicPaths) {
     revalidatePath(publicPath);
@@ -216,6 +217,31 @@ async function syncPropertyMedia(propertyId: string, coverImage: string, gallery
           alt: index === 0 ? "Featured property image" : "Property gallery image",
           entityType: MediaEntityType.PROPERTY,
           propertyId
+        }
+      })
+    )
+  );
+}
+
+async function syncProjectMedia(projectId: string, coverImage: string, gallery: string[]) {
+  const urls = dedupeImageList([coverImage, ...gallery]);
+
+  await prisma.media.deleteMany({
+    where: {
+      projectId
+    }
+  });
+
+  if (!urls.length) return;
+
+  await Promise.all(
+    urls.map((url, index) =>
+      prisma.media.create({
+        data: {
+          url,
+          alt: index === 0 ? "Featured project image" : "Project gallery image",
+          entityType: MediaEntityType.PROJECT,
+          projectId
         }
       })
     )
@@ -425,9 +451,29 @@ export async function submitCareerApplication(
 export async function createOrUpdateProject(formData: FormData) {
   await requireRoleAccess(canEditProjects);
   ensureDatabase();
+  const id = String(formData.get("id") || "").trim() || undefined;
+  const title = String(formData.get("title") || "").trim();
+  const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
+  const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
+  const mainImageFile = formData.get("mainImageFile");
+  const galleryFiles = formData
+    .getAll("galleryFiles")
+    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+  const coverImage =
+    mainImageFile instanceof File && mainImageFile.size > 0
+      ? await saveSiteImage(mainImageFile, title || "project", "projects")
+      : existingCoverImage;
+
+  const uploadedGallery = await Promise.all(
+    galleryFiles.map((file, index) => saveSiteImage(file, `${title || "project"}-${index + 1}`, "projects"))
+  );
+
+  const normalizedGallery = dedupeImageList([coverImage, ...retainedGallery, ...uploadedGallery]);
+
   const parsed = projectSchema.safeParse({
-    id: formData.get("id") || undefined,
-    title: formData.get("title"),
+    id,
+    title,
     summary: formData.get("summary"),
     description: formData.get("description"),
     city: formData.get("city"),
@@ -437,42 +483,83 @@ export async function createOrUpdateProject(formData: FormData) {
     status: formData.get("status"),
     completionDate: formData.get("completionDate") || undefined,
     featured: parseBoolean(formData.get("featured")),
-    coverImage: formData.get("coverImage"),
-    gallery: formData.get("gallery") || undefined,
+    coverImage,
+    gallery: normalizedGallery.join(", "),
     seoTitle: formData.get("seoTitle") || undefined,
     seoDescription: formData.get("seoDescription") || undefined
   });
 
-  if (!parsed.success) throw new Error("Invalid project payload");
+  if (!parsed.success) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Invalid project payload", parsed.error.flatten().fieldErrors);
+    }
+
+    redirect(id ? `/admin/projects/${id}?error=1` : "/admin/projects?error=1");
+  }
+
+  const nextSlug = slugify(parsed.data.title);
+  const projectById = parsed.data.id
+    ? await prisma.project.findUnique({
+        where: { id: parsed.data.id },
+        select: { id: true, slug: true }
+      })
+    : null;
+  const projectBySlug = await prisma.project.findUnique({
+    where: { slug: nextSlug },
+    select: { id: true, slug: true }
+  });
+  const previousProject = projectById ?? projectBySlug;
 
   const { id: _projectId, ...projectValues } = parsed.data;
 
   const data = {
     ...projectValues,
-    slug: slugify(parsed.data.title),
-    gallery: safeSplitGallery(parsed.data.gallery ?? ""),
+    slug: nextSlug,
+    gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
     completionDate: parsed.data.completionDate ? new Date(parsed.data.completionDate) : null
   };
 
-  if (parsed.data.id) {
+  const isExistingDatabaseProject = Boolean(previousProject);
+  let projectId = isExistingDatabaseProject ? previousProject?.id : undefined;
+
+  if (previousProject?.id) {
     await prisma.project.update({
-      where: { id: parsed.data.id },
+      where: { id: previousProject.id },
       data
     });
   } else {
-    await prisma.project.create({ data });
+    const project = await prisma.project.create({ data });
+    projectId = project.id;
+  }
+
+  if (projectId) {
+    await syncProjectMedia(projectId, data.coverImage, data.gallery);
   }
 
   revalidatePath("/");
   revalidatePath("/admin");
+  revalidatePath("/admin/projects");
+
+  if (isExistingDatabaseProject && projectId) {
+    redirect(`/admin/projects/${projectId}?updated=1`);
+  }
+
+  redirect("/admin/projects?created=1");
 }
 
 export async function deleteProject(formData: FormData) {
   await requireRoleAccess(canEditProjects);
   ensureDatabase();
-  const id = String(formData.get("id"));
+  const id = String(formData.get("id") || "").trim();
+  if (!id) {
+    redirect("/admin/projects?error=1");
+  }
+
   await prisma.project.delete({ where: { id } });
   revalidatePath("/");
+  revalidatePath("/admin");
+  revalidatePath("/admin/projects");
+  redirect("/admin/projects?deleted=1");
 }
 
 export async function createOrUpdateProperty(formData: FormData) {
@@ -867,7 +954,6 @@ export async function deleteJobPosting(formData: FormData) {
 
 export async function updateSiteContent(formData: FormData) {
   await requireRoleAccess(canEditContent);
-  ensureDatabase();
   const existingHeroImage = String(formData.get("existingHeroImage") || "").trim();
   const heroImageFile = formData.get("heroImageFile");
   const heroImage =
@@ -945,35 +1031,53 @@ export async function updateSiteContent(formData: FormData) {
     redirect(`/admin/content?error=${encodeURIComponent(message)}`);
   }
 
-  const { id, ...data } = parsed.data;
-  const now = new Date();
-  const siteContentCollection = (await getMongoDb()).collection("SiteContent") as {
-    updateOne: (filter: Record<string, unknown>, update: Record<string, unknown>) => Promise<unknown>;
-    insertOne: (document: Record<string, unknown>) => Promise<unknown>;
-  };
+  try {
+    ensureDatabase();
+    const { id, ...data } = parsed.data;
+    const now = new Date();
+    const siteContentCollection = (await getMongoDb()).collection("SiteContent") as {
+      updateOne: (filter: Record<string, unknown>, update: Record<string, unknown>) => Promise<unknown>;
+      insertOne: (document: Record<string, unknown>) => Promise<unknown>;
+    };
 
-  if (id) {
-    await siteContentCollection.updateOne(
-      { _id: id },
-      {
-        $set: {
-          ...data,
-          updatedAt: now
+    if (id) {
+      await siteContentCollection.updateOne(
+        { _id: id },
+        {
+          $set: {
+            ...data,
+            updatedAt: now
+          }
         }
-      }
-    );
-  } else {
-    await siteContentCollection.insertOne({
-      _id: randomUUID(),
-      ...data,
-      createdAt: now,
-      updatedAt: now
-    });
-  }
+      );
+    } else {
+      await siteContentCollection.insertOne({
+        _id: randomUUID(),
+        ...data,
+        createdAt: now,
+        updatedAt: now
+      });
+    }
 
-  revalidatePublicSiteContent();
-  revalidatePath("/admin/content");
-  redirect("/admin/content?saved=1");
+    revalidatePublicSiteContent();
+    revalidatePath("/admin/content");
+    redirect("/admin/content?saved=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Remote website content save failed, storing content locally instead.", error);
+    }
+    await upsertLocalSiteContent({
+      id: parsed.data.id || "local-site-content",
+      ...parsed.data
+    });
+    revalidatePublicSiteContent();
+    revalidatePath("/admin/content");
+    redirect("/admin/content?saved=1&mode=local");
+  }
 }
 
 export async function exportLeadsCsv() {

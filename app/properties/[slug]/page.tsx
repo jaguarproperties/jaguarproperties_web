@@ -59,7 +59,7 @@ export default async function PropertyDetailsPage({
           <Button asChild variant="ghost" className="w-fit">
             <Link href="/properties">
               <ArrowLeft className="h-4 w-4" />
-              Back to Properties
+              Back to Projects
             </Link>
           </Button>
 
