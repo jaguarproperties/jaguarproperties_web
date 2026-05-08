@@ -20,7 +20,10 @@ if (process.env.NODE_ENV !== "production") {
 
 async function connectMongoClient() {
   if (!globalForMongo.mongoConnectPromise) {
-    globalForMongo.mongoConnectPromise = mongoClient.connect();
+    globalForMongo.mongoConnectPromise = mongoClient.connect().catch((error) => {
+      globalForMongo.mongoConnectPromise = undefined;
+      throw error;
+    });
   }
 
   const client = await globalForMongo.mongoConnectPromise;

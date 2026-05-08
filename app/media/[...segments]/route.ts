@@ -1,6 +1,8 @@
 import { readFile } from "fs/promises";
 import path from "path";
 
+import { getStoredTestimonialImageById } from "@/lib/testimonial-images";
+
 const CONTENT_TYPES: Record<string, string> = {
   ".avif": "image/avif",
   ".gif": "image/gif",
@@ -27,7 +29,29 @@ export async function GET(
   _request: Request,
   { params }: { params: { segments: string[] } }
 ) {
-  const filePath = resolveMediaPath(params.segments ?? []);
+  const segments = params.segments ?? [];
+
+  if (segments[0] === "testimonials" && segments[1]) {
+    try {
+      const image = await getStoredTestimonialImageById(segments[1]);
+
+      if (!image) {
+        return new Response("File not found", { status: 404 });
+      }
+
+      return new Response(new Uint8Array(image.data), {
+        headers: {
+          "Cache-Control": "public, max-age=31536000, immutable",
+          "Content-Type": image.contentType,
+          "Content-Disposition": `inline; filename="${image.filename}"`
+        }
+      });
+    } catch {
+      return new Response("File not found", { status: 404 });
+    }
+  }
+
+  const filePath = resolveMediaPath(segments);
 
   if (!filePath) {
     return new Response("Invalid path", { status: 400 });

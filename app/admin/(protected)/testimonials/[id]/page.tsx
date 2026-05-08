@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { TestimonialForm } from "@/components/admin/testimonial-form";
-import { getAdminCollections } from "@/lib/data";
+import { listAllTestimonials } from "@/lib/testimonials";
 
 export default async function EditTestimonialPage({
   params,
@@ -10,7 +10,7 @@ export default async function EditTestimonialPage({
   params: { id: string };
   searchParams?: { updated?: string; error?: string };
 }) {
-  const { testimonials } = await getAdminCollections();
+  const testimonials = await listAllTestimonials();
   const testimonial = testimonials.find((item: { id: string }) => item.id === params.id);
   const wasUpdated = searchParams?.updated === "1";
   const errorMessage = searchParams?.error;

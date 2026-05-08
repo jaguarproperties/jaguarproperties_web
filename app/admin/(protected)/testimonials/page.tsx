@@ -4,14 +4,14 @@ import { deleteTestimonial } from "@/app/actions";
 import { TestimonialForm } from "@/components/admin/testimonial-form";
 import { TableCard } from "@/components/admin/table-card";
 import { Button } from "@/components/ui/button";
-import { getAdminCollections } from "@/lib/data";
+import { listAllTestimonials } from "@/lib/testimonials";
 
 export default async function AdminTestimonialsPage({
   searchParams
 }: {
   searchParams?: { created?: string; deleted?: string; error?: string };
 }) {
-  const { testimonials } = await getAdminCollections();
+  const testimonials = await listAllTestimonials();
   const hasScrollableList = testimonials.length > 5;
   const errorMessage = searchParams?.error;
   const wasCreated = searchParams?.created === "1";

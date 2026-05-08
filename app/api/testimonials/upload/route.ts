@@ -2,8 +2,8 @@ import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import { auth } from "@/lib/auth";
-import { uploadImageToCloudinary } from "@/lib/cloudinary";
 import { canEditContent } from "@/lib/permissions";
+import { saveTestimonialImageToMongo } from "@/lib/testimonial-images";
 
 export const runtime = "nodejs";
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Testimonial images must be smaller than 8 MB each." }, { status: 400 });
     }
 
-    const { url } = await uploadImageToCloudinary(file);
+    const url = await saveTestimonialImageToMongo(file);
 
     return NextResponse.json({ url });
   } catch (error) {

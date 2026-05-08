@@ -183,7 +183,7 @@ export function SingleImageUploadField({
         {uploadError
           ? uploadError
           : isUploading
-            ? "Uploading image to Cloudinary..."
+            ? "Uploading image to MongoDB..."
             : previewName
               ? uploadEndpoint
                 ? `Uploaded: ${previewName}`

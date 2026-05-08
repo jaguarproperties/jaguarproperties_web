@@ -164,11 +164,7 @@ const getCachedBlogPosts = unstable_cache(
 );
 
 const getCachedTestimonials = unstable_cache(
-  async () =>
-    withFallback(
-      () => listPublishedTestimonials(),
-      demoTestimonials.filter((testimonial) => testimonial.published)
-    ),
+  async () => listPublishedTestimonials(),
   ["testimonials"],
   { revalidate: 300, tags: ["testimonials"] }
 );
