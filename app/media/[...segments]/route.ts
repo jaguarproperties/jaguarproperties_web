@@ -1,7 +1,9 @@
 import { readFile } from "fs/promises";
 import path from "path";
 
-import { getStoredTestimonialImageById } from "@/lib/testimonial-images";
+import { formatTestimonialImageLookupError, getStoredTestimonialImageById } from "@/lib/testimonial-images";
+
+export const runtime = "nodejs";
 
 const CONTENT_TYPES: Record<string, string> = {
   ".avif": "image/avif",
@@ -46,8 +48,8 @@ export async function GET(
           "Content-Disposition": `inline; filename="${image.filename}"`
         }
       });
-    } catch {
-      return new Response("File not found", { status: 404 });
+    } catch (error) {
+      return new Response(formatTestimonialImageLookupError(error), { status: 503 });
     }
   }
 

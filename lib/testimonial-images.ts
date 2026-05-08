@@ -1,11 +1,13 @@
 import { randomUUID } from "crypto";
 
+import { formatDatabaseConnectionError } from "@/lib/database-url";
 import { getMongoDb } from "@/lib/mongo";
 
 const TESTIMONIAL_MEDIA_PREFIX = "/media/testimonials/";
 
 type StoredTestimonialImageDocument = {
   _id: string;
+  id?: string;
   entityType: "TESTIMONIAL";
   filename: string;
   contentType: string;
@@ -55,6 +57,7 @@ export async function saveTestimonialImageToMongo(file: File) {
 
   await collection.insertOne({
     _id: id,
+    id,
     entityType: "TESTIMONIAL",
     filename: file.name || `testimonial-${id}`,
     contentType: file.type || "application/octet-stream",
@@ -70,8 +73,12 @@ export async function saveTestimonialImageToMongo(file: File) {
 export async function getStoredTestimonialImageById(id: string) {
   const collection = await getTestimonialImageCollection();
   const document = (await collection.findOne({
-    _id: id,
-    entityType: "TESTIMONIAL"
+    $or: [
+      { _id: id, entityType: "TESTIMONIAL" },
+      { id, entityType: "TESTIMONIAL" },
+      { _id: id },
+      { id }
+    ]
   })) as StoredTestimonialImageDocument | null;
 
   if (!document) {
@@ -89,6 +96,10 @@ export async function getStoredTestimonialImageById(id: string) {
     data,
     filename: document.filename
   };
+}
+
+export function formatTestimonialImageLookupError(error: unknown) {
+  return formatDatabaseConnectionError(error);
 }
 
 export async function deleteStoredTestimonialImageByUrl(url: string | null | undefined) {
