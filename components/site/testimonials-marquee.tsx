@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { Translate } from "@/components/site/translate";
@@ -40,6 +40,17 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   const messageRef = useRef<HTMLParagraphElement | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [canExpand, setCanExpand] = useState(false);
+  const [hasImageError, setHasImageError] = useState(false);
+  const imageSrc = useMemo(() => resolveImageSrc(testimonial.image), [testimonial.image]);
+  const initials = useMemo(() => {
+    const parts = testimonial.name
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2);
+
+    return parts.map((part) => part[0]?.toUpperCase() ?? "").join("") || "JP";
+  }, [testimonial.name]);
 
   useEffect(() => {
     const element = messageRef.current;
@@ -57,20 +68,30 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
     };
   }, []);
 
+  useEffect(() => {
+    setHasImageError(false);
+    setExpanded(false);
+  }, [testimonial.id, testimonial.image]);
+
   return (
     <Card className="w-[300px] shrink-0 rounded-[28px] border-black/10 bg-white/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] md:w-[360px]">
-      <div className="flex items-center gap-4">
-        <div className="relative h-16 w-16 overflow-hidden rounded-2xl border border-primary/20 bg-primary/10">
-          <Image
-            src={resolveImageSrc(testimonial.image)}
-            alt={testimonial.name}
-            fill
-            sizes="64px"
-            className="object-cover"
-            unoptimized={shouldBypassImageOptimization(resolveImageSrc(testimonial.image))}
-          />
+      <div className="flex items-start gap-4">
+        <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/15 via-primary/10 to-amber-100 text-lg font-semibold text-primary">
+          {imageSrc && !hasImageError ? (
+            <Image
+              src={imageSrc}
+              alt={testimonial.name}
+              fill
+              sizes="64px"
+              className="object-cover"
+              unoptimized={shouldBypassImageOptimization(imageSrc)}
+              onError={() => setHasImageError(true)}
+            />
+          ) : (
+            <span aria-hidden="true">{initials}</span>
+          )}
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-[0.28em] text-primary">
             <Translate id="home.testimonials.client" defaultText="Client Voice" />
           </p>

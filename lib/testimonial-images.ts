@@ -8,7 +8,7 @@ const TESTIMONIAL_MEDIA_PREFIX = "/media/testimonials/";
 type StoredTestimonialImageDocument = {
   _id: string;
   id?: string;
-  entityType: "TESTIMONIAL";
+  entityType?: "TESTIMONIAL";
   filename: string;
   contentType: string;
   size: number;
@@ -44,8 +44,19 @@ export function getStoredTestimonialImageUrl(id: string) {
 export function getStoredTestimonialImageIdFromUrl(url: string | null | undefined) {
   if (!url) return null;
   const normalized = url.trim();
-  return normalized.startsWith(TESTIMONIAL_MEDIA_PREFIX)
-    ? normalized.slice(TESTIMONIAL_MEDIA_PREFIX.length)
+
+  if (!normalized) {
+    return null;
+  }
+
+  const pathOnly = normalized.startsWith("http://") || normalized.startsWith("https://")
+    ? new URL(normalized).pathname
+    : normalized;
+
+  const sanitizedPath = pathOnly.replace(/[?#].*$/, "").replace(/\/+$/, "");
+
+  return sanitizedPath.startsWith(TESTIMONIAL_MEDIA_PREFIX)
+    ? sanitizedPath.slice(TESTIMONIAL_MEDIA_PREFIX.length)
     : null;
 }
 
@@ -111,7 +122,11 @@ export async function deleteStoredTestimonialImageByUrl(url: string | null | und
 
   const collection = await getTestimonialImageCollection();
   await collection.deleteOne({
-    _id: id,
-    entityType: "TESTIMONIAL"
+    $or: [
+      { _id: id, entityType: "TESTIMONIAL" },
+      { id, entityType: "TESTIMONIAL" },
+      { _id: id },
+      { id }
+    ]
   });
 }
