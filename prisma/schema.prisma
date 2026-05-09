@@ -282,9 +282,14 @@ model Project {
   location        String
   country         String
   priceRange      String
+  areaSqFt        Int?
+  areaLabel       String?
+  tags            String[]       @default([])
   status          ProjectStatus  @default(LAUNCHING)
   completionDate  DateTime?
   featured        Boolean        @default(false)
+  visible         Boolean        @default(true)
+  sortOrder       Int            @default(0)
   coverImage      String
   gallery         String[]
   seoTitle        String?
@@ -429,6 +434,7 @@ model SiteContent {
   homeFeaturedProjectsDescription String?
   homeFeaturedPropertiesTitle       String?
   homeFeaturedPropertiesDescription String?
+  homeFeaturedVideoUrl              String?
   homePropertyShowcaseSlugs         String[]  @default([])
   homePortfolioTitle       String?
   homePortfolioDescription String?

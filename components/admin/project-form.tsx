@@ -54,6 +54,20 @@ export function ProjectForm({ project }: { project?: Record<string, any> }) {
         <Input name="title" placeholder="Project title" defaultValue={project?.title} required />
         <Input name="priceRange" placeholder="Price range" defaultValue={project?.priceRange} required />
       </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Input
+          name="areaSqFt"
+          type="number"
+          min="1"
+          placeholder="Plot size / area in sq ft"
+          defaultValue={project?.areaSqFt ?? ""}
+        />
+        <Input
+          name="areaLabel"
+          placeholder="Area label (example: 100-acre township)"
+          defaultValue={project?.areaLabel ?? ""}
+        />
+      </div>
       <Textarea name="summary" placeholder="Short summary" defaultValue={project?.summary} required rows={3} />
       <Textarea name="description" placeholder="Full description" defaultValue={project?.description} required rows={6} />
       <div className="grid gap-4 md:grid-cols-3">
@@ -61,6 +75,11 @@ export function ProjectForm({ project }: { project?: Record<string, any> }) {
         <Input name="location" placeholder="Location" defaultValue={project?.location} required />
         <Input name="country" placeholder="Country" defaultValue={project?.country} required />
       </div>
+      <Input
+        name="tags"
+        placeholder="Tags separated by commas"
+        defaultValue={Array.isArray(project?.tags) ? project.tags.join(", ") : ""}
+      />
       <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto]">
         <Select name="status" defaultValue={project?.status ?? "LAUNCHING"}>
           <option value="UPCOMING" className="bg-zinc-950">UPCOMING</option>
@@ -71,6 +90,19 @@ export function ProjectForm({ project }: { project?: Record<string, any> }) {
         <label className="flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-sm text-zinc-300">
           <Checkbox name="featured" defaultChecked={project?.featured} />
           Featured
+        </label>
+      </div>
+      <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+        <Input
+          name="sortOrder"
+          type="number"
+          min="0"
+          placeholder="Sort order"
+          defaultValue={project?.sortOrder ?? 0}
+        />
+        <label className="flex items-center gap-3 rounded-2xl border border-white/10 px-4 py-3 text-sm text-zinc-300">
+          <Checkbox name="visible" defaultChecked={project?.visible ?? true} />
+          Visible on website
         </label>
       </div>
       <PropertyImageFields

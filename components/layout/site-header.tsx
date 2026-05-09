@@ -25,7 +25,7 @@ const mobileSectionLinks = [
 export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/88 backdrop-blur-2xl dark:border-white/10">
-      <div className="container flex min-h-[88px] items-center justify-between gap-6 py-3 md:min-h-[96px]">
+      <div className="container flex min-h-[76px] items-center justify-between gap-6 py-2 md:min-h-[84px]">
         <Link href="/" className="flex items-center">
           <Image
             src={siteMedia.jaguarPropertiesLogo}
@@ -33,7 +33,7 @@ export async function SiteHeader() {
             width={935}
             height={424}
             priority
-            className="h-auto w-auto max-h-[64px] object-contain md:max-h-[78px]"
+            className="h-auto w-[108px] object-contain sm:w-[124px] md:w-[150px]"
             unoptimized={shouldBypassImageOptimization(siteMedia.jaguarPropertiesLogo)}
           />
         </Link>

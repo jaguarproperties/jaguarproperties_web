@@ -14,7 +14,8 @@ export default async function AdminProjectsPage({
   const { projects } = await getAdminCollections();
   const wasCreated = searchParams?.created === "1";
   const wasDeleted = searchParams?.deleted === "1";
-  const hasError = searchParams?.error === "1";
+  const errorMessage = searchParams?.error ? decodeURIComponent(searchParams.error) : null;
+  const hasError = Boolean(errorMessage);
 
   return (
     <div className="space-y-8">
@@ -35,7 +36,7 @@ export default async function AdminProjectsPage({
       ) : null}
       {hasError ? (
         <div className="rounded-[24px] border border-rose-400/30 bg-rose-500/10 px-5 py-4 text-sm font-semibold text-rose-100">
-          Could not save this project. Please review the form and try again.
+          {errorMessage === "1" ? "Could not save this project. Please review the form and try again." : errorMessage}
         </div>
       ) : null}
 
@@ -51,7 +52,9 @@ export default async function AdminProjectsPage({
             <tr>
               <th className="pb-3 pl-4">Title</th>
               <th className="pb-3">Location</th>
+              <th className="pb-3">Order</th>
               <th className="pb-3">Status</th>
+              <th className="pb-3">Visibility</th>
               <th className="pb-3">Action</th>
             </tr>
           </thead>
@@ -60,7 +63,9 @@ export default async function AdminProjectsPage({
               <tr key={project.id} className="border-t border-white/10 text-zinc-300">
                 <td className="py-3 pl-4">{project.title}</td>
                 <td className="py-3">{project.location}</td>
+                <td className="py-3">{project.sortOrder ?? 0}</td>
                 <td className="py-3">{project.status}</td>
+                <td className="py-3">{project.visible ? "Visible" : "Hidden"}</td>
                 <td className="py-3">
                   <div className="flex gap-2">
                     <Button asChild variant="secondary" size="sm">

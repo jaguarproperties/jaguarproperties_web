@@ -2,12 +2,11 @@ import { Metadata } from "next";
 import { CircleDollarSign, MapPinned, Sparkles } from "lucide-react";
 
 import { PageShell } from "@/components/layout/page-shell";
-import { FilterBar } from "@/components/site/filter-bar";
-import { PropertyCard } from "@/components/site/property-card";
+import { ProjectCard } from "@/components/site/project-card";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
-import { getProperties, getSiteContent } from "@/lib/data";
+import { getProjects, getSiteContent } from "@/lib/data";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
@@ -30,13 +29,10 @@ export default async function PropertiesPage({
   };
 }) {
   const [properties, rawSiteContent] = await Promise.all([
-    getProperties({
+    getProjects({
       search: searchParams?.search,
       location: searchParams?.location,
-      budget: searchParams?.budget,
-      size: searchParams?.size,
-      status: searchParams?.status,
-      category: searchParams?.category
+      status: searchParams?.status
     }),
     getSiteContent()
   ]);
@@ -69,7 +65,6 @@ export default async function PropertiesPage({
               );
             })}
           </div>
-          <FilterBar />
         </div>
         <div className="mt-6 text-sm text-zinc-700 dark:text-zinc-400">
           {properties.length}{" "}
@@ -79,8 +74,8 @@ export default async function PropertiesPage({
           />
         </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
-          {properties.map((property) => (
-            <PropertyCard key={property.id} property={property} />
+          {properties.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
         {properties.length === 0 ? (

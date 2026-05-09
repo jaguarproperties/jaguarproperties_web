@@ -3,7 +3,7 @@ import { Building2, Globe2, Landmark, Newspaper } from "lucide-react";
 import { PageShell } from "@/components/layout/page-shell";
 import { Hero } from "@/components/site/hero";
 import { SectionHeading } from "@/components/site/section-heading";
-import { PropertyCard } from "@/components/site/property-card";
+import { ProjectCard } from "@/components/site/project-card";
 import { TestimonialsMarquee } from "@/components/site/testimonials-marquee";
 import { BlogCard } from "@/components/site/blog-card";
 import { Translate } from "@/components/site/translate";
@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { HoverLift } from "@/components/motion/hover-lift";
-import { getBlogPosts, getFeaturedProperties, getSiteContent, getTestimonials } from "@/lib/data";
+import { getBlogPosts, getFeaturedProjects, getSiteContent, getTestimonials } from "@/lib/data";
 import {
   parseLocationItems,
   parseStatItems,
@@ -20,10 +20,43 @@ import {
 
 export const revalidate = 300;
 
+function getYoutubeEmbedUrl(url: unknown) {
+  if (typeof url !== "string" || !url.trim()) {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+
+    if (parsedUrl.hostname === "youtu.be") {
+      const videoId = parsedUrl.pathname.replace("/", "").trim();
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    }
+
+    if (parsedUrl.hostname.includes("youtube.com")) {
+      if (parsedUrl.pathname.startsWith("/embed/")) {
+        return url;
+      }
+
+      if (parsedUrl.pathname.startsWith("/shorts/") || parsedUrl.pathname.startsWith("/live/")) {
+        const videoId = parsedUrl.pathname.split("/")[2]?.trim();
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+      }
+
+      const videoId = parsedUrl.searchParams.get("v");
+      return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export default async function HomePage() {
-  const [rawSiteContent, properties, posts, testimonials] = await Promise.all([
+  const [rawSiteContent, projects, posts, testimonials] = await Promise.all([
     getSiteContent(),
-    getFeaturedProperties(),
+    getFeaturedProjects(),
     getBlogPosts(),
     getTestimonials()
   ]);
@@ -31,6 +64,7 @@ export default async function HomePage() {
 
   const marketHighlights = parseStatItems(siteContent.homeStats);
   const homeLocations = parseLocationItems(siteContent.homePresenceLocations);
+  const featuredVideoEmbedUrl = getYoutubeEmbedUrl(siteContent.homeFeaturedVideoUrl);
 
   return (
     <PageShell>
@@ -121,10 +155,10 @@ export default async function HomePage() {
           description={siteContent.homeFeaturedPropertiesDescription}
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {properties.map((property, index) => (
-            <FadeIn key={property.id} delay={index * 0.08}>
+          {projects.map((project, index) => (
+            <FadeIn key={project.id} delay={index * 0.08}>
               <HoverLift>
-                <PropertyCard property={property} />
+                <ProjectCard project={project} />
               </HoverLift>
             </FadeIn>
           ))}
@@ -149,6 +183,33 @@ export default async function HomePage() {
             }
           />
           <TestimonialsMarquee testimonials={testimonials} />
+        </section>
+      ) : null}
+
+      {featuredVideoEmbedUrl ? (
+        <section id="featured-video" className="container scroll-mt-32 py-16 md:py-20">
+          <SectionHeading
+            eyebrow={<Translate id="home.video.eyebrow" defaultText="Featured Video" />}
+            title={<Translate id="home.video.title" defaultText="Watch our latest property update." />}
+            description={
+              <Translate
+                id="home.video.description"
+                defaultText="A highlighted video showcase placed right before the latest news and announcements."
+              />
+            }
+          />
+          <Card className="mt-10 overflow-hidden p-3 sm:p-4">
+            <div className="aspect-video overflow-hidden rounded-[24px] bg-black">
+              <iframe
+                className="h-full w-full"
+                src={featuredVideoEmbedUrl}
+                title="Featured Jaguar Properties video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </Card>
         </section>
       ) : null}
 

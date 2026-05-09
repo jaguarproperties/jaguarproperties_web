@@ -1,6 +1,9 @@
 import { unstable_cache } from "next/cache";
+import type { Project } from "@prisma/client";
 
 import { isDatabaseEnabled } from "@/lib/database-url";
+import { getLocalBlogPostBySlug, listLocalBlogPosts, listLocalPublishedBlogPosts } from "@/lib/local-blog-posts";
+import { getLocalProjectBySlug, listLocalProjects } from "@/lib/local-projects";
 import { readLocalSiteContent } from "@/lib/local-site-content";
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
@@ -104,6 +107,13 @@ export type PropertyFilterParams = {
   category?: string;
 };
 
+export type ProjectFilterParams = {
+  search?: string;
+  location?: string;
+  status?: string;
+  tag?: string;
+};
+
 async function withFallback<T>(query: () => Promise<T>, fallback: T) {
   if (!hasDatabase) return fallback;
   try {
@@ -159,16 +169,54 @@ const getCachedFeaturedProperties = unstable_cache(
   { revalidate: 300, tags: ["properties"] }
 );
 
+const sortProjectsForDisplay = <T extends {
+  sortOrder?: number | null;
+  updatedAt?: Date | string | null;
+  createdAt?: Date | string | null;
+}>(projects: T[]) =>
+  [...projects].sort((left, right) => {
+    const orderDifference = (left.sortOrder ?? 0) - (right.sortOrder ?? 0);
+    if (orderDifference !== 0) return orderDifference;
+
+    const leftTime = new Date(left.updatedAt ?? left.createdAt ?? 0).getTime();
+    const rightTime = new Date(right.updatedAt ?? right.createdAt ?? 0).getTime();
+    return rightTime - leftTime;
+  });
+
+const getCachedFeaturedProjects = unstable_cache(
+  async () =>
+    (hasDatabase
+      ? withFallback(
+          async () => {
+            const projects = await prisma.project.findMany({
+              where: {
+                featured: true,
+                visible: true
+              },
+              orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
+            });
+
+            return sortProjectsForDisplay(projects).slice(0, 3);
+          },
+          sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.featured && project.visible)).slice(0, 3)
+        )
+      : sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.featured && project.visible)).slice(0, 3)),
+  ["featured-projects"],
+  { revalidate: 300, tags: ["projects"] }
+);
+
 const getCachedBlogPosts = unstable_cache(
   async () =>
-    withFallback(
-      () =>
-        prisma.blogPost.findMany({
-          where: { published: true },
-          orderBy: { publishedAt: "desc" }
-        }),
-      demoPosts
-    ),
+    hasDatabase
+      ? withFallback(
+          () =>
+            prisma.blogPost.findMany({
+              where: { published: true },
+              orderBy: { publishedAt: "desc" }
+            }),
+          await listLocalPublishedBlogPosts()
+        )
+      : listLocalPublishedBlogPosts(),
   ["blog-posts"],
   { revalidate: 300, tags: ["posts"] }
 );
@@ -194,6 +242,22 @@ const getCachedProperties = unstable_cache(
     ),
   ["all-properties"],
   { revalidate: 300, tags: ["properties"] }
+);
+
+const getCachedProjects = unstable_cache(
+  async () =>
+    hasDatabase
+      ? withFallback(
+          () =>
+            prisma.project.findMany({
+              where: { visible: true },
+              orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
+            }),
+          await listLocalProjects()
+        )
+      : listLocalProjects(),
+  ["all-projects"],
+  { revalidate: 300, tags: ["projects"] }
 );
 
 const getCachedDashboardOverview = unstable_cache(
@@ -363,14 +427,41 @@ export async function getSiteContent() {
 }
 
 export async function getProjectBySlug(slug: string) {
+  if (!hasDatabase) {
+    return getLocalProjectBySlug(slug);
+  }
+
   return withFallback(
     () =>
-      prisma.project.findUnique({
-        where: { slug },
-        include: { properties: true }
+      prisma.project.findFirst({
+        where: { slug, visible: true },
+        include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
       }),
-    demoProjects.find((project) => project.slug === slug) ?? null
+    await getLocalProjectBySlug(slug)
   );
+}
+
+function filterProjects<T extends Pick<Project, "title" | "summary" | "description" | "location" | "city" | "status" | "tags">>(
+  projects: T[],
+  filters: ProjectFilterParams
+) {
+  const search = filters.search?.trim().toLowerCase();
+  const location = filters.location?.trim().toLowerCase();
+  const status = filters.status?.trim().toLowerCase();
+  const tag = filters.tag?.trim().toLowerCase();
+
+  return projects.filter((project) => {
+    const haystack = [project.title, project.summary, project.description, project.location, project.city, ...project.tags]
+      .join(" ")
+      .toLowerCase();
+
+    const matchesSearch = search ? haystack.includes(search) : true;
+    const matchesLocation = location ? project.location.toLowerCase().includes(location) : true;
+    const matchesStatus = status ? project.status.toLowerCase() === status : true;
+    const matchesTag = tag ? project.tags.some((item) => item.toLowerCase() === tag) : true;
+
+    return matchesSearch && matchesLocation && matchesStatus && matchesTag;
+  });
 }
 
 function parsePriceValue(price: string) {
@@ -584,6 +675,15 @@ export async function getFeaturedProperties() {
   return getCachedFeaturedProperties();
 }
 
+export async function getFeaturedProjects() {
+  return getCachedFeaturedProjects();
+}
+
+export async function getProjects(filters: ProjectFilterParams = {}) {
+  const projects = await getCachedProjects();
+  return filterProjects(projects, filters);
+}
+
 export async function getBlogPosts() {
   return getCachedBlogPosts();
 }
@@ -595,21 +695,20 @@ export async function getTestimonials() {
 export async function getBlogPostBySlug(slug: string) {
   return unstable_cache(
     async () =>
-      withFallback(
-        () =>
-          prisma.blogPost.findUnique({
-            where: { slug },
-            include: {
-              media: {
-                orderBy: { createdAt: "asc" }
-              }
-            }
-          }),
-        (() => {
-          const post = demoPosts.find((item) => item.slug === slug);
-          return post ? { ...post, media: [] } : null;
-        })()
-      ),
+      hasDatabase
+        ? withFallback(
+            () =>
+              prisma.blogPost.findUnique({
+                where: { slug },
+                include: {
+                  media: {
+                    orderBy: { createdAt: "asc" }
+                  }
+                }
+              }),
+            await getLocalBlogPostBySlug(slug)
+          )
+        : getLocalBlogPostBySlug(slug),
     ["blog-post", slug],
     { revalidate: 300, tags: ["posts"] }
   )();
@@ -623,16 +722,18 @@ export async function getAdminCollections() {
   return withFallback(
     async () => {
       const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
-        prisma.project.findMany({ orderBy: { createdAt: "desc" } }),
+        prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
         prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
-        prisma.blogPost.findMany({
-          include: {
-            media: {
-              orderBy: { createdAt: "asc" }
-            }
-          },
-          orderBy: { createdAt: "desc" }
-        }),
+        hasDatabase
+          ? prisma.blogPost.findMany({
+              include: {
+                media: {
+                  orderBy: { createdAt: "asc" }
+                }
+              },
+              orderBy: { createdAt: "desc" }
+            })
+          : listLocalBlogPosts(),
         prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
         prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
         getSiteContent()
@@ -651,9 +752,9 @@ export async function getAdminCollections() {
       };
     },
     {
-      projects: demoProjects,
+      projects: await listLocalProjects(),
       properties: [],
-      posts: demoPosts.map((post) => ({ ...post, media: [] })),
+      posts: await listLocalBlogPosts(),
       testimonials: demoTestimonials,
       leads: demoLeads,
       applications: demoApplications,

@@ -182,6 +182,12 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           required
           rows={3}
         />
+        <Input
+          name="homeFeaturedVideoUrl"
+          placeholder="Homepage featured video URL"
+          defaultValue={content?.homeFeaturedVideoUrl}
+          required
+        />
         <Input name="homeNewsTitle" placeholder="Homepage news title" defaultValue={content?.homeNewsTitle} required />
         <Textarea
           name="homeNewsDescription"
@@ -190,6 +196,7 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           required
           rows={3}
         />
+        <CmsHint>Paste any standard YouTube link for the homepage featured video section.</CmsHint>
         <div className="grid gap-4 md:grid-cols-2">
           <Input
             name="homeConciergeTitle"

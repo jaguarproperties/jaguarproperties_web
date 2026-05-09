@@ -13,7 +13,8 @@ export default async function EditProjectPage({
   const { projects } = await getAdminCollections();
   const project = projects.find((item) => item.id === params.id);
   const wasUpdated = searchParams?.updated === "1";
-  const hasError = searchParams?.error === "1";
+  const errorMessage = searchParams?.error ? decodeURIComponent(searchParams.error) : null;
+  const hasError = Boolean(errorMessage);
 
   if (!project) notFound();
 
@@ -30,7 +31,7 @@ export default async function EditProjectPage({
       ) : null}
       {hasError ? (
         <div className="rounded-[24px] border border-rose-400/30 bg-rose-500/10 px-5 py-4 text-sm font-semibold text-rose-100">
-          Could not save this project. Please review the form and try again.
+          {errorMessage === "1" ? "Could not save this project. Please review the form and try again." : errorMessage}
         </div>
       ) : null}
       <ProjectForm project={project} />

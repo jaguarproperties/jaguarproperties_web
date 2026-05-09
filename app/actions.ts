@@ -15,6 +15,8 @@ import { auth } from "@/lib/auth";
 import { getCareerBySlug } from "@/lib/careers";
 import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
+import { deleteLocalBlogPost, upsertLocalBlogPost } from "@/lib/local-blog-posts";
+import { deleteLocalProject, upsertLocalProject } from "@/lib/local-projects";
 import { upsertLocalSiteContent } from "@/lib/local-site-content";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
@@ -97,6 +99,13 @@ function revalidatePublicSiteContent() {
 
 function parseBoolean(value: FormDataEntryValue | null) {
   return value === "on" || value === "true";
+}
+
+function parseStringList(value: FormDataEntryValue | string | null | undefined) {
+  return String(value ?? "")
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
 }
 
 function parsePermissionSelection(formData: FormData): Permission[] {
@@ -450,7 +459,6 @@ export async function submitCareerApplication(
 
 export async function createOrUpdateProject(formData: FormData) {
   await requireRoleAccess(canEditProjects);
-  ensureDatabase();
   const id = String(formData.get("id") || "").trim() || undefined;
   const title = String(formData.get("title") || "").trim();
   const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
@@ -480,9 +488,14 @@ export async function createOrUpdateProject(formData: FormData) {
     location: formData.get("location"),
     country: formData.get("country"),
     priceRange: formData.get("priceRange"),
+    areaSqFt: formData.get("areaSqFt") || undefined,
+    areaLabel: formData.get("areaLabel") || undefined,
+    tags: formData.get("tags") || undefined,
     status: formData.get("status"),
     completionDate: formData.get("completionDate") || undefined,
     featured: parseBoolean(formData.get("featured")),
+    visible: parseBoolean(formData.get("visible")),
+    sortOrder: formData.get("sortOrder") || 0,
     coverImage,
     gallery: normalizedGallery.join(", "),
     seoTitle: formData.get("seoTitle") || undefined,
@@ -498,68 +511,133 @@ export async function createOrUpdateProject(formData: FormData) {
   }
 
   const nextSlug = slugify(parsed.data.title);
-  const projectById = parsed.data.id
-    ? await prisma.project.findUnique({
-        where: { id: parsed.data.id },
-        select: { id: true, slug: true }
-      })
-    : null;
-  const projectBySlug = await prisma.project.findUnique({
-    where: { slug: nextSlug },
-    select: { id: true, slug: true }
-  });
-  const previousProject = projectById ?? projectBySlug;
-
   const { id: _projectId, ...projectValues } = parsed.data;
-
   const data = {
     ...projectValues,
     slug: nextSlug,
+    tags: parseStringList(parsed.data.tags),
     gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
+    areaSqFt: parsed.data.areaSqFt ?? null,
+    areaLabel: parsed.data.areaLabel?.trim() || null,
     completionDate: parsed.data.completionDate ? new Date(parsed.data.completionDate) : null
   };
 
-  const isExistingDatabaseProject = Boolean(previousProject);
-  let projectId = isExistingDatabaseProject ? previousProject?.id : undefined;
-
-  if (previousProject?.id) {
-    await prisma.project.update({
-      where: { id: previousProject.id },
-      data
+  try {
+    ensureDatabase();
+    
+    const projectById = parsed.data.id
+      ? await prisma.project.findUnique({
+          where: { id: parsed.data.id },
+          select: { id: true, slug: true }
+        })
+      : null;
+    const projectBySlug = await prisma.project.findUnique({
+      where: { slug: nextSlug },
+      select: { id: true, slug: true }
     });
-  } else {
-    const project = await prisma.project.create({ data });
-    projectId = project.id;
+    const previousProject = projectById ?? projectBySlug;
+    const isExistingDatabaseProject = Boolean(previousProject);
+    let projectId = isExistingDatabaseProject ? previousProject?.id : undefined;
+
+    if (previousProject?.id) {
+      await prisma.project.update({
+        where: { id: previousProject.id },
+        data
+      });
+    } else {
+      const project = await prisma.project.create({ data });
+      projectId = project.id;
+    }
+
+    if (projectId) {
+      await syncProjectMedia(projectId, data.coverImage, data.gallery);
+    }
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/projects");
+    revalidatePath("/properties");
+    revalidatePath(`/properties/${nextSlug}`);
+    if (previousProject?.slug && previousProject.slug !== nextSlug) {
+      revalidatePath(`/properties/${previousProject.slug}`);
+    }
+    revalidateTag("projects");
+
+    if (isExistingDatabaseProject && projectId) {
+      redirect(`/admin/projects/${projectId}?updated=1`);
+    }
+
+    redirect("/admin/projects?created=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to save project in database, falling back to local storage.", error);
+    }
+
+    const now = new Date();
+    const localProject = await upsertLocalProject({
+      ...data,
+      id: id || `local-project-${nextSlug}`,
+      seoTitle: data.seoTitle ?? null,
+      seoDescription: data.seoDescription ?? null,
+      createdAt: now,
+      updatedAt: now,
+      properties: [],
+      media: data.gallery.map((url, index) => ({
+        id: `local-project-media-${nextSlug}-${index + 1}`,
+        url,
+        alt: index === 0 ? "Featured project image" : "Project gallery image",
+        createdAt: now
+      }))
+    });
+
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/projects");
+    revalidatePath("/properties");
+    revalidatePath(`/properties/${nextSlug}`);
+    revalidateTag("projects");
+
+    redirect(id ? `/admin/projects/${localProject.id}?updated=1` : "/admin/projects?created=1");
   }
-
-  if (projectId) {
-    await syncProjectMedia(projectId, data.coverImage, data.gallery);
-  }
-
-  revalidatePath("/");
-  revalidatePath("/admin");
-  revalidatePath("/admin/projects");
-
-  if (isExistingDatabaseProject && projectId) {
-    redirect(`/admin/projects/${projectId}?updated=1`);
-  }
-
-  redirect("/admin/projects?created=1");
 }
 
 export async function deleteProject(formData: FormData) {
   await requireRoleAccess(canEditProjects);
-  ensureDatabase();
   const id = String(formData.get("id") || "").trim();
   if (!id) {
     redirect("/admin/projects?error=1");
   }
 
-  await prisma.project.delete({ where: { id } });
-  revalidatePath("/");
-  revalidatePath("/admin");
-  revalidatePath("/admin/projects");
-  redirect("/admin/projects?deleted=1");
+  try {
+    ensureDatabase();
+    await prisma.project.delete({ where: { id } });
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/projects");
+    revalidatePath("/properties");
+    revalidateTag("projects");
+    redirect("/admin/projects?deleted=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to delete project from database, falling back to local storage.", error);
+    }
+
+    await deleteLocalProject(id);
+    revalidatePath("/");
+    revalidatePath("/admin");
+    revalidatePath("/admin/projects");
+    revalidatePath("/properties");
+    revalidateTag("projects");
+    redirect("/admin/projects?deleted=1");
+  }
 }
 
 export async function createOrUpdateProperty(formData: FormData) {
@@ -700,7 +778,6 @@ export async function deleteProperty(formData: FormData) {
 
 export async function createOrUpdateBlogPost(formData: FormData) {
   await requireRoleAccess(canManageNews);
-  ensureDatabase();
 
   const id = String(formData.get("id") || "").trim() || undefined;
   const title = String(formData.get("title") || "").trim();
@@ -735,68 +812,128 @@ export async function createOrUpdateBlogPost(formData: FormData) {
 
   if (!parsed.success) throw new Error("Invalid blog post payload");
 
-  const previousPost = parsed.data.id
-    ? await prisma.blogPost.findUnique({
-        where: { id: parsed.data.id },
-        select: { slug: true }
-      })
-    : null;
-
   const { id: _postId, ...postValues } = parsed.data;
-
   const data = {
     ...postValues,
     slug: slugify(parsed.data.title)
   };
 
-  let postId = parsed.data.id;
+  try {
+    ensureDatabase();
 
-  if (parsed.data.id) {
-    await prisma.blogPost.update({
-      where: { id: parsed.data.id },
-      data
+    const previousPost = parsed.data.id
+      ? await prisma.blogPost.findUnique({
+          where: { id: parsed.data.id },
+          select: { slug: true }
+        })
+      : null;
+
+    let postId = parsed.data.id;
+
+    if (parsed.data.id) {
+      await prisma.blogPost.update({
+        where: { id: parsed.data.id },
+        data
+      });
+    } else {
+      const post = await prisma.blogPost.create({ data });
+      postId = post.id;
+    }
+
+    if (postId) {
+      await syncBlogPostMedia(postId, coverImage, normalizedGallery);
+    }
+
+    revalidateTag("posts");
+    revalidatePath("/");
+    revalidatePath("/news");
+    revalidatePath(`/news/${data.slug}`);
+    if (previousPost?.slug && previousPost.slug !== data.slug) {
+      revalidatePath(`/news/${previousPost.slug}`);
+    }
+    revalidatePath("/admin");
+    revalidatePath("/admin/blog");
+
+    if (parsed.data.id) {
+      redirect(`/admin/blog/${postId}?updated=1`);
+    }
+
+    redirect("/admin/blog?created=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to save blog post in database, falling back to local storage.", error);
+    }
+
+    const now = new Date();
+    const localPost = await upsertLocalBlogPost({
+      id: id || `local-post-${data.slug}`,
+      title: data.title,
+      slug: data.slug,
+      excerpt: data.excerpt,
+      content: data.content,
+      coverImage: data.coverImage,
+      seoTitle: data.seoTitle ?? null,
+      seoDescription: data.seoDescription ?? null,
+      published: data.published,
+      publishedAt: now,
+      createdAt: now,
+      updatedAt: now,
+      media: normalizedGallery.map((url, index) => ({
+        id: `local-blog-media-${data.slug}-${index + 1}`,
+        url,
+        alt: index === 0 ? "Featured news image" : "News gallery image",
+        createdAt: now
+      }))
     });
-  } else {
-    const post = await prisma.blogPost.create({ data });
-    postId = post.id;
-  }
 
-  if (postId) {
-    await syncBlogPostMedia(postId, coverImage, normalizedGallery);
-  }
+    revalidateTag("posts");
+    revalidatePath("/");
+    revalidatePath("/news");
+    revalidatePath(`/news/${data.slug}`);
+    revalidatePath("/admin");
+    revalidatePath("/admin/blog");
 
-  revalidateTag("posts");
-  revalidatePath("/");
-  revalidatePath("/news");
-  revalidatePath(`/news/${data.slug}`);
-  if (previousPost?.slug && previousPost.slug !== data.slug) {
-    revalidatePath(`/news/${previousPost.slug}`);
+    redirect(id ? `/admin/blog/${localPost.id}?updated=1` : "/admin/blog?created=1");
   }
-  revalidatePath("/admin");
-  revalidatePath("/admin/blog");
-
-  if (parsed.data.id) {
-    redirect(`/admin/blog/${postId}?updated=1`);
-  }
-
-  redirect("/admin/blog?created=1");
 }
 
 export async function deleteBlogPost(formData: FormData) {
   await requireRoleAccess(canManageNews);
-  ensureDatabase();
   const id = String(formData.get("id"));
-  const post = await prisma.blogPost.findUnique({
-    where: { id },
-    select: { slug: true }
-  });
-  await prisma.blogPost.delete({ where: { id } });
-  revalidateTag("posts");
-  revalidatePath("/news");
-  if (post?.slug) {
-    revalidatePath(`/news/${post.slug}`);
+
+  try {
+    ensureDatabase();
+    const post = await prisma.blogPost.findUnique({
+      where: { id },
+      select: { slug: true }
+    });
+    await prisma.blogPost.delete({ where: { id } });
+    revalidateTag("posts");
+    revalidatePath("/news");
+    if (post?.slug) {
+      revalidatePath(`/news/${post.slug}`);
+    }
+    revalidatePath("/admin/blog");
+    redirect("/admin/blog?deleted=1");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Unable to delete blog post from database, falling back to local storage.", error);
+    }
+
+    await deleteLocalBlogPost(id);
+    revalidateTag("posts");
+    revalidatePath("/news");
+    revalidatePath("/admin/blog");
+    redirect("/admin/blog?deleted=1");
   }
-  revalidatePath("/admin/blog");
 }
 
 export async function createOrUpdateTestimonial(formData: FormData) {
@@ -984,6 +1121,7 @@ export async function updateSiteContent(formData: FormData) {
     presenceText: formData.get("presenceText"),
     homeFeaturedPropertiesTitle: formData.get("homeFeaturedPropertiesTitle"),
     homeFeaturedPropertiesDescription: formData.get("homeFeaturedPropertiesDescription"),
+    homeFeaturedVideoUrl: formData.get("homeFeaturedVideoUrl"),
     homePortfolioTitle: formData.get("homePortfolioTitle"),
     homePortfolioDescription: formData.get("homePortfolioDescription"),
     homePortfolioItems: formData.get("homePortfolioItems"),

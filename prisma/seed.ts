@@ -15,7 +15,7 @@ const LEGACY_ADMIN_EMAIL = "admin@jaguarproperties.in";
 const projectSeedData = [
   {
     id: "seed-project-jaguar-city",
-    title: "JAGUAR CITY",
+    title: "Jaguar City",
     slug: "jaguar-city",
     summary:
       "100 acres divided into 4 blocks, ready for registration, attached to NH-648 at Doddaballapura Town in Bangalore North.",
@@ -25,9 +25,14 @@ const projectSeedData = [
     location: "Doddaballapura",
     country: "India",
     priceRange: "Ready For Registration",
+    areaSqFt: 2400,
+    areaLabel: "100-acre township · 4 blocks",
+    tags: ["Ready for Registration", "Township", "Premium"],
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
+    visible: true,
+    sortOrder: 1,
     coverImage: siteMedia.jaguarCityCover,
     gallery: [siteMedia.jaguarCity, siteMedia.jaguarCityCommunity, siteMedia.jaguarCityGrowth],
     seoTitle: "Jaguar City | 100 Acres at NH-648 Doddaballapura",
@@ -35,8 +40,60 @@ const projectSeedData = [
       "Explore Jaguar City, a 100-acre four-block project ready for registration at NH-648, Doddaballapura Town, Bangalore North."
   },
   {
+    id: "seed-project-jaguar-paradise",
+    title: "Jaguar Paradise",
+    slug: "jaguar-paradise",
+    summary:
+      "A plotted community built for buyers who want gated living, registration clarity, and a growth-led North Bengaluru address.",
+    description:
+      "Jaguar Paradise is positioned as a premium plotted community for families and investors who want a balanced combination of location access, documentation readiness, and a cleaner residential environment in the broader Bengaluru growth corridor.",
+    city: "Bengaluru",
+    location: "North Bengaluru",
+    country: "India",
+    priceRange: "Price on request",
+    areaSqFt: 1500,
+    areaLabel: "Premium plotted community",
+    tags: ["Premium", "Listing"],
+    status: ProjectStatus.LAUNCHING,
+    completionDate: null,
+    featured: true,
+    visible: true,
+    sortOrder: 2,
+    coverImage: siteMedia.jaguarCityCommunity,
+    gallery: [siteMedia.jaguarCityCommunity, siteMedia.jaguarCityCover, siteMedia.jaguarCityGrowth],
+    seoTitle: "Jaguar Paradise | Premium Plotted Community",
+    seoDescription:
+      "Discover Jaguar Paradise, a premium plotted community in the North Bengaluru growth corridor."
+  },
+  {
+    id: "seed-project-green-hills",
+    title: "Green Hills",
+    slug: "green-hills",
+    summary:
+      "A land-led community designed around open surroundings, investor appeal, and ready access to Bengaluru's expanding northern belt.",
+    description:
+      "Green Hills is framed as a plotted development for buyers who value calmer surroundings, future growth potential, and a flexible entry point into the Bengaluru plotted-land market.",
+    city: "Bengaluru",
+    location: "Bangalore North",
+    country: "India",
+    priceRange: "Price on request",
+    areaSqFt: 1200,
+    areaLabel: "Growth-led plotted enclave",
+    tags: ["Listing", "Investment"],
+    status: ProjectStatus.UPCOMING,
+    completionDate: null,
+    featured: true,
+    visible: true,
+    sortOrder: 3,
+    coverImage: siteMedia.jaguarCityGrowth,
+    gallery: [siteMedia.jaguarCityGrowth, siteMedia.jaguarCityCommunity, siteMedia.jaguarCityCover],
+    seoTitle: "Green Hills | Plotted Development in North Bengaluru",
+    seoDescription:
+      "Explore Green Hills, a plotted development designed for long-term growth and investor interest."
+  },
+  {
     id: "seed-project-emirates-city",
-    title: "EMIRATES CITY",
+    title: "Emirates City",
     slug: "emirates-city",
     summary:
       "100 acres divided into 4 blocks with flexible payment plans between 18 and 36 months, attached to Jaguar City on NH-648.",
@@ -46,9 +103,14 @@ const projectSeedData = [
     location: "Doddaballapura",
     country: "India",
     priceRange: "Flexible Payment Plans (18 - 36 Months)",
+    areaSqFt: 2400,
+    areaLabel: "100-acre township · 4 blocks",
+    tags: ["Premium", "Listing", "Payment Plan"],
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
+    visible: true,
+    sortOrder: 4,
     coverImage: siteMedia.emiratesCity,
     gallery: [siteMedia.emiratesCity, siteMedia.jaguarCityCommunity, siteMedia.jaguarCityCover],
     seoTitle: "Emirates City | 100 Acres Beside Jaguar City",
@@ -56,53 +118,36 @@ const projectSeedData = [
       "Explore Emirates City, a 100-acre four-block project with flexible 18 to 36 month payment plans at Doddaballapura Town, Bangalore North."
   },
   {
-    id: "seed-project-jaguar-farm-lands",
-    title: "JAGUAR FARM LANDS",
-    slug: "jaguar-farm-lands",
+    id: "seed-project-jaguar-diamond-city",
+    title: "Jaguar Diamond City",
+    slug: "jaguar-diamond-city",
     summary:
-      "160 acres of farm house villa plots, approximately 6000 to 12000 sq.ft., around 20 minutes from Doddaballapura.",
+      "A registration-ready plotted project with direct highway access on the Doddaballapura to Nelamangala route.",
     description:
-      "JAGUAR FARM LANDS is a 160-acre project built around larger-format farm house villa plots of approximately 6000 to 12000 sq.ft. The location sits around 20 minutes from Doddaballapura and connects the Dabaspet NH-04 corridor to NH-648, making it suitable for buyers looking for lifestyle-led land holdings with regional connectivity.",
+      "Jaguar Diamond City is designed for buyers seeking ready-for-registration plots in a smaller-format project with strong road connectivity and practical access to the Doddaballapura market.",
     city: "Bengaluru",
-    location: "Doddaballapura Corridor",
+    location: "Doddaballapura",
     country: "India",
-    priceRange: "Approx. 6000 - 12000 sqft",
+    priceRange: "Price on request",
+    areaSqFt: 1800,
+    areaLabel: "10-acre plotted project",
+    tags: ["Ready for Registration", "Listing"],
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
-    coverImage: siteMedia.jaguarFarmLands,
-    gallery: [siteMedia.jaguarFarmLands, siteMedia.jaguarCityCommunity, siteMedia.jaguarCityGrowth],
-    seoTitle: "Jaguar Farm Lands | 160 Acres Farm House Villa Plots",
+    visible: true,
+    sortOrder: 5,
+    coverImage: siteMedia.jaguarCity,
+    gallery: [siteMedia.jaguarCity, siteMedia.jaguarCityGrowth, siteMedia.jaguarCityCover],
+    seoTitle: "Jaguar Diamond City | Registration Ready Plots",
     seoDescription:
-      "Explore Jaguar Farm Lands, a 160-acre project with farm house villa plots around 6000 to 12000 sq.ft. near Doddaballapura."
-  },
-  {
-    id: "seed-project-jaguar-platinum-city",
-    title: "JAGUAR PLATINUM CITY",
-    slug: "jaguar-platinum-city",
-    summary:
-      "A 52-acre township project with flexible payment plans attached to Davanagere High Tech City, Karnataka.",
-    description:
-      "JAGUAR PLATINUM CITY is a 52-acre township project positioned alongside Davanagere High Tech City in Karnataka. It is presented as a land-led development opportunity for buyers who want a larger township format supported by flexible payment plans in an emerging regional growth market.",
-    city: "Davanagere",
-    location: "Davanagere High Tech City",
-    country: "India",
-    priceRange: "Flexible Payment Plans",
-    status: ProjectStatus.UPCOMING,
-    completionDate: null,
-    featured: true,
-    coverImage: siteMedia.jaguarBrochureCover,
-    gallery: [siteMedia.jaguarBrochureCover, siteMedia.jaguarCityCover, siteMedia.jaguarCityGrowth],
-    seoTitle: "Jaguar Platinum City | 52 Acres at Davanagere High Tech City",
-    seoDescription:
-      "Explore Jaguar Platinum City, a 52-acre township project with flexible payment plans attached to Davanagere High Tech City, Karnataka."
+      "Explore Jaguar Diamond City, a registration-ready plotted project at Doddaballapura with strong road connectivity."
   }
 ];
 
 const seededProjectIdsByTitle = {
   "Emirates City": "seed-project-emirates-city",
-  "Jaguar Farm Lands": "seed-project-jaguar-farm-lands",
-  "Jaguar Platinum City": "seed-project-jaguar-platinum-city"
+  "Jaguar Diamond City": "seed-project-jaguar-diamond-city"
 } as const;
 
 async function syncDefaultAdminUser({

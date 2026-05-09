@@ -1,0 +1,186 @@
+[
+  {
+    "id": "demo-project-1",
+    "title": "Jaguar City",
+    "slug": "jaguar-city",
+    "summary": "100 acres divided into 4 blocks, ready for registration, attached to NH-648 at Doddaballapura Town in Bangalore North.",
+    "description": "JAGUAR CITY is a 100-acre project divided into four blocks and positioned as a ready-for-registration plotted development attached to NH-648 at Doddaballapura Town, Bangalore North. It is designed for buyers who want immediate documentation readiness, strong highway visibility, and a large-format township opportunity in the Doddaballapura growth corridor.",
+    "city": "Bengaluru",
+    "location": "Doddaballapura",
+    "country": "India",
+    "priceRange": "Ready For Registration",
+    "areaSqFt": 2400,
+    "areaLabel": "100-acre township · 4 blocks",
+    "tags": [
+      "Ready for Registration",
+      "Township",
+      "Premium"
+    ],
+    "status": "LAUNCHING",
+    "completionDate": null,
+    "featured": true,
+    "visible": true,
+    "sortOrder": 1,
+    "coverImage": "/uploads/site-media/jaguar-city-150c0be1-bde2-4b8d-8a20-88cb9b70900e.png",
+    "gallery": [
+      "/uploads/site-media/jaguar-city-150c0be1-bde2-4b8d-8a20-88cb9b70900e.png",
+      "/media/site-media/jaguar-city-growth.jpeg"
+    ],
+    "seoTitle": "Jaguar City | 100 Acres at NH-648 Doddaballapura",
+    "seoDescription": "Explore Jaguar City, a 100-acre four-block project ready for registration at NH-648, Doddaballapura Town, Bangalore North.",
+    "createdAt": "2026-05-09T05:12:11.512Z",
+    "updatedAt": "2026-05-09T05:12:11.512Z",
+    "properties": [],
+    "media": [
+      {
+        "id": "local-project-media-jaguar-city-1",
+        "url": "/uploads/site-media/jaguar-city-150c0be1-bde2-4b8d-8a20-88cb9b70900e.png",
+        "alt": "Featured project image",
+        "createdAt": "2026-05-09T05:12:11.512Z"
+      },
+      {
+        "id": "local-project-media-jaguar-city-2",
+        "url": "/media/site-media/jaguar-city-growth.jpeg",
+        "alt": "Project gallery image",
+        "createdAt": "2026-05-09T05:12:11.512Z"
+      }
+    ]
+  },
+  {
+    "id": "demo-project-2",
+    "title": "Jaguar Paradise",
+    "slug": "jaguar-paradise",
+    "summary": "A plotted community built for buyers who want gated living, registration clarity, and a growth-led North Bengaluru address.",
+    "description": "Jaguar Paradise is positioned as a premium plotted community for families and investors who want a balanced combination of location access, documentation readiness, and a cleaner residential environment in the broader Bengaluru growth corridor.",
+    "city": "Bengaluru",
+    "location": "North Bengaluru",
+    "country": "India",
+    "priceRange": "Price on request",
+    "areaSqFt": 1500,
+    "areaLabel": "Premium plotted community",
+    "tags": [
+      "Premium",
+      "Listing"
+    ],
+    "status": "LAUNCHING",
+    "completionDate": null,
+    "featured": true,
+    "visible": true,
+    "sortOrder": 2,
+    "coverImage": "/media/site-media/jaguar-city-community.jpeg",
+    "gallery": [
+      "/media/site-media/jaguar-city-community.jpeg",
+      "/media/site-media/jaguar-city-cover.png",
+      "/media/site-media/jaguar-city-growth.jpeg"
+    ],
+    "seoTitle": "Jaguar Paradise | Premium Plotted Community",
+    "seoDescription": "Discover Jaguar Paradise, a premium plotted community in the North Bengaluru growth corridor.",
+    "createdAt": "2026-05-09T05:05:26.816Z",
+    "updatedAt": "2026-05-09T05:05:26.816Z",
+    "properties": [],
+    "media": []
+  },
+  {
+    "id": "demo-project-3",
+    "title": "Green Hills",
+    "slug": "green-hills",
+    "summary": "A land-led community designed around open surroundings, investor appeal, and ready access to Bengaluru's expanding northern belt.",
+    "description": "Green Hills is framed as a plotted development for buyers who value calmer surroundings, future growth potential, and a flexible entry point into the Bengaluru plotted-land market.",
+    "city": "Bengaluru",
+    "location": "Bangalore North",
+    "country": "India",
+    "priceRange": "Price on request",
+    "areaSqFt": 1200,
+    "areaLabel": "Growth-led plotted enclave",
+    "tags": [
+      "Listing",
+      "Investment"
+    ],
+    "status": "UPCOMING",
+    "completionDate": null,
+    "featured": true,
+    "visible": true,
+    "sortOrder": 3,
+    "coverImage": "/media/site-media/jaguar-city-growth.jpeg",
+    "gallery": [
+      "/media/site-media/jaguar-city-growth.jpeg",
+      "/media/site-media/jaguar-city-community.jpeg",
+      "/media/site-media/jaguar-city-cover.png"
+    ],
+    "seoTitle": "Green Hills | Plotted Development in North Bengaluru",
+    "seoDescription": "Explore Green Hills, a plotted development designed for long-term growth and investor interest.",
+    "createdAt": "2026-05-09T05:05:26.816Z",
+    "updatedAt": "2026-05-09T05:05:26.816Z",
+    "properties": [],
+    "media": []
+  },
+  {
+    "id": "demo-project-4",
+    "title": "Emirates City",
+    "slug": "emirates-city",
+    "summary": "100 acres divided into 4 blocks with flexible payment plans between 18 and 36 months, attached to Jaguar City on NH-648.",
+    "description": "EMIRATES CITY is a 100-acre project divided into four blocks and attached to the Jaguar City corridor on NH-648 at Doddaballapura Town, Bangalore North. The project is positioned for buyers who want a large plotted development with flexible payment plans structured between 18 and 36 months.",
+    "city": "Bengaluru",
+    "location": "Doddaballapura",
+    "country": "India",
+    "priceRange": "Flexible Payment Plans (18 - 36 Months)",
+    "areaSqFt": 2400,
+    "areaLabel": "100-acre township · 4 blocks",
+    "tags": [
+      "Premium",
+      "Listing",
+      "Payment Plan"
+    ],
+    "status": "LAUNCHING",
+    "completionDate": null,
+    "featured": true,
+    "visible": true,
+    "sortOrder": 4,
+    "coverImage": "/media/site-media/emirates-city.jpeg",
+    "gallery": [
+      "/media/site-media/emirates-city.jpeg",
+      "/media/site-media/jaguar-city-community.jpeg",
+      "/media/site-media/jaguar-city-cover.png"
+    ],
+    "seoTitle": "Emirates City | 100 Acres Beside Jaguar City",
+    "seoDescription": "Explore Emirates City, a 100-acre four-block project with flexible 18 to 36 month payment plans at Doddaballapura Town, Bangalore North.",
+    "createdAt": "2026-05-09T05:05:26.816Z",
+    "updatedAt": "2026-05-09T05:05:26.816Z",
+    "properties": [],
+    "media": []
+  },
+  {
+    "id": "demo-project-5",
+    "title": "Jaguar Diamond City",
+    "slug": "jaguar-diamond-city",
+    "summary": "A registration-ready plotted project with direct highway access on the Doddaballapura to Nelamangala route.",
+    "description": "Jaguar Diamond City is designed for buyers seeking ready-for-registration plots in a smaller-format project with strong road connectivity and practical access to the Doddaballapura market.",
+    "city": "Bengaluru",
+    "location": "Doddaballapura",
+    "country": "India",
+    "priceRange": "Price on request",
+    "areaSqFt": 1800,
+    "areaLabel": "10-acre plotted project",
+    "tags": [
+      "Ready for Registration",
+      "Listing"
+    ],
+    "status": "LAUNCHING",
+    "completionDate": null,
+    "featured": true,
+    "visible": true,
+    "sortOrder": 5,
+    "coverImage": "/media/site-media/jaguar-city.jpeg",
+    "gallery": [
+      "/media/site-media/jaguar-city.jpeg",
+      "/media/site-media/jaguar-city-growth.jpeg",
+      "/media/site-media/jaguar-city-cover.png"
+    ],
+    "seoTitle": "Jaguar Diamond City | Registration Ready Plots",
+    "seoDescription": "Explore Jaguar Diamond City, a registration-ready plotted project at Doddaballapura with strong road connectivity.",
+    "createdAt": "2026-05-09T05:05:26.816Z",
+    "updatedAt": "2026-05-09T05:05:26.816Z",
+    "properties": [],
+    "media": []
+  }
+]
