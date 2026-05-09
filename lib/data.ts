@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import { MediaEntityType } from "@prisma/client";
 import type { JobApplication, Lead, Prisma, Project } from "@prisma/client";
 
 import { isDatabaseEnabled } from "@/lib/database-url";
@@ -22,6 +23,86 @@ const hasDatabase = isDatabaseEnabled() && Boolean(process.env.DATABASE_DIRECT_U
 function assertDatabaseAvailable() {
   if (!hasDatabase) {
     throw new Error("DATABASE_URL is not configured. This application is configured to use MongoDB for all data.");
+  }
+}
+
+function dedupeProjectImages(coverImage: string, gallery: string[]) {
+  return Array.from(new Set([coverImage, ...gallery].filter(Boolean)));
+}
+
+async function syncProjectMediaForDatabase(projectId: string, coverImage: string, gallery: string[]) {
+  const urls = dedupeProjectImages(coverImage, gallery);
+
+  await prisma.media.deleteMany({
+    where: { projectId }
+  });
+
+  if (!urls.length) return;
+
+  await Promise.all(
+    urls.map((url, index) =>
+      prisma.media.create({
+        data: {
+          url,
+          alt: index === 0 ? "Featured project image" : "Project gallery image",
+          entityType: MediaEntityType.PROJECT,
+          projectId
+        }
+      })
+    )
+  );
+}
+
+async function syncLocalProjectsToDatabase() {
+  if (!hasDatabase) return;
+
+  const localProjects = await listLocalProjects();
+
+  for (const project of localProjects) {
+    const payload = {
+      title: project.title,
+      slug: project.slug,
+      summary: project.summary,
+      description: project.description,
+      city: project.city,
+      location: project.location,
+      country: project.country,
+      priceRange: project.priceRange,
+      areaSqFt: project.areaSqFt,
+      areaLabel: project.areaLabel,
+      tags: project.tags,
+      status: project.status,
+      completionDate: project.completionDate,
+      featured: project.featured,
+      visible: project.visible,
+      sortOrder: project.sortOrder,
+      coverImage: project.coverImage,
+      gallery: project.gallery,
+      seoTitle: project.seoTitle,
+      seoDescription: project.seoDescription
+    };
+
+    const existingProject = await prisma.project.findFirst({
+      where: {
+        OR: [{ id: project.id }, { slug: project.slug }]
+      },
+      select: { id: true }
+    });
+
+    const savedProject = existingProject
+      ? await prisma.project.update({
+          where: { id: existingProject.id },
+          data: payload
+        })
+      : await prisma.project.create({
+          data: {
+            id: project.id,
+            ...payload,
+            createdAt: project.createdAt
+          }
+        });
+
+    await syncProjectMediaForDatabase(savedProject.id, project.coverImage, project.gallery);
   }
 }
 
@@ -757,6 +838,8 @@ export async function getAdminCollections(): Promise<AdminCollections> {
   }
 
   try {
+    await syncLocalProjectsToDatabase();
+
     const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
       prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
       prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
