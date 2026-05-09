@@ -298,9 +298,19 @@ const sortProjectsForDisplay = <T extends {
     return rightTime - leftTime;
   });
 
+async function getLocalVisibleProjects() {
+  return sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.visible));
+}
+
+async function getLocalFeaturedProjects() {
+  return (await getLocalVisibleProjects()).filter((project) => project.featured).slice(0, 3);
+}
+
 const getCachedFeaturedProjects = unstable_cache(
-  async () =>
-    withFallback(
+  async () => {
+    const localFeaturedProjects = await getLocalFeaturedProjects();
+
+    return withFallback(
       async () => {
         const projects = await prisma.project.findMany({
           where: {
@@ -312,8 +322,11 @@ const getCachedFeaturedProjects = unstable_cache(
 
         return sortProjectsForDisplay(projects).slice(0, 3);
       },
-      sortProjectsForDisplay(demoProjects.filter((project) => project.featured && project.visible)).slice(0, 3)
-    ),
+      localFeaturedProjects.length
+        ? localFeaturedProjects
+        : sortProjectsForDisplay(demoProjects.filter((project) => project.featured && project.visible)).slice(0, 3)
+    );
+  },
   ["featured-projects"],
   { revalidate: 300, tags: ["projects"] }
 );
@@ -353,15 +366,18 @@ const getCachedProperties = unstable_cache(
 );
 
 const getCachedProjects = unstable_cache(
-  async () =>
-    withFallback(
+  async () => {
+    const localProjects = await getLocalVisibleProjects();
+
+    return withFallback(
       () =>
         prisma.project.findMany({
           where: { visible: true },
           orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
         }),
-      demoProjects.filter((project) => project.visible)
-    ),
+      localProjects.length ? localProjects : demoProjects.filter((project) => project.visible)
+    );
+  },
   ["all-projects"],
   { revalidate: 300, tags: ["projects"] }
 );

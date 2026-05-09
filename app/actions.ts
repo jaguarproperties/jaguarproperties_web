@@ -110,6 +110,66 @@ function parseStringList(value: FormDataEntryValue | string | null | undefined) 
     .filter(Boolean);
 }
 
+async function saveProjectToLocalStore(
+  parsedProject: Omit<Awaited<ReturnType<typeof projectSchema.parse>>, never>,
+  data: {
+    title: string;
+    slug: string;
+    summary: string;
+    description: string;
+    city: string;
+    location: string;
+    country: string;
+    priceRange: string;
+    areaSqFt: number | null;
+    areaLabel: string | null;
+    tags: string[];
+    status: "UPCOMING" | "LAUNCHING" | "COMPLETED";
+    completionDate: Date | null;
+    featured: boolean;
+    visible: boolean;
+    sortOrder: number;
+    coverImage: string;
+    gallery: string[];
+    seoTitle?: string;
+    seoDescription?: string;
+  }
+) {
+  const localProjects = await listLocalProjects();
+  const previousProject =
+    localProjects.find((item) => parsedProject.id && item.id === parsedProject.id) ??
+    localProjects.find((item) => item.slug === data.slug);
+
+  const now = new Date();
+  const projectRecord = {
+    ...(previousProject ?? {}),
+    ...data,
+    id: previousProject?.id ?? parsedProject.id ?? randomUUID(),
+    slug: data.slug,
+    status: data.status,
+    seoTitle: data.seoTitle ?? null,
+    seoDescription: data.seoDescription ?? null,
+    createdAt: previousProject?.createdAt ?? now,
+    updatedAt: now,
+    properties: previousProject?.properties ?? [],
+    media:
+      data.gallery?.map((url, index) => ({
+        id: `${previousProject?.id ?? parsedProject.id ?? "project"}-media-${index + 1}`,
+        url,
+        alt: index === 0 ? "Featured project image" : "Project gallery image",
+        createdAt: now
+      })) ?? []
+  };
+
+  const savedProject = await upsertLocalProject(projectRecord);
+
+  return {
+    projectId: savedProject.id,
+    previousSlug: previousProject?.slug,
+    wasExistingProject: Boolean(previousProject)
+  };
+}
+
 function parsePermissionSelection(formData: FormData): Permission[] {
   return permissionList.filter((permission) => parseBoolean(formData.get(permission)));
 }
@@ -530,65 +590,57 @@ export async function createOrUpdateProject(formData: FormData) {
     let wasExistingProject = false;
 
     if (hasLiveDatabase()) {
-      const projectById = parsed.data.id
-        ? await prisma.project.findUnique({
-            where: { id: parsed.data.id },
-            select: { id: true, slug: true }
-          })
-        : null;
-      const projectBySlug = await prisma.project.findUnique({
-        where: { slug: nextSlug },
-        select: { id: true, slug: true }
-      });
-      const previousProject = projectById ?? projectBySlug;
-      wasExistingProject = Boolean(previousProject);
-      projectId = previousProject?.id ?? projectId;
-      previousSlug = previousProject?.slug;
-
-      if (previousProject?.id) {
-        await prisma.project.update({
-          where: { id: previousProject.id },
-          data
+      try {
+        const projectById = parsed.data.id
+          ? await prisma.project.findUnique({
+              where: { id: parsed.data.id },
+              select: { id: true, slug: true }
+            })
+          : null;
+        const projectBySlug = await prisma.project.findUnique({
+          where: { slug: nextSlug },
+          select: { id: true, slug: true }
         });
-      } else {
-        const project = await prisma.project.create({ data });
-        projectId = project.id;
-      }
+        const previousProject = projectById ?? projectBySlug;
+        wasExistingProject = Boolean(previousProject);
+        projectId = previousProject?.id ?? projectId;
+        previousSlug = previousProject?.slug;
 
-      if (projectId) {
-        await syncProjectMedia(projectId, data.coverImage, data.gallery);
+        if (previousProject?.id) {
+          await prisma.project.update({
+            where: { id: previousProject.id },
+            data
+          });
+        } else {
+          const project = await prisma.project.create({ data });
+          projectId = project.id;
+        }
+
+        if (projectId) {
+          await syncProjectMedia(projectId, data.coverImage, data.gallery);
+        }
+      } catch (error) {
+        console.warn("Database save failed for project, falling back to local project storage.", error);
+        const localResult = await saveProjectToLocalStore(parsed.data, {
+          ...data,
+          status: data.status as "UPCOMING" | "LAUNCHING" | "COMPLETED",
+          seoTitle: data.seoTitle ?? undefined,
+          seoDescription: data.seoDescription ?? undefined
+        });
+        projectId = localResult.projectId;
+        previousSlug = localResult.previousSlug;
+        wasExistingProject = localResult.wasExistingProject;
       }
     } else {
-      const localProjects = await listLocalProjects();
-      const previousProject =
-        localProjects.find((item) => parsed.data.id && item.id === parsed.data.id) ??
-        localProjects.find((item) => item.slug === nextSlug);
-
-      const now = new Date();
-      const projectRecord = {
-        ...(previousProject ?? {}),
+      const localResult = await saveProjectToLocalStore(parsed.data, {
         ...data,
-        id: previousProject?.id ?? parsed.data.id ?? randomUUID(),
-        slug: nextSlug,
         status: data.status as "UPCOMING" | "LAUNCHING" | "COMPLETED",
-        seoTitle: data.seoTitle ?? null,
-        seoDescription: data.seoDescription ?? null,
-        createdAt: previousProject?.createdAt ?? now,
-        updatedAt: now,
-        properties: previousProject?.properties ?? [],
-        media:
-          data.gallery?.map((url, index) => ({
-            id: `${previousProject?.id ?? parsed.data.id ?? "project"}-media-${index + 1}`,
-            url,
-            alt: index === 0 ? "Featured project image" : "Project gallery image",
-            createdAt: now
-          })) ?? []
-      };
-
-      const savedProject = await upsertLocalProject(projectRecord);
-      projectId = savedProject.id;
-      previousSlug = previousProject?.slug;
-      wasExistingProject = Boolean(previousProject);
+        seoTitle: data.seoTitle ?? undefined,
+        seoDescription: data.seoDescription ?? undefined
+      });
+      projectId = localResult.projectId;
+      previousSlug = localResult.previousSlug;
+      wasExistingProject = localResult.wasExistingProject;
     }
 
     revalidatePath("/");
@@ -625,7 +677,12 @@ export async function deleteProject(formData: FormData) {
 
   try {
     if (hasLiveDatabase()) {
-      await prisma.project.delete({ where: { id } });
+      try {
+        await prisma.project.delete({ where: { id } });
+      } catch (error) {
+        console.warn("Database delete failed for project, falling back to local project storage.", error);
+        await deleteLocalProject(id);
+      }
     } else {
       await deleteLocalProject(id);
     }
