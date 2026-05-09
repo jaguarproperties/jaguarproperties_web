@@ -1,9 +1,10 @@
 import { unstable_cache } from "next/cache";
-import type { Project } from "@prisma/client";
+import type { JobApplication, Lead, Prisma, Project } from "@prisma/client";
 
 import { isDatabaseEnabled } from "@/lib/database-url";
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
+import { getLocalProjectBySlug, listLocalProjects } from "@/lib/local-projects";
 import { allowedPropertyTitles } from "@/lib/property-showcase";
 import { listAllTestimonials, listPublishedTestimonials } from "@/lib/testimonials";
 import {
@@ -71,6 +72,43 @@ type DashboardOverview = {
   applications: number;
   jobs: number;
   openings: number;
+};
+
+type AdminProjectRecord = {
+  id: string;
+  title: string;
+  slug: string;
+  summary: string;
+  description: string;
+  city: string;
+  location: string;
+  country: string;
+  priceRange: string;
+  areaSqFt: number | null;
+  areaLabel: string | null;
+  tags: string[];
+  status: "UPCOMING" | "LAUNCHING" | "COMPLETED";
+  completionDate: Date | null;
+  featured: boolean;
+  visible: boolean;
+  sortOrder: number;
+  coverImage: string;
+  gallery: string[];
+  seoTitle: string | null;
+  seoDescription: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+type AdminPropertyRecord = Prisma.PropertyGetPayload<{ include: { project: true } }>;
+type AdminPostRecord = Prisma.BlogPostGetPayload<{ include: { media: true } }>;
+type AdminCollections = {
+  projects: AdminProjectRecord[];
+  properties: AdminPropertyRecord[];
+  posts: AdminPostRecord[];
+  testimonials: Awaited<ReturnType<typeof listAllTestimonials>>;
+  leads: Lead[];
+  applications: JobApplication[];
+  siteContent: NonNullable<Awaited<ReturnType<typeof getSiteContent>>>;
 };
 
 type PropertyRecord = (typeof demoProperties)[number];
@@ -414,11 +452,22 @@ export async function getSiteContent() {
 }
 
 export async function getProjectBySlug(slug: string) {
-  assertDatabaseAvailable();
-  return prisma.project.findFirst({
-    where: { slug, visible: true },
-    include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
-  });
+  if (!hasDatabase) {
+    return getLocalProjectBySlug(slug);
+  }
+
+  try {
+    return await prisma.project.findFirst({
+      where: { slug, visible: true },
+      include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Project lookup failed, serving local project fallback instead.", error);
+    }
+
+    return getLocalProjectBySlug(slug);
+  }
 }
 
 function filterProjects<T extends Pick<Project, "title" | "summary" | "description" | "location" | "city" | "status" | "tags">>(
@@ -694,35 +743,62 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
   return getCachedDashboardOverview();
 }
 
-export async function getAdminCollections() {
-  assertDatabaseAvailable();
-  const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
-    prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
-    prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
-    prisma.blogPost.findMany({
-      include: {
-        media: {
-          orderBy: { createdAt: "asc" }
-        }
-      },
-      orderBy: { createdAt: "desc" }
-    }),
-    prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
-    prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
-    getSiteContent()
-  ]);
+export async function getAdminCollections(): Promise<AdminCollections> {
+  if (!hasDatabase) {
+    return {
+      projects: await listLocalProjects(),
+      properties: restrictToAllowedProperties(demoProperties),
+      posts: demoPosts.map((post) => ({ ...post, media: [] })),
+      testimonials: demoTestimonials,
+      leads: demoLeads,
+      applications: demoApplications,
+      siteContent: demoSiteContent
+    };
+  }
 
-  const testimonials = await listAllTestimonials();
+  try {
+    const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
+      prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
+      prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
+      prisma.blogPost.findMany({
+        include: {
+          media: {
+            orderBy: { createdAt: "asc" }
+          }
+        },
+        orderBy: { createdAt: "desc" }
+      }),
+      prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
+      prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
+      getSiteContent()
+    ]);
 
-  return {
-    projects,
-    properties: restrictToAllowedProperties(properties),
-    posts,
-    testimonials,
-    leads,
-    applications,
-    siteContent
-  };
+    const testimonials = await listAllTestimonials();
+
+    return {
+      projects,
+      properties: restrictToAllowedProperties(properties),
+      posts,
+      testimonials,
+      leads,
+      applications,
+      siteContent: siteContent ?? demoSiteContent
+    };
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Admin collections unavailable from database, serving local fallback instead.", error);
+    }
+
+    return {
+      projects: await listLocalProjects(),
+      properties: restrictToAllowedProperties(demoProperties),
+      posts: demoPosts.map((post) => ({ ...post, media: [] })),
+      testimonials: demoTestimonials,
+      leads: demoLeads,
+      applications: demoApplications,
+      siteContent: demoSiteContent
+    };
+  }
 }
 
 export async function getAdminDashboardPreview() {

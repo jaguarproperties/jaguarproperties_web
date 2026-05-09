@@ -18,6 +18,7 @@ import { replaceHolidayCalendar } from "@/lib/holidays";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
+import { deleteLocalProject, listLocalProjects, upsertLocalProject } from "@/lib/local-projects";
 import { createTestimonial, deleteTestimonialById, updateTestimonial } from "@/lib/testimonials";
 import { slugify, safeSplitGallery } from "@/lib/utils";
 import {
@@ -78,6 +79,10 @@ function ensureDatabase() {
       "DATABASE_URL is not configured. Add your MongoDB connection string to use live admin mutations."
     );
   }
+}
+
+function hasLiveDatabase() {
+  return isDatabaseEnabled() && Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL);
 }
 
 async function requireHrmWorkspaceManager() {
@@ -520,34 +525,70 @@ export async function createOrUpdateProject(formData: FormData) {
   };
 
   try {
-    ensureDatabase();
-    
-    const projectById = parsed.data.id
-      ? await prisma.project.findUnique({
-          where: { id: parsed.data.id },
-          select: { id: true, slug: true }
-        })
-      : null;
-    const projectBySlug = await prisma.project.findUnique({
-      where: { slug: nextSlug },
-      select: { id: true, slug: true }
-    });
-    const previousProject = projectById ?? projectBySlug;
-    const isExistingDatabaseProject = Boolean(previousProject);
-    let projectId = isExistingDatabaseProject ? previousProject?.id : undefined;
+    let projectId = parsed.data.id;
+    let previousSlug: string | undefined;
+    let wasExistingProject = false;
 
-    if (previousProject?.id) {
-      await prisma.project.update({
-        where: { id: previousProject.id },
-        data
+    if (hasLiveDatabase()) {
+      const projectById = parsed.data.id
+        ? await prisma.project.findUnique({
+            where: { id: parsed.data.id },
+            select: { id: true, slug: true }
+          })
+        : null;
+      const projectBySlug = await prisma.project.findUnique({
+        where: { slug: nextSlug },
+        select: { id: true, slug: true }
       });
-    } else {
-      const project = await prisma.project.create({ data });
-      projectId = project.id;
-    }
+      const previousProject = projectById ?? projectBySlug;
+      wasExistingProject = Boolean(previousProject);
+      projectId = previousProject?.id ?? projectId;
+      previousSlug = previousProject?.slug;
 
-    if (projectId) {
-      await syncProjectMedia(projectId, data.coverImage, data.gallery);
+      if (previousProject?.id) {
+        await prisma.project.update({
+          where: { id: previousProject.id },
+          data
+        });
+      } else {
+        const project = await prisma.project.create({ data });
+        projectId = project.id;
+      }
+
+      if (projectId) {
+        await syncProjectMedia(projectId, data.coverImage, data.gallery);
+      }
+    } else {
+      const localProjects = await listLocalProjects();
+      const previousProject =
+        localProjects.find((item) => parsed.data.id && item.id === parsed.data.id) ??
+        localProjects.find((item) => item.slug === nextSlug);
+
+      const now = new Date();
+      const projectRecord = {
+        ...(previousProject ?? {}),
+        ...data,
+        id: previousProject?.id ?? parsed.data.id ?? randomUUID(),
+        slug: nextSlug,
+        status: data.status as "UPCOMING" | "LAUNCHING" | "COMPLETED",
+        seoTitle: data.seoTitle ?? null,
+        seoDescription: data.seoDescription ?? null,
+        createdAt: previousProject?.createdAt ?? now,
+        updatedAt: now,
+        properties: previousProject?.properties ?? [],
+        media:
+          data.gallery?.map((url, index) => ({
+            id: `${previousProject?.id ?? parsed.data.id ?? "project"}-media-${index + 1}`,
+            url,
+            alt: index === 0 ? "Featured project image" : "Project gallery image",
+            createdAt: now
+          })) ?? []
+      };
+
+      const savedProject = await upsertLocalProject(projectRecord);
+      projectId = savedProject.id;
+      previousSlug = previousProject?.slug;
+      wasExistingProject = Boolean(previousProject);
     }
 
     revalidatePath("/");
@@ -555,12 +596,12 @@ export async function createOrUpdateProject(formData: FormData) {
     revalidatePath("/admin/projects");
     revalidatePath("/properties");
     revalidatePath(`/properties/${nextSlug}`);
-    if (previousProject?.slug && previousProject.slug !== nextSlug) {
-      revalidatePath(`/properties/${previousProject.slug}`);
+    if (previousSlug && previousSlug !== nextSlug) {
+      revalidatePath(`/properties/${previousSlug}`);
     }
     revalidateTag("projects");
 
-    if (isExistingDatabaseProject && projectId) {
+    if (wasExistingProject && projectId) {
       redirect(`/admin/projects/${projectId}?updated=1`);
     }
 
@@ -583,8 +624,11 @@ export async function deleteProject(formData: FormData) {
   }
 
   try {
-    ensureDatabase();
-    await prisma.project.delete({ where: { id } });
+    if (hasLiveDatabase()) {
+      await prisma.project.delete({ where: { id } });
+    } else {
+      await deleteLocalProject(id);
+    }
     revalidatePath("/");
     revalidatePath("/admin");
     revalidatePath("/admin/projects");
