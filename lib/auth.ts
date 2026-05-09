@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 import NextAuth from "next-auth";
 import { z } from "zod";
 
-import { isDatabaseEnabled } from "@/lib/database-url";
 import { ensureMongoConnection } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 
@@ -16,39 +15,6 @@ const credentialsSchema = z.object({
   identifier: z.string().min(3),
   password: z.string().min(6)
 });
-
-function getEnvAdminUser(identifier: string, password: string) {
-  const adminUsername = process.env.ADMIN_USERNAME;
-  const adminEmail = process.env.ADMIN_EMAIL;
-  const adminPassword = process.env.ADMIN_PASSWORD;
-
-  if (!adminUsername || !adminEmail || !adminPassword) {
-    return null;
-  }
-
-  const normalizedIdentifier = identifier.trim();
-  const normalizedIdentifierLower = normalizedIdentifier.toLowerCase();
-  const normalizedAdminUsername = adminUsername.trim().toLowerCase();
-  const normalizedAdminEmail = adminEmail.trim().toLowerCase();
-
-  if (
-    (
-      normalizedIdentifierLower === normalizedAdminUsername ||
-      normalizedIdentifierLower === normalizedAdminEmail
-    ) &&
-    password === adminPassword
-  ) {
-    return {
-      id: "demo-admin",
-      email: adminEmail,
-      name: "Jaguar Admin",
-      employeeCode: "JP2026A0001",
-      role: DEFAULT_ROLE
-    };
-  }
-
-  return null;
-}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: { strategy: "jwt" },
@@ -70,18 +36,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const identifier = parsed.data.identifier.trim();
         const identifierLower = identifier.toLowerCase();
         const identifierUpper = identifier.toUpperCase();
-        const envAdminUser = getEnvAdminUser(identifier, parsed.data.password);
 
-        if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
-          if (!envAdminUser) {
-            console.error("[Auth] Login failed because DATABASE_URL is missing and fallback admin env credentials are not configured.", {
-              identifier,
-              hasAdminUsername: Boolean(process.env.ADMIN_USERNAME),
-              hasAdminEmail: Boolean(process.env.ADMIN_EMAIL),
-              hasAdminPassword: Boolean(process.env.ADMIN_PASSWORD)
-            });
-          }
-          return envAdminUser;
+        if (!(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
+          console.error("[Auth] Login failed because DATABASE_URL is missing.", {
+            identifier
+          });
+          return null;
         }
 
         try {
@@ -100,26 +60,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!user) {
-            if (!envAdminUser) {
-              console.error("[Auth] Login failed because no matching admin user was found in MongoDB and env fallback credentials did not match.", {
-                identifier,
-                nextAuthUrl: process.env.NEXTAUTH_URL ?? null
-              });
-            }
-            return envAdminUser;
+            console.error("[Auth] Login failed because no matching admin user was found in MongoDB.", {
+              identifier,
+              nextAuthUrl: process.env.NEXTAUTH_URL ?? null
+            });
+            return null;
           }
 
           const isValid = await bcrypt.compare(parsed.data.password, user.passwordHash);
           if (!isValid) {
-            if (!envAdminUser) {
-              console.error("[Auth] Login failed because password comparison failed.", {
-                identifier,
-                userId: user.id,
-                username: user.username,
-                email: user.email
-              });
-            }
-            return envAdminUser;
+            console.error("[Auth] Login failed because password comparison failed.", {
+              identifier,
+              userId: user.id,
+              username: user.username,
+              email: user.email
+            });
+            return null;
           }
 
           console.log("[Auth] Login successful.", {
@@ -141,13 +97,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             identifier,
             hasDatabaseUrl: Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL),
             nextAuthUrl: process.env.NEXTAUTH_URL ?? null,
-            hasAdminFallback:
-              Boolean(process.env.ADMIN_USERNAME) &&
-              Boolean(process.env.ADMIN_EMAIL) &&
-              Boolean(process.env.ADMIN_PASSWORD),
             error
           });
-          return envAdminUser;
+          return null;
         }
       }
     })

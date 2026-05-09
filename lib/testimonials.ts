@@ -1,7 +1,5 @@
 import { randomUUID } from "crypto";
 
-import { isDatabaseEnabled } from "@/lib/database-url";
-import { demoTestimonials } from "@/lib/demo-data";
 import { getMongoDb } from "@/lib/mongo";
 import { deleteStoredTestimonialImageByUrl } from "@/lib/testimonial-images";
 
@@ -38,44 +36,20 @@ async function getTestimonialCollection() {
   return (await getMongoDb()).collection("Testimonial") as any;
 }
 
-async function withTestimonialsFallback<T>(query: () => Promise<T>, fallback: T) {
-  if (!isDatabaseEnabled()) {
-    return fallback;
-  }
-
-  try {
-    return await query();
-  } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Testimonials database unavailable, serving fallback data instead.", error);
-    }
-
-    return fallback;
-  }
-}
-
 export async function listPublishedTestimonials() {
-  const documents = await withTestimonialsFallback(
-    async () =>
-      (await (await getTestimonialCollection())
-        .find({ published: true })
-        .sort({ updatedAt: -1, createdAt: -1 })
-        .toArray()) as Array<Record<string, any>>,
-    demoTestimonials
-  );
+  const documents = (await (await getTestimonialCollection())
+    .find({ published: true })
+    .sort({ updatedAt: -1, createdAt: -1 })
+    .toArray()) as Array<Record<string, any>>;
 
   return documents.map((document: Record<string, any>) => normalizeTestimonialDocument(document));
 }
 
 export async function listAllTestimonials() {
-  const documents = await withTestimonialsFallback(
-    async () =>
-      (await (await getTestimonialCollection())
-        .find({})
-        .sort({ updatedAt: -1, createdAt: -1 })
-        .toArray()) as Array<Record<string, any>>,
-    demoTestimonials
-  );
+  const documents = (await (await getTestimonialCollection())
+    .find({})
+    .sort({ updatedAt: -1, createdAt: -1 })
+    .toArray()) as Array<Record<string, any>>;
 
   return documents.map((document: Record<string, any>) => normalizeTestimonialDocument(document));
 }

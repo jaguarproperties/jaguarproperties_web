@@ -2,9 +2,6 @@ import { unstable_cache } from "next/cache";
 import type { Project } from "@prisma/client";
 
 import { isDatabaseEnabled } from "@/lib/database-url";
-import { getLocalBlogPostBySlug, listLocalBlogPosts, listLocalPublishedBlogPosts } from "@/lib/local-blog-posts";
-import { getLocalProjectBySlug, listLocalProjects } from "@/lib/local-projects";
-import { readLocalSiteContent } from "@/lib/local-site-content";
 import { prisma } from "@/lib/prisma";
 import { careerOpenings } from "@/lib/careers";
 import { allowedPropertyTitles } from "@/lib/property-showcase";
@@ -20,6 +17,12 @@ import {
 } from "@/lib/demo-data";
 
 const hasDatabase = isDatabaseEnabled() && Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL);
+
+function assertDatabaseAvailable() {
+  if (!hasDatabase) {
+    throw new Error("DATABASE_URL is not configured. This application is configured to use MongoDB for all data.");
+  }
+}
 
 export type AdminUserRecord = {
   id: string;
@@ -114,36 +117,31 @@ export type ProjectFilterParams = {
   tag?: string;
 };
 
-async function withFallback<T>(query: () => Promise<T>, fallback: T) {
-  if (!hasDatabase) return fallback;
+async function withFallback<T>(query: () => Promise<T>, _fallback: T) {
+  if (!hasDatabase) {
+    return _fallback;
+  }
+
   try {
     return await query();
   } catch (error) {
     if (process.env.NODE_ENV === "development") {
-      console.warn("Database unavailable, serving demo data instead.", error);
+      console.warn("Database query failed, serving fallback data instead.", error);
     }
-    return fallback;
+
+    return _fallback;
   }
 }
 
 const getCachedSiteContent = unstable_cache(
-  async () => {
-    if (!hasDatabase) {
-      return readLocalSiteContent();
-    }
-
-    try {
-      return await prisma.siteContent.findFirst({
-        orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
-      });
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Database unavailable, serving local site content instead.", error);
-      }
-
-      return readLocalSiteContent();
-    }
-  },
+  async () =>
+    withFallback(
+      () =>
+        prisma.siteContent.findFirst({
+          orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
+        }),
+      demoSiteContent
+    ),
   ["site-content"],
   { revalidate: 300, tags: ["site-content"] }
 );
@@ -159,9 +157,7 @@ const getCachedFeaturedProperties = unstable_cache(
           orderBy: { createdAt: "desc" }
         });
 
-        const mergedProperties = mergePropertyRecords(properties, demoProperties as PropertyRecord[]);
-
-        return restrictToAllowedProperties(mergedProperties.filter((property) => property.featured)).slice(0, 3);
+        return restrictToAllowedProperties(properties.filter((property) => property.featured)).slice(0, 3);
       },
       restrictToAllowedProperties(demoProperties.filter((property) => property.featured)).slice(0, 3)
     ),
@@ -185,44 +181,40 @@ const sortProjectsForDisplay = <T extends {
 
 const getCachedFeaturedProjects = unstable_cache(
   async () =>
-    (hasDatabase
-      ? withFallback(
-          async () => {
-            const projects = await prisma.project.findMany({
-              where: {
-                featured: true,
-                visible: true
-              },
-              orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
-            });
-
-            return sortProjectsForDisplay(projects).slice(0, 3);
+    withFallback(
+      async () => {
+        const projects = await prisma.project.findMany({
+          where: {
+            featured: true,
+            visible: true
           },
-          sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.featured && project.visible)).slice(0, 3)
-        )
-      : sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.featured && project.visible)).slice(0, 3)),
+          orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
+        });
+
+        return sortProjectsForDisplay(projects).slice(0, 3);
+      },
+      sortProjectsForDisplay(demoProjects.filter((project) => project.featured && project.visible)).slice(0, 3)
+    ),
   ["featured-projects"],
   { revalidate: 300, tags: ["projects"] }
 );
 
 const getCachedBlogPosts = unstable_cache(
   async () =>
-    hasDatabase
-      ? withFallback(
-          () =>
-            prisma.blogPost.findMany({
-              where: { published: true },
-              orderBy: { publishedAt: "desc" }
-            }),
-          await listLocalPublishedBlogPosts()
-        )
-      : listLocalPublishedBlogPosts(),
+    withFallback(
+      () =>
+        prisma.blogPost.findMany({
+          where: { published: true },
+          orderBy: { publishedAt: "desc" }
+        }),
+      demoPosts
+    ),
   ["blog-posts"],
   { revalidate: 300, tags: ["posts"] }
 );
 
 const getCachedTestimonials = unstable_cache(
-  async () => listPublishedTestimonials(),
+  async () => withFallback(() => listPublishedTestimonials(), demoTestimonials.filter((item) => item.published)),
   ["testimonials"],
   { revalidate: 300, tags: ["testimonials"] }
 );
@@ -230,14 +222,11 @@ const getCachedTestimonials = unstable_cache(
 const getCachedProperties = unstable_cache(
   async () =>
     withFallback(
-      async () => {
-        const properties = await prisma.property.findMany({
+      () =>
+        prisma.property.findMany({
           include: { project: true },
           orderBy: { createdAt: "desc" }
-        });
-
-        return mergePropertyRecords(properties, demoProperties as PropertyRecord[]);
-      },
+        }),
       demoProperties
     ),
   ["all-properties"],
@@ -246,16 +235,14 @@ const getCachedProperties = unstable_cache(
 
 const getCachedProjects = unstable_cache(
   async () =>
-    hasDatabase
-      ? withFallback(
-          () =>
-            prisma.project.findMany({
-              where: { visible: true },
-              orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
-            }),
-          await listLocalProjects()
-        )
-      : listLocalProjects(),
+    withFallback(
+      () =>
+        prisma.project.findMany({
+          where: { visible: true },
+          orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
+        }),
+      demoProjects.filter((project) => project.visible)
+    ),
   ["all-projects"],
   { revalidate: 300, tags: ["projects"] }
 );
@@ -427,18 +414,11 @@ export async function getSiteContent() {
 }
 
 export async function getProjectBySlug(slug: string) {
-  if (!hasDatabase) {
-    return getLocalProjectBySlug(slug);
-  }
-
-  return withFallback(
-    () =>
-      prisma.project.findFirst({
-        where: { slug, visible: true },
-        include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
-      }),
-    await getLocalProjectBySlug(slug)
-  );
+  assertDatabaseAvailable();
+  return prisma.project.findFirst({
+    where: { slug, visible: true },
+    include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
+  });
 }
 
 function filterProjects<T extends Pick<Project, "title" | "summary" | "description" | "location" | "city" | "status" | "tags">>(
@@ -694,21 +674,17 @@ export async function getTestimonials() {
 
 export async function getBlogPostBySlug(slug: string) {
   return unstable_cache(
-    async () =>
-      hasDatabase
-        ? withFallback(
-            () =>
-              prisma.blogPost.findUnique({
-                where: { slug },
-                include: {
-                  media: {
-                    orderBy: { createdAt: "asc" }
-                  }
-                }
-              }),
-            await getLocalBlogPostBySlug(slug)
-          )
-        : getLocalBlogPostBySlug(slug),
+    async () => {
+      assertDatabaseAvailable();
+      return prisma.blogPost.findUnique({
+        where: { slug },
+        include: {
+          media: {
+            orderBy: { createdAt: "asc" }
+          }
+        }
+      });
+    },
     ["blog-post", slug],
     { revalidate: 300, tags: ["posts"] }
   )();
@@ -719,48 +695,34 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
 }
 
 export async function getAdminCollections() {
-  return withFallback(
-    async () => {
-      const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
-        prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
-        prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
-        hasDatabase
-          ? prisma.blogPost.findMany({
-              include: {
-                media: {
-                  orderBy: { createdAt: "asc" }
-                }
-              },
-              orderBy: { createdAt: "desc" }
-            })
-          : listLocalBlogPosts(),
-        prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
-        prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
-        getSiteContent()
-      ]);
+  assertDatabaseAvailable();
+  const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
+    prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
+    prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
+    prisma.blogPost.findMany({
+      include: {
+        media: {
+          orderBy: { createdAt: "asc" }
+        }
+      },
+      orderBy: { createdAt: "desc" }
+    }),
+    prisma.lead.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.jobApplication.findMany({ orderBy: { createdAt: "desc" } }),
+    getSiteContent()
+  ]);
 
-      const testimonials = await listAllTestimonials();
+  const testimonials = await listAllTestimonials();
 
-      return {
-        projects,
-        properties: restrictToAllowedProperties(properties),
-        posts,
-        testimonials,
-        leads,
-        applications,
-        siteContent
-      };
-    },
-    {
-      projects: await listLocalProjects(),
-      properties: [],
-      posts: await listLocalBlogPosts(),
-      testimonials: demoTestimonials,
-      leads: demoLeads,
-      applications: demoApplications,
-      siteContent: demoSiteContent
-    }
-  );
+  return {
+    projects,
+    properties: restrictToAllowedProperties(properties),
+    posts,
+    testimonials,
+    leads,
+    applications,
+    siteContent
+  };
 }
 
 export async function getAdminDashboardPreview() {

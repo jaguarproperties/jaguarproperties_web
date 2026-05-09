@@ -15,9 +15,6 @@ import { auth } from "@/lib/auth";
 import { getCareerBySlug } from "@/lib/careers";
 import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
-import { deleteLocalBlogPost, upsertLocalBlogPost } from "@/lib/local-blog-posts";
-import { deleteLocalProject, upsertLocalProject } from "@/lib/local-projects";
-import { upsertLocalSiteContent } from "@/lib/local-site-content";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
@@ -573,35 +570,8 @@ export async function createOrUpdateProject(formData: FormData) {
       throw error;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Unable to save project in database, falling back to local storage.", error);
-    }
-
-    const now = new Date();
-    const localProject = await upsertLocalProject({
-      ...data,
-      id: id || `local-project-${nextSlug}`,
-      seoTitle: data.seoTitle ?? null,
-      seoDescription: data.seoDescription ?? null,
-      createdAt: now,
-      updatedAt: now,
-      properties: [],
-      media: data.gallery.map((url, index) => ({
-        id: `local-project-media-${nextSlug}-${index + 1}`,
-        url,
-        alt: index === 0 ? "Featured project image" : "Project gallery image",
-        createdAt: now
-      }))
-    });
-
-    revalidatePath("/");
-    revalidatePath("/admin");
-    revalidatePath("/admin/projects");
-    revalidatePath("/properties");
-    revalidatePath(`/properties/${nextSlug}`);
-    revalidateTag("projects");
-
-    redirect(id ? `/admin/projects/${localProject.id}?updated=1` : "/admin/projects?created=1");
+    const message = formatDatabaseConnectionError(error);
+    redirect(id ? `/admin/projects/${id}?error=${encodeURIComponent(message)}` : `/admin/projects?error=${encodeURIComponent(message)}`);
   }
 }
 
@@ -626,17 +596,8 @@ export async function deleteProject(formData: FormData) {
       throw error;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Unable to delete project from database, falling back to local storage.", error);
-    }
-
-    await deleteLocalProject(id);
-    revalidatePath("/");
-    revalidatePath("/admin");
-    revalidatePath("/admin/projects");
-    revalidatePath("/properties");
-    revalidateTag("projects");
-    redirect("/admin/projects?deleted=1");
+    const message = formatDatabaseConnectionError(error);
+    redirect(`/admin/projects?error=${encodeURIComponent(message)}`);
   }
 }
 
@@ -864,40 +825,8 @@ export async function createOrUpdateBlogPost(formData: FormData) {
       throw error;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Unable to save blog post in database, falling back to local storage.", error);
-    }
-
-    const now = new Date();
-    const localPost = await upsertLocalBlogPost({
-      id: id || `local-post-${data.slug}`,
-      title: data.title,
-      slug: data.slug,
-      excerpt: data.excerpt,
-      content: data.content,
-      coverImage: data.coverImage,
-      seoTitle: data.seoTitle ?? null,
-      seoDescription: data.seoDescription ?? null,
-      published: data.published,
-      publishedAt: now,
-      createdAt: now,
-      updatedAt: now,
-      media: normalizedGallery.map((url, index) => ({
-        id: `local-blog-media-${data.slug}-${index + 1}`,
-        url,
-        alt: index === 0 ? "Featured news image" : "News gallery image",
-        createdAt: now
-      }))
-    });
-
-    revalidateTag("posts");
-    revalidatePath("/");
-    revalidatePath("/news");
-    revalidatePath(`/news/${data.slug}`);
-    revalidatePath("/admin");
-    revalidatePath("/admin/blog");
-
-    redirect(id ? `/admin/blog/${localPost.id}?updated=1` : "/admin/blog?created=1");
+    const message = formatDatabaseConnectionError(error);
+    redirect(id ? `/admin/blog/${id}?error=${encodeURIComponent(message)}` : `/admin/blog?error=${encodeURIComponent(message)}`);
   }
 }
 
@@ -924,15 +853,8 @@ export async function deleteBlogPost(formData: FormData) {
       throw error;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Unable to delete blog post from database, falling back to local storage.", error);
-    }
-
-    await deleteLocalBlogPost(id);
-    revalidateTag("posts");
-    revalidatePath("/news");
-    revalidatePath("/admin/blog");
-    redirect("/admin/blog?deleted=1");
+    const message = formatDatabaseConnectionError(error);
+    redirect(`/admin/blog?error=${encodeURIComponent(message)}`);
   }
 }
 
@@ -1205,16 +1127,8 @@ export async function updateSiteContent(formData: FormData) {
       throw error;
     }
 
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Remote website content save failed, storing content locally instead.", error);
-    }
-    await upsertLocalSiteContent({
-      id: parsed.data.id || "local-site-content",
-      ...parsed.data
-    });
-    revalidatePublicSiteContent();
-    revalidatePath("/admin/content");
-    redirect("/admin/content?saved=1&mode=local");
+    const message = formatDatabaseConnectionError(error);
+    redirect(`/admin/content?error=${encodeURIComponent(message)}`);
   }
 }
 
