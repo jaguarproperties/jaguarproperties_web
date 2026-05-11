@@ -466,7 +466,7 @@ model SiteContent {
   contactPhone     String
   officeAddress    String
   mapEmbedUrl      String
-  footerBlurb      String    @default("Premium real estate experiences across Bengaluru, Doha, and Dubai.")
+  footerBlurb      String    @default("Premium real estate experiences across Bengaluru, Qatar, and Dubai.")
   footerCopyright  String    @default("© 2026 JAGUAR PROPERTIES. Premium real estate developer for Bengaluru, Qatar, and Dubai.")
   footerNote       String    @default("Designed for modern buyers, fast performance, and mobile responsiveness.")
   instagramUrl     String    @default("https://instagram.com")

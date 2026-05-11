@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
+    "sync:cms": "tsx scripts/sync-cms-data.ts",
+    "sync:projects": "tsx scripts/sync-project-content.ts",
+    "sync:all": "tsx prisma/seed.ts && tsx scripts/sync-project-content.ts && tsx scripts/sync-cms-data.ts",
     "reset-user-password": "tsx scripts/reset-user-password.ts"
   },
   "dependencies": {

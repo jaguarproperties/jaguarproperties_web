@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Building2, MapPin, Sparkles } from "lucide-react";
 
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
@@ -109,7 +110,7 @@ export function Hero({
                 <div className="mt-4 space-y-3 text-sm text-zinc-100">
                   {locations.map((location) => (
                     <p key={location} className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-primary" /> {location}
+                      <MapPin className="h-4 w-4 text-primary" /> <TranslateText text={location} />
                     </p>
                   ))}
                 </div>
@@ -120,19 +121,19 @@ export function Hero({
                   <Translate id="hero.signatureLiving" defaultText="Signature Living" />
                 </p>
                 <p className="mt-4 text-sm leading-7 text-zinc-200">
-                  <Translate id="hero.presence.details" defaultText={signatureText} />
+                  <TranslateText text={signatureText} />
                 </p>
               </div>
               <div className="animate-property-float rounded-[30px] border border-white/15 bg-black/30 p-6 shadow-2xl backdrop-blur-xl">
                 <div className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-primary">
                   <Building2 className="h-5 w-5" />
-                  <span>{spotlight.label}</span>
+                  <span><TranslateText text={spotlight.label} /></span>
                 </div>
                 <div className="mt-5 rounded-3xl bg-white/10 p-5 text-zinc-100 shadow-xl">
-                  <p className="text-sm uppercase tracking-[0.35em] text-zinc-300">{spotlight.label}</p>
-                  <p className="mt-3 whitespace-pre-line text-2xl font-semibold text-white">{spotlight.title}</p>
-                  <p className="mt-2 text-sm text-zinc-400">{spotlight.text}</p>
-                  <p className="mt-4 text-sm font-semibold text-primary">{spotlight.price}</p>
+                  <p className="text-sm uppercase tracking-[0.35em] text-zinc-300"><TranslateText text={spotlight.label} /></p>
+                  <p className="mt-3 whitespace-pre-line text-2xl font-semibold text-white"><TranslateText text={spotlight.title} /></p>
+                  <p className="mt-2 text-sm text-zinc-400"><TranslateText text={spotlight.text} /></p>
+                  <p className="mt-4 text-sm font-semibold text-primary"><TranslateText text={spotlight.price} /></p>
                 </div>
               </div>
             </div>
@@ -146,7 +147,7 @@ export function Hero({
             <div className="mt-3 space-y-2 text-sm text-zinc-100">
               {locations.map((location) => (
                 <p key={location} className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-primary" /> {location}
+                  <MapPin className="h-4 w-4 text-primary" /> <TranslateText text={location} />
                 </p>
               ))}
             </div>
@@ -157,7 +158,7 @@ export function Hero({
               <Translate id="hero.signatureLiving" defaultText="Signature Living" />
             </p>
             <p className="mt-3 text-sm leading-7 text-zinc-200">
-              <Translate id="hero.presence.details" defaultText={signatureText} />
+              <TranslateText text={signatureText} />
             </p>
           </div>
         </div>

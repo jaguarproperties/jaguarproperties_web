@@ -7,6 +7,7 @@ import { ProjectCard } from "@/components/site/project-card";
 import { TestimonialsMarquee } from "@/components/site/testimonials-marquee";
 import { BlogCard } from "@/components/site/blog-card";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
@@ -93,15 +94,15 @@ export default async function HomePage() {
       <section id="about" className="container scroll-mt-32 py-16 md:py-20">
         <SectionHeading
           eyebrow={<Translate id="about.eyebrow" defaultText="About Us" />}
-          title={siteContent.aboutTitle}
-          description={siteContent.aboutBody}
+          title={<TranslateText text={siteContent.aboutTitle} />}
+          description={<TranslateText text={siteContent.aboutBody} />}
         />
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {marketHighlights.map((item, index) => (
             <Card key={`${item.value}-${index}`} className="p-6">
               <p className="font-display text-4xl text-foreground dark:text-white">{item.value}</p>
               <p className="mt-3 text-sm leading-7 text-zinc-700 dark:text-zinc-400">
-                {item.label}
+                <TranslateText text={item.label} />
               </p>
             </Card>
           ))}
@@ -138,7 +139,7 @@ export default async function HomePage() {
                     {item.title === "Presence" ? (
                       <Translate id="about.presence.text" defaultText={item.text ?? ""} />
                     ) : (
-                      item.text
+                      <TranslateText text={item.text} />
                     )}
                   </p>
                 </Card>
@@ -151,8 +152,8 @@ export default async function HomePage() {
       <section id="featured-properties" className="container scroll-mt-32 py-16 md:py-20">
         <SectionHeading
           eyebrow={<Translate id="section.featuredProjects.eyebrow" defaultText="Featured Projects" />}
-          title={siteContent.homeFeaturedPropertiesTitle}
-          description={siteContent.homeFeaturedPropertiesDescription}
+          title={<TranslateText text={siteContent.homeFeaturedPropertiesTitle} />}
+          description={<TranslateText text={siteContent.homeFeaturedPropertiesDescription} />}
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {projects.map((project, index) => (
@@ -216,8 +217,8 @@ export default async function HomePage() {
       <section id="latest-news" className="container scroll-mt-32 py-16 md:py-20">
         <SectionHeading
           eyebrow={<Translate id="section.news.eyebrow" defaultText="News" />}
-          title={siteContent.homeNewsTitle}
-          description={siteContent.homeNewsDescription}
+          title={<TranslateText text={siteContent.homeNewsTitle} />}
+          description={<TranslateText text={siteContent.homeNewsDescription} />}
         />
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {posts.slice(0, 3).map((post, index) => (
@@ -238,12 +239,12 @@ export default async function HomePage() {
               <Translate id="home.concierge.eyebrow" defaultText="Concierge Support" />
             </p>
             <h2 className="mt-4 font-display text-4xl text-foreground dark:text-white">
-              {siteContent.homeConciergeTitle}
+              <TranslateText text={siteContent.homeConciergeTitle} />
             </h2>
           </div>
           <Button asChild size="lg">
             <a href={siteContent.homeConciergeButtonHref}>
-              <Translate id="section.concierge.button" defaultText={siteContent.homeConciergeButtonLabel} />
+              <TranslateText text={siteContent.homeConciergeButtonLabel} />
             </a>
           </Button>
         </Card>

@@ -5,6 +5,7 @@ import { PageShell } from "@/components/layout/page-shell";
 import { ProjectCard } from "@/components/site/project-card";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getProjects, getSiteContent } from "@/lib/data";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
@@ -46,8 +47,8 @@ export default async function PropertiesPage({
         <div className="space-y-8">
           <SectionHeading
             eyebrow={<Translate id="projects.page.eyebrow" defaultText="Projects" />}
-            title={siteContent.propertiesTitle}
-            description={siteContent.propertiesDescription}
+            title={<TranslateText text={siteContent.propertiesTitle} />}
+            description={<TranslateText text={siteContent.propertiesDescription} />}
           />
           <div className="grid gap-4 lg:grid-cols-3">
             {advantages.map((item, index) => {
@@ -56,10 +57,10 @@ export default async function PropertiesPage({
               <Card key={item.title} className="h-full p-6">
                 <Icon className="h-8 w-8 text-primary" />
                 <h3 className="mt-4 font-display text-2xl text-foreground dark:text-white">
-                  {item.title}
+                  <TranslateText text={item.title} />
                 </h3>
                 <p className="mt-3 text-sm leading-7 text-zinc-700 dark:text-zinc-400">
-                  {item.text}
+                  <TranslateText text={item.text} />
                 </p>
               </Card>
               );

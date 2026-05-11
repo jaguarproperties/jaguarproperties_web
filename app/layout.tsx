@@ -8,11 +8,11 @@ import { siteMedia } from "@/lib/site-media";
 
 export const metadata: Metadata = {
   title: {
-    default: "Jaguar Properties | Luxury Real Estate in Bengaluru, Doha & Dubai",
+    default: "Jaguar Properties | Luxury Real Estate in Bengaluru, Qatar & Dubai",
     template: "%s | Jaguar Properties"
   },
   description:
-    "Jaguar Properties builds premium residential communities and investment-led developments across Bengaluru, Doha, and Dubai.",
+    "Jaguar Properties builds premium residential communities and investment-led developments across Bengaluru, Qatar, and Dubai.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),

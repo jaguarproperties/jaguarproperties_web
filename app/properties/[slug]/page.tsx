@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { PropertyGallery } from "@/components/site/property-gallery";
 import { SectionHeading } from "@/components/site/section-heading";
+import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getProjectBySlug } from "@/lib/data";
@@ -47,14 +49,14 @@ export default async function ProjectDetailsPage({
           <Button asChild variant="ghost" className="w-fit">
             <Link href="/properties">
               <ArrowLeft className="h-4 w-4" />
-              Back to Projects
+              <Translate id="button.backToProjects" defaultText="Back to Projects" />
             </Link>
           </Button>
 
           <SectionHeading
-            eyebrow={tags[0]}
-            title={project.title}
-            description={project.summary}
+            eyebrow={<TranslateText text={tags[0]} />}
+            title={<TranslateText text={project.title} />}
+            description={<TranslateText text={project.summary} />}
           />
 
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
@@ -68,49 +70,53 @@ export default async function ProjectDetailsPage({
                       key={tag}
                       className="rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-primary-foreground"
                     >
-                      {tag}
+                      <TranslateText text={tag} />
                     </span>
                   ))}
                   <span className="rounded-full border border-black/10 px-4 py-2 text-sm text-zinc-700 dark:border-white/10 dark:text-zinc-300">
-                    {project.priceRange}
+                    <TranslateText text={project.priceRange} />
                   </span>
                 </div>
 
                 <div className="mt-6 space-y-4">
                   <div className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
                     <MapPin className="mt-0.5 h-4 w-4 text-primary" />
-                    <span>{project.location}, {project.city}, {project.country}</span>
+                    <span><TranslateText text={project.location} />, <TranslateText text={project.city} />, <TranslateText text={project.country} /></span>
                   </div>
                   <div className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
                     <Ruler className="mt-0.5 h-4 w-4 text-primary" />
-                    <span>{areaLabel}</span>
+                    <span><TranslateText text={areaLabel} /></span>
                   </div>
                   <div className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
                     <Building2 className="mt-0.5 h-4 w-4 text-primary" />
-                    <span>{project.status.replaceAll("_", " ")}</span>
+                    <span><TranslateText text={project.status.replaceAll("_", " ")} /></span>
                   </div>
                   <div className="flex items-start gap-3 text-sm text-zinc-700 dark:text-zinc-300">
                     <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
-                    <span>{project.priceRange}</span>
+                    <span><TranslateText text={project.priceRange} /></span>
                   </div>
                 </div>
               </Card>
 
               <Card className="p-6">
-                <h2 className="font-display text-3xl text-foreground dark:text-white">Overview</h2>
-                <p className="mt-4 text-base leading-8 text-zinc-700 dark:text-zinc-300">{project.description}</p>
+                <h2 className="font-display text-3xl text-foreground dark:text-white">
+                  <Translate id="project.overview" defaultText="Overview" />
+                </h2>
+                <p className="mt-4 text-base leading-8 text-zinc-700 dark:text-zinc-300"><TranslateText text={project.description} /></p>
               </Card>
 
               {project.tags.length ? (
                 <Card className="p-6">
-                  <p className="text-xs uppercase tracking-[0.3em] text-primary">Project Tags</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-primary">
+                    <Translate id="project.tags" defaultText="Project Tags" />
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-3">
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
                         className="rounded-full border border-black/10 bg-black/[0.03] px-4 py-2 text-sm text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300"
                       >
-                        {tag}
+                        <TranslateText text={tag} />
                       </span>
                     ))}
                   </div>

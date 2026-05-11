@@ -11,6 +11,22 @@ type LanguageContextValue = {
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
 
+function normalizeLookupValue(value: string) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function findTranslationKey(candidate: string) {
+  const normalizedCandidate = normalizeLookupValue(candidate);
+
+  for (const [translationKey, englishText] of Object.entries(translations.en)) {
+    if (normalizeLookupValue(englishText) === normalizedCandidate) {
+      return translationKey;
+    }
+  }
+
+  return null;
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Locale>(defaultLocale);
 
@@ -31,7 +47,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const t = useMemo(
-    () => (key: string, defaultText: string) => translations[language]?.[key] ?? defaultText,
+    () => (key: string, defaultText: string) => {
+      const directMatch = translations[language]?.[key];
+
+      if (directMatch) {
+        return directMatch;
+      }
+
+      const resolvedKey = findTranslationKey(defaultText) ?? findTranslationKey(key);
+
+      if (resolvedKey) {
+        return translations[language]?.[resolvedKey] ?? defaultText;
+      }
+
+      return defaultText;
+    },
     [language]
   );
 

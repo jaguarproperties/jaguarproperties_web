@@ -28,7 +28,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "about.mission": "Mission",
     "about.vision": "Vision",
     "about.presence": "Presence",
-    "about.presence.text": "Bengaluru, Doha, and Dubai with market-specific luxury developments.",
+    "about.presence.text": "Bengaluru, Qatar, and Dubai with market-specific luxury developments.",
     "section.featuredProjects.eyebrow": "Featured Projects",
     "section.featuredProjects.title": "Flagship developments shaped by precision and place.",
     "section.featuredProjects.description": "A curated mix of plotted communities, residences, and luxury enclaves across high-growth destinations.",
@@ -159,7 +159,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "home.portfolioStories.1.label": "Bengaluru",
     "home.portfolioStories.1.value": "Residential growth",
     "home.portfolioStories.1.text": "Design-led plotted developments, villas, and apartments placed in high-conviction North Bengaluru corridors.",
-    "home.portfolioStories.2.label": "Doha",
+    "home.portfolioStories.2.label": "Qatar",
     "home.portfolioStories.2.value": "Executive living",
     "home.portfolioStories.2.text": "Premium residences shaped for professionals, families, and investors seeking quality rental-led markets.",
     "home.portfolioStories.3.label": "Dubai",
@@ -307,7 +307,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     "Urban Access": "Urban Access",
     "North Bengaluru": "North Bengaluru",
     "property.viewDetails": "View Details",
-    "property.highlights": "Project Highlights"
+    "property.highlights": "Project Highlights",
+    "button.backToProjects": "Back to Projects",
+    "project.overview": "Overview",
+    "project.tags": "Project Tags",
+    "button.seeMore": "See more",
+    "button.seeLess": "See less",
+    "contact.map.open": "Open in Google Maps",
+    "contact.map.viewLocation": "View location"
   },
   hi: {
     "nav.home": "होम",
@@ -329,7 +336,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "about.mission": "मिशन",
     "about.vision": "विजन",
     "about.presence": "उपस्थिति",
-    "about.presence.text": "बैंगलोर, दोहा, और दुबई में बाज़ार-विशिष्ट लक्ज़री विकास।",
+    "about.presence.text": "बैंगलोर, क़तर, और दुबई में बाज़ार-विशिष्ट लक्ज़री विकास।",
     "section.featuredProjects.eyebrow": "विशेष प्रोजेक्ट्स",
     "section.featuredProjects.title": "प्रिसिजन और स्थान द्वारा आकार दिए गए प्रमुख विकास।",
     "section.featuredProjects.description": "उच्च-विकास गंतव्यों में प्लॉट किए गए समुदायों, आवासों और लक्ज़री एंकेल्स का एक क्यूरेटेड मिश्रण।",
@@ -608,7 +615,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     "Urban Access": "अर्बन एक्सेस",
     "North Bengaluru": "नॉर्थ बेंगलुरु",
     "property.viewDetails": "विवरण देखें",
-    "property.highlights": "प्रोजेक्ट हाइलाइट्स"
+    "property.highlights": "प्रोजेक्ट हाइलाइट्स",
+    "button.backToProjects": "प्रोजेक्ट्स पर वापस जाएं",
+    "project.overview": "अवलोकन",
+    "project.tags": "प्रोजेक्ट टैग्स",
+    "button.seeMore": "और देखें",
+    "button.seeLess": "कम देखें",
+    "contact.map.open": "Google Maps में खोलें",
+    "contact.map.viewLocation": "लोकेशन देखें"
   },
   ar: {
     "nav.home": "الرئيسية",
@@ -630,7 +644,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "about.mission": "مهمة",
     "about.vision": "رؤية",
     "about.presence": "حضور",
-    "about.presence.text": "بنغالور، الدوحة، ودبي بتطويرات فاخرة متخصصة بالسوق.",
+    "about.presence.text": "بنغالورو، قطر، ودبي بتطويرات فاخرة متخصصة بالسوق.",
     "section.featuredProjects.eyebrow": "المشاريع المميزة",
     "section.featuredProjects.title": "مشروعات رائدة مصممة بالدقة والموقع.",
     "section.featuredProjects.description": "مجموعة مختارة من المجتمعات المسورة، المساكن، والمشروعات الفاخرة في وجهات عالية النمو.",
@@ -853,7 +867,16 @@ export const translations: Record<Locale, Record<string, string>> = {
     "Featured": "مميز",
     "Villa Community": "مجتمع فلل",
     "Urban Access": "وصول حضري",
-    "North Bengaluru": "شمال بنغالور"
+    "North Bengaluru": "شمال بنغالور",
+    "property.viewDetails": "عرض التفاصيل",
+    "property.highlights": "أبرز مميزات المشروع",
+    "button.backToProjects": "العودة إلى المشاريع",
+    "project.overview": "نظرة عامة",
+    "project.tags": "وسوم المشروع",
+    "button.seeMore": "عرض المزيد",
+    "button.seeLess": "عرض أقل",
+    "contact.map.open": "افتح في خرائط Google",
+    "contact.map.viewLocation": "عرض الموقع"
   },
   kn: {
     "nav.home": "ಮನೆ",
@@ -875,7 +898,7 @@ export const translations: Record<Locale, Record<string, string>> = {
     "about.mission": "ದೌತ್ಯ",
     "about.vision": "ದೃಷ್ಠಿ",
     "about.presence": "ಹಾಜರಾತಿ",
-    "about.presence.text": "ಬೆಂಗಳೂರು, ದೋಹಾ ಮತ್ತು ದುಬೈನಲ್ಲಿ ಮಾರುಕಟ್ಟೆ-ನಿರ್ದಿಷ್ಟ ಐಷಾರಾಮಿ ಅಭಿವೃದ್ಧಿಗಳು.",
+    "about.presence.text": "ಬೆಂಗಳೂರು, ಕತಾರ್ ಮತ್ತು ದುಬೈನಲ್ಲಿ ಮಾರುಕಟ್ಟೆ-ನಿರ್ದಿಷ್ಟ ಐಷಾರಾಮಿ ಅಭಿವೃದ್ಧಿಗಳು.",
     "section.featuredProjects.eyebrow": "ಪ್ರಮುಖ ಪ್ರಾಜೆಕ್ಟ್‌ಗಳು",
     "section.featuredProjects.title": "ನಿಖರತೆ ಮತ್ತು ಸ್ಥಾನದಲ್ಲಿ ರೂಪಿಸಲಾದ ಪ್ರಮುಖ ಅಭಿವೃದ್ಧಿಗಳು.",
     "section.featuredProjects.description": "ಅವರ್ತಿತ ವೃದ್ಧಿ ಗಮ್ಯಸ್ಥಳಗಳಲ್ಲಿನ ಪ್ಲಾಟ್‌ಗೊಂಡ ಸಮುದಾಯಗಳು, ವಾಸಸ್ಥಳಗಳು ಮತ್ತು ಐಷಾರಾಮಿ ಎಂಕ್ಲೇವ್ಗಳ ವೈಶಿಷ್ಟ್ಯಪೂರ್ಣ ಮಿಶ್ರಣ.",
@@ -1094,6 +1117,15 @@ export const translations: Record<Locale, Record<string, string>> = {
     "Featured": "ಪ್ರಮುಖ",
     "Villa Community": "ವಿಲ್ಲಾ ಸಮುದಾಯ",
     "Urban Access": "ನಗರ ಪ್ರವೇಶ",
-    "North Bengaluru": "ಉತ್ತರ ಬೆಂಗಳೂರು"
+    "North Bengaluru": "ಉತ್ತರ ಬೆಂಗಳೂರು",
+    "property.viewDetails": "ವಿವರಗಳನ್ನು ನೋಡಿ",
+    "property.highlights": "ಪ್ರಾಜೆಕ್ಟ್ ಹೈಲೈಟ್ಸ್",
+    "button.backToProjects": "ಪ್ರಾಜೆಕ್ಟ್‌ಗಳಿಗೆ ಹಿಂತಿರುಗಿ",
+    "project.overview": "ಸಮಗ್ರ ನೋಟ",
+    "project.tags": "ಪ್ರಾಜೆಕ್ಟ್ ಟ್ಯಾಗ್‌ಗಳು",
+    "button.seeMore": "ಇನ್ನಷ್ಟು ನೋಡಿ",
+    "button.seeLess": "ಕಡಿಮೆ ನೋಡಿ",
+    "contact.map.open": "Google Maps ನಲ್ಲಿ ತೆರೆಯಿರಿ",
+    "contact.map.viewLocation": "ಸ್ಥಳವನ್ನು ನೋಡಿ"
   }
 };

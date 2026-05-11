@@ -5,6 +5,7 @@ import { PageShell } from "@/components/layout/page-shell";
 import { LeadForm } from "@/components/site/lead-form";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/data";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
@@ -29,8 +30,8 @@ export default async function ContactPage() {
           <div>
             <SectionHeading
               eyebrow={<Translate id="contact.eyebrow" defaultText="Contact" />}
-              title={siteContent.contactTitle}
-              description={siteContent.contactDescription}
+              title={<TranslateText text={siteContent.contactTitle} />}
+              description={<TranslateText text={siteContent.contactDescription} />}
             />
             <div className="mt-8 grid gap-4">
               {supportPoints.map((item, index) => {
@@ -40,8 +41,8 @@ export default async function ContactPage() {
                   <div className="flex gap-4">
                     <Icon className="mt-1 h-5 w-5 text-primary" />
                     <div>
-                      <h3 className="font-display text-2xl text-foreground dark:text-white">{item.title}</h3>
-                      <p className="mt-2 text-sm leading-7 text-zinc-700 dark:text-zinc-300">{item.text}</p>
+                      <h3 className="font-display text-2xl text-foreground dark:text-white"><TranslateText text={item.title} /></h3>
+                      <p className="mt-2 text-sm leading-7 text-zinc-700 dark:text-zinc-300"><TranslateText text={item.text} /></p>
                     </div>
                   </div>
                 </Card>
@@ -69,8 +70,8 @@ export default async function ContactPage() {
                 className="pointer-events-none min-h-[360px] w-full"
               />
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/65 px-5 py-3 text-sm text-white backdrop-blur-sm transition group-hover:bg-black/75">
-                <span>Open Jaguar Properties in Google Maps</span>
-                <span className="font-semibold text-primary">View location</span>
+                <span><Translate id="contact.map.open" defaultText="Open Jaguar Properties in Google Maps" /></span>
+                <span className="font-semibold text-primary"><Translate id="contact.map.viewLocation" defaultText="View location" /></span>
               </div>
             </a>
           </div>

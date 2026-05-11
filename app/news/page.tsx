@@ -5,6 +5,7 @@ import { PageShell } from "@/components/layout/page-shell";
 import { BlogCard } from "@/components/site/blog-card";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getBlogPosts, getSiteContent } from "@/lib/data";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
@@ -27,8 +28,8 @@ export default async function NewsPage() {
       <section className="container py-16 md:py-20">
         <SectionHeading
           eyebrow={<Translate id="news.page.eyebrow" defaultText="Editorial" />}
-          title={siteContent.newsTitle}
-          description={siteContent.newsDescription}
+          title={<TranslateText text={siteContent.newsTitle} />}
+          description={<TranslateText text={siteContent.newsDescription} />}
         />
         <div className="mt-10 grid gap-4 lg:grid-cols-3">
           {editorialTracks.map((track, index) => {
@@ -37,10 +38,10 @@ export default async function NewsPage() {
             <Card key={track.title} className="h-full p-6">
               <Icon className="h-8 w-8 text-primary" />
               <h3 className="mt-4 font-display text-2xl text-foreground dark:text-white">
-                {track.title}
+                <TranslateText text={track.title} />
               </h3>
               <p className="mt-3 text-sm leading-7 text-zinc-700 dark:text-zinc-400">
-                {track.text}
+                <TranslateText text={track.text} />
               </p>
             </Card>
             );

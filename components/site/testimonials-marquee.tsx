@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
@@ -95,7 +96,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           <p className="text-xs uppercase tracking-[0.28em] text-primary">
             <Translate id="home.testimonials.client" defaultText="Client Voice" />
           </p>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">{testimonial.name}</h3>
+          <h3 className="mt-1 text-lg font-semibold text-foreground"><TranslateText text={testimonial.name} /></h3>
         </div>
       </div>
       <p
@@ -113,7 +114,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
           onClick={() => setExpanded((current) => !current)}
           className="mt-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary transition hover:opacity-75"
         >
-          {expanded ? "See less" : "See more"}
+          <Translate id={expanded ? "button.seeLess" : "button.seeMore"} defaultText={expanded ? "See less" : "See more"} />
         </button>
       ) : null}
     </Card>

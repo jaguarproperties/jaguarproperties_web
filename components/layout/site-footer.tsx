@@ -4,6 +4,7 @@ import { Facebook, Instagram, Linkedin, Youtube, X } from "lucide-react";
 import { getSiteContent } from "@/lib/data";
 import { footerNavigationColumns } from "@/lib/footer-pages";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { resolveSiteContent } from "@/lib/site-content";
 
 export async function SiteFooter() {
@@ -26,7 +27,7 @@ export async function SiteFooter() {
         <div className="max-w-md">
           <p className="font-display text-3xl tracking-[0.12em] text-foreground">JAGUAR PROPERTIES</p>
           <p className="mt-5 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
-            {content?.footerBlurb}
+            <TranslateText text={content?.footerBlurb} />
           </p>
         </div>
         <div className="rounded-[28px] border border-black/10 bg-white/40 p-6 dark:border-white/10 dark:bg-white/5">
@@ -39,7 +40,7 @@ export async function SiteFooter() {
                 <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                 <div className="space-y-1">
                   {branch.map((line) => (
-                    <p key={line}>{line}</p>
+                    <p key={line}><TranslateText text={line} /></p>
                   ))}
                 </div>
               </li>
@@ -109,10 +110,10 @@ export async function SiteFooter() {
       <div className="border-t border-black/10 dark:border-white/10">
         <div className="container space-y-3 py-8 text-center text-zinc-600 dark:text-zinc-400">
           <p className="text-sm leading-6 md:text-base">
-            {content?.footerCopyright}
+            <TranslateText text={content?.footerCopyright} />
           </p>
           <p className="text-sm leading-6 md:text-base">
-            {content?.footerNote}
+            <TranslateText text={content?.footerNote} />
           </p>
         </div>
       </div>

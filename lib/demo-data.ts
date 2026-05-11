@@ -6,7 +6,7 @@ export const demoSiteContent = {
   id: "demo-site-content",
   heroTitle: "Jaguar City opens a new chapter of plotted living in North Bengaluru.",
   heroSubtitle:
-    "A 100-acre integrated township in Doddaballapura with premium plots, modern infrastructure, community amenities, and strong long-term investment potential near Bengaluru's airport growth corridor.",
+    "A 100-acer integrated township in Doddaballapura with premium plots, modern infrastructure, community amenities, and strong long-term investment potential near Bengaluru's airport growth corridor.",
   heroImage: siteMedia.jaguarCityCover,
   homePrimaryCtaLabel: "View Projects",
   homePrimaryCtaHref: "/properties",
@@ -28,7 +28,7 @@ export const demoSiteContent = {
     "To provide premium and affordable plots with transparent processes, quality infrastructure, and a secure path to land ownership for every family.",
   vision:
     "To develop world-class townships and become a benchmark in real estate through trust, quality, and innovation.",
-  presenceText: "Bengaluru, Doha, and Dubai with market-specific luxury developments.",
+  presenceText: "Bengaluru, Qatar, and Dubai with market-specific luxury developments.",
   homeFeaturedProjectsTitle: "",
   homeFeaturedProjectsDescription: "",
   homeFeaturedPropertiesTitle: "Featured projects and investment-led opportunities.",
@@ -39,7 +39,7 @@ export const demoSiteContent = {
   homePortfolioDescription:
     "Jaguar Properties brings hospitality thinking into every phase of development, from land planning to final handover.",
   homePortfolioItems:
-    "Bengaluru|Residential growth|Design-led plotted developments, villas, and apartments placed in high-conviction North Bengaluru corridors.\nDoha|Executive living|Premium residences shaped for professionals, families, and investors seeking quality rental-led markets.\nDubai|Global luxury|High-visibility branded living concepts with strong lifestyle positioning and international buyer appeal.\nClient care|Concierge support|A guided ownership journey built around trust, transparent communication, and long-term relationship value.",
+    "Bengaluru|Residential growth|Design-led plotted developments, villas, and apartments placed in high-conviction North Bengaluru corridors.\nQatar|Executive living|Premium residences shaped for professionals, families, and investors seeking quality rental-led markets.\nDubai|Global luxury|High-visibility branded living concepts with strong lifestyle positioning and international buyer appeal.\nClient care|Concierge support|A guided ownership journey built around trust, transparent communication, and long-term relationship value.",
   homeNewsTitle: "Market insight and development updates.",
   homeNewsDescription: "Editorial coverage, investor notes, and Jaguar announcements.",
   homeConciergeTitle: "Plan your next acquisition with Jaguar.",
@@ -76,9 +76,9 @@ export const demoSiteContent = {
   contactEmail: "info@jaguarproperties.in",
   contactPhone: "+91 78299 56789",
   officeAddress:
-    "Bangalore – Head Office\n5, First Main Road, Second Floor\nKHB Layout, Yelahanka New Town\nBangalore – 560064, India\n\nDubai – UAE – Branch Office\n\nCalicut – India – Branch Office",
+    "Bangalore – Head Office\n5, First Main Road, Second Floor\nKHB Layout, Yelahanka New Town\nBangalore – 560064, India\n\nDubai – UAE – Branch Office\n\nCalicut – India – Branch Office\n\nQatar – Branch Office",
   mapEmbedUrl: "https://www.google.com/maps?q=13.09840,77.58476&z=17&output=embed",
-  footerBlurb: "Premium real estate experiences across Bengaluru, Doha, and Dubai.",
+  footerBlurb: "Premium real estate experiences across Bengaluru, Qatar, and Dubai.",
   footerCopyright:
     "© 2026 JAGUAR PROPERTIES. Premium real estate developer for Bengaluru, Qatar, and Dubai.",
   footerNote: "Designed for modern buyers, fast performance, and mobile responsiveness.",
@@ -338,30 +338,40 @@ export const demoPosts = [
 export const demoTestimonials = [
   {
     id: "demo-testimonial-1",
-    name: "Raghavendra S",
+    name: "Haritha Reddy",
     message:
-      "Jaguar Properties kept the process clear from site visit to documentation. The team was responsive, transparent, and easy to work with throughout.",
-    image: siteMedia.jaguarCityCommunity,
+      "Very recently we bought a property in Jaguar Properties. It was an excellent journey from the discussion with the seller till the registration. Every interaction was transparent. I sincerely thank the team.",
+    image: "/uploads/site-media/testimonial-demo-profile.png",
     published: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
     id: "demo-testimonial-2",
-    name: "Farah N",
+    name: "Akash Sharma",
     message:
-      "We were looking for a plotted development with long-term value and better road connectivity. Jaguar guided us patiently and answered every question with confidence.",
-    image: siteMedia.emiratesCity,
+      "I bought a plot in Jaguar Properties. I received possession with all legal documents and never faced any issues. They provided good service and the plot pricing and location are very good.",
+    image: "/uploads/site-media/testimonial-demo-profile.png",
     published: true,
     createdAt: new Date(),
     updatedAt: new Date()
   },
   {
     id: "demo-testimonial-3",
-    name: "Vikram Patel",
+    name: "Joseph Geethan",
     message:
-      "The overall experience felt professional and well-managed. What stood out most was the speed of follow-up and the clarity around the project details.",
-    image: siteMedia.jaguarCityGrowth,
+      "We are happy to deal with a company that understands direct selling. The team is professional and extremely helpful. The location in Bangalore is very good and we truly appreciate the experience.",
+    image: "/uploads/site-media/testimonial-demo-profile.png",
+    published: true,
+    createdAt: new Date(),
+    updatedAt: new Date()
+  },
+  {
+    id: "demo-testimonial-4",
+    name: "Manoj Kumar",
+    message:
+      "We are very happy with the price offered by Jaguar Properties to own a home. We are satisfied with the service they provided. Wishing the team great success in the future.",
+    image: "/uploads/site-media/testimonial-demo-profile.png",
     published: true,
     createdAt: new Date(),
     updatedAt: new Date()
