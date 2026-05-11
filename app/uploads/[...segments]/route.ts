@@ -3,6 +3,8 @@ import path from "path";
 
 import { NextRequest } from "next/server";
 
+import { formatSiteMediaLookupError, getStoredSiteMediaByFilename } from "@/lib/site-media-storage";
+
 const CONTENT_TYPES: Record<string, string> = {
   ".avif": "image/avif",
   ".gif": "image/gif",
@@ -37,7 +39,28 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: { segments: string[] } }
 ) {
-  const filePaths = resolveCandidateUploadPaths(params.segments ?? []);
+  const segments = params.segments ?? [];
+
+  if (segments[0] === "site-media" && segments[1]) {
+    try {
+      const image = await getStoredSiteMediaByFilename(segments[1]);
+
+      if (image) {
+        return new Response(new Uint8Array(image.data), {
+          status: 200,
+          headers: {
+            "Cache-Control": "public, max-age=31536000, immutable",
+            "Content-Type": image.contentType,
+            "Content-Disposition": `inline; filename="${image.filename}"`
+          }
+        });
+      }
+    } catch (error) {
+      return new Response(formatSiteMediaLookupError(error), { status: 503 });
+    }
+  }
+
+  const filePaths = resolveCandidateUploadPaths(segments);
 
   if (!filePaths.length) {
     return new Response("Invalid path", { status: 400 });

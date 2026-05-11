@@ -17,7 +17,7 @@ import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database
 import { replaceHolidayCalendar } from "@/lib/holidays";
 import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
-import { SITE_MEDIA_BASE_PATH } from "@/lib/site-media";
+import { saveSiteMediaToMongo } from "@/lib/site-media-storage";
 import { deleteLocalProject, listLocalProjects, upsertLocalProject } from "@/lib/local-projects";
 import { createTestimonial, deleteTestimonialById, updateTestimonial } from "@/lib/testimonials";
 import { slugify, safeSplitGallery } from "@/lib/utils";
@@ -210,10 +210,6 @@ function getHrmLetterheadStorageDir() {
   return path.join(process.cwd(), "public", "uploads", "hrm-letterheads");
 }
 
-function getSiteMediaStorageDir() {
-  return path.join(process.cwd(), "storage", "site-media");
-}
-
 function isAllowedResumeType(file: File) {
   return [
     "application/pdf",
@@ -228,12 +224,6 @@ function isAllowedLetterheadType(file: File) {
 
 function isAllowedPropertyImageType(file: File) {
   return ["image/png", "image/jpeg", "image/jpg", "image/webp", "image/gif"].includes(file.type);
-}
-
-function sanitizeFilenameSegment(value: string) {
-  const trimmed = value.trim().toLowerCase();
-  const sanitized = trimmed.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  return sanitized || "property-image";
 }
 
 async function savePropertyImage(file: File, propertyTitle: string) {
@@ -253,16 +243,7 @@ async function saveSiteImage(file: File, baseName: string, contextLabel: string)
     throw new Error(`${contextLabel[0].toUpperCase()}${contextLabel.slice(1)} images must be smaller than 8 MB each.`);
   }
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-  const extension = path.extname(file.name) || ".jpg";
-  const storageDir = getSiteMediaStorageDir();
-  const filename = `${sanitizeFilenameSegment(baseName)}-${randomUUID()}${extension.toLowerCase()}`;
-
-  await mkdir(storageDir, { recursive: true });
-  await writeFile(path.join(storageDir, filename), buffer);
-
-  return `${SITE_MEDIA_BASE_PATH}/${filename}`;
+  return saveSiteMediaToMongo(file, baseName);
 }
 
 function dedupeImageList(images: string[]) {
