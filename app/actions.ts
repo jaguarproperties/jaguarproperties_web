@@ -211,7 +211,7 @@ function getHrmLetterheadStorageDir() {
 }
 
 function getSiteMediaStorageDir() {
-  return path.join(process.cwd(), "public", "uploads", "site-media");
+  return path.join(process.cwd(), "storage", "site-media");
 }
 
 function isAllowedResumeType(file: File) {

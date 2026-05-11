@@ -16,15 +16,23 @@ const CONTENT_TYPES: Record<string, string> = {
   ".webp": "image/webp"
 };
 
-function resolveMediaPath(segments: string[]) {
+function resolveCandidateMediaPaths(segments: string[]) {
+  const storageRoot = path.join(process.cwd(), "storage");
   const uploadsRoot = path.join(process.cwd(), "public", "uploads");
-  const resolvedPath = path.resolve(uploadsRoot, ...segments);
+  const storagePath = path.resolve(storageRoot, ...segments);
+  const uploadsPath = path.resolve(uploadsRoot, ...segments);
 
-  if (!resolvedPath.startsWith(uploadsRoot)) {
-    return null;
+  const candidates: string[] = [];
+
+  if (storagePath.startsWith(storageRoot)) {
+    candidates.push(storagePath);
   }
 
-  return resolvedPath;
+  if (uploadsPath.startsWith(uploadsRoot)) {
+    candidates.push(uploadsPath);
+  }
+
+  return candidates;
 }
 
 export async function GET(
@@ -53,24 +61,28 @@ export async function GET(
     }
   }
 
-  const filePath = resolveMediaPath(segments);
+  const filePaths = resolveCandidateMediaPaths(segments);
 
-  if (!filePath) {
+  if (!filePaths.length) {
     return new Response("Invalid path", { status: 400 });
   }
 
-  try {
-    const file = await readFile(filePath);
-    const extension = path.extname(filePath).toLowerCase();
-    const contentType = CONTENT_TYPES[extension] ?? "application/octet-stream";
+  for (const filePath of filePaths) {
+    try {
+      const file = await readFile(filePath);
+      const extension = path.extname(filePath).toLowerCase();
+      const contentType = CONTENT_TYPES[extension] ?? "application/octet-stream";
 
-    return new Response(file, {
-      headers: {
-        "Cache-Control": "public, max-age=31536000, immutable",
-        "Content-Type": contentType
-      }
-    });
-  } catch {
-    return new Response("File not found", { status: 404 });
+      return new Response(file, {
+        headers: {
+          "Cache-Control": "public, max-age=31536000, immutable",
+          "Content-Type": contentType
+        }
+      });
+    } catch {
+      // Try the next candidate location.
+    }
   }
+
+  return new Response("File not found", { status: 404 });
 }
