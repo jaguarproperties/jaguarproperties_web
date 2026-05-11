@@ -43,19 +43,19 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     address: "Attached to SH-74, Doddaballapura towards Nelamangala, Bangalore North",
     price: "Price on request",
     areaSqFt: 1800,
-    areaLabel: "10-acre plotted project",
+    areaLabel: "Plotted project",
     categoryLabel: "Ready For Registration",
     locationLabel: "SH-74, Doddaballapura",
     badge: "Plots",
     summary:
-      "A 10-acre registration-ready plotted project placed on the Doddaballapura to Nelamangala stretch.",
+      "A  registration-ready plotted project placed on the Doddaballapura to Nelamangala stretch.",
     description:
       "Jaguar Diamond City is designed for buyers seeking plotted land in a smaller-format project with direct State Highway access and Bangalore North connectivity.",
     detailTitle: "Jaguar Diamond City, Doddaballapura",
     detailBody:
-      "Jaguar Diamond City is a 10-acre project located on SH-74, along the Doddaballapura towards Nelamangala route in Bangalore North. The project is positioned for buyers who want ready-for-registration plots in a highway-linked micro-market.",
+      "Jaguar Diamond City is a  project located on SH-74, along the Doddaballapura towards Nelamangala route in Bangalore North. The project is positioned for buyers who want ready-for-registration plots in a highway-linked micro-market.",
     highlights: [
-      "10-acre project",
+      "Project",
       "Ready for registration plots",
       "Attached to SH-74",
       "Doddaballapura towards Nelamangala connectivity"
@@ -74,19 +74,19 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     address: "Attached to Jaguar City NH-648 at Doddaballapura Town, Bangalore North",
     price: "Flexible payment plans",
     areaSqFt: 2400,
-    areaLabel: "100-acre township · 4 blocks",
+    areaLabel: "Township · 4 blocks",
     categoryLabel: "18-36 Months Payment Plan",
     locationLabel: "NH-648, Doddaballapura",
     badge: "Township",
     summary:
-      "A 100-acre township project divided into four blocks with flexible payment plans beside Jaguar City.",
+      "A  township project divided into four blocks with flexible payment plans beside Jaguar City.",
     description:
       "Emirates City expands the Doddaballapura township story with large-format plotted land supported by longer payment-tenure flexibility for buyers and investors.",
     detailTitle: "Emirates City, Doddaballapura",
     detailBody:
-      "Emirates City is introduced as a 100-acre project divided into four blocks, attached to the Jaguar City NH-648 corridor at Doddaballapura Town. It is presented as a plotted township opportunity with flexible payment plans ranging from 18 to 36 months.",
+      "Emirates City is introduced as a  project divided into four blocks, attached to the Jaguar City NH-648 corridor at Doddaballapura Town. It is presented as a plotted township opportunity with flexible payment plans ranging from 18 to 36 months.",
     highlights: [
-      "100-acre project divided into 4 blocks",
+      "Project divided into 4 blocks",
       "Flexible payment plans between 18 and 36 months",
       "Attached to Jaguar City on NH-648",
       "Located at Doddaballapura Town, Bangalore North"
@@ -105,19 +105,19 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     address: "Attached to SH-09 at Doddaballapura Town, Bangalore North",
     price: "Price on request",
     areaSqFt: 1500,
-    areaLabel: "10-acre plotted project",
+    areaLabel: "Plotted project",
     categoryLabel: "Ready For Registration",
     locationLabel: "SH-09, Doddaballapura",
     badge: "Highway Access",
     summary:
-      "A 10-acre project with registration-ready plots placed directly on the SH-09 corridor.",
+      "A  project with registration-ready plots placed directly on the SH-09 corridor.",
     description:
       "Jaguar Highway Residency is designed for buyers looking for a plotted site with immediate registration readiness and practical highway-led access in Doddaballapura.",
     detailTitle: "Jaguar Highway Residency, Doddaballapura",
     detailBody:
-      "Jaguar Highway Residency is a 10-acre project attached to SH-09 at Doddaballapura Town in Bangalore North. The positioning makes it suitable for buyers who prioritize easy road access and ready-for-registration plot inventory.",
+      "Jaguar Highway Residency is a  project attached to SH-09 at Doddaballapura Town in Bangalore North. The positioning makes it suitable for buyers who prioritize easy road access and ready-for-registration plot inventory.",
     highlights: [
-      "10-acre project",
+      "Project",
       "Ready for registration plots",
       "Attached to SH-09",
       "Located at Doddaballapura Town, Bangalore North"
@@ -136,19 +136,19 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     address: "Attached to Davanagere City, Karnataka",
     price: "Flexible payment plans",
     areaSqFt: 2400,
-    areaLabel: "52-acre township project",
+    areaLabel: "Township project",
     categoryLabel: "Flexible Payment Plan",
     locationLabel: "Davanagere, Karnataka",
     badge: "Township",
     summary:
-      "A 52-acre township opportunity in Davanagere with flexible payment-plan support.",
+      "A township opportunity in Davanagere with flexible payment-plan support.",
     description:
       "Jaguar Platinum City is positioned as a larger-format township project for buyers exploring plotted real estate opportunities beyond Bengaluru in an emerging Karnataka location.",
     detailTitle: "Jaguar Platinum City, Davanagere",
     detailBody:
-      "Jaguar Platinum City is described as a 52-acre township project attached to Davanagere City in Karnataka. It is intended for buyers who want a sizable land-led development with flexible payment support in a growing regional market.",
+      "Jaguar Platinum City is described as a township project attached to Davanagere City in Karnataka. It is intended for buyers who want a sizable land-led development with flexible payment support in a growing regional market.",
     highlights: [
-      "52-acre township project",
+      "Township project",
       "Flexible payment plans",
       "Attached to Davanagere City",
       "Regional Karnataka growth opportunity"
@@ -172,14 +172,14 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     locationLabel: "Doddaballapura - Dabaspet corridor",
     badge: "Farm House Villa Plots",
     summary:
-      "A 160-acre farm lands project offering larger-format villa plots for lifestyle and long-hold buyers.",
+      "A  farm lands project offering larger-format villa plots for lifestyle and long-hold buyers.",
     description:
       "Jaguar Farm Lands is tailored for buyers who want open-format land with farmhouse villa potential, larger plot sizes, and access to the Doddaballapura-Dabaspet growth belt.",
     detailTitle: "Jaguar Farm Lands, Doddaballapura Corridor",
     detailBody:
-      "Jaguar Farm Lands is introduced as a 160-acre project with farm house villa plots of approximately 6000 to 12000 sq.ft. Located around 20 minutes from Doddaballapura and connected toward Dabaspet via NH-648, it is suited to buyers seeking larger land parcels with lifestyle potential.",
+      "Jaguar Farm Lands is introduced as a  project with farm house villa plots of approximately 6000 to 12000 sq.ft. Located around 20 minutes from Doddaballapura and connected toward Dabaspet via NH-648, it is suited to buyers seeking larger land parcels with lifestyle potential.",
     highlights: [
-      "160-acre project",
+      "Farm lands project",
       "Farm house villa plots",
       "Approx. 6000 to 12000 sq.ft. sizes",
       "Connects to Dabaspet via National Highway-648"
@@ -198,19 +198,19 @@ export const propertyShowcase: PropertyShowcaseEntry[] = [
     address: "At Jaguar City Township Project, attached to NH-648, Doddaballapura, Bangalore North",
     price: "Price on request",
     areaSqFt: 1200,
-    areaLabel: "17-acre apartment project · 500-1000 units",
+    areaLabel: "Apartment project · 500-1000 units",
     categoryLabel: "Apartments",
     locationLabel: "Jaguar City Township, Doddaballapura",
     badge: "Apartment Community",
     summary:
-      "A 17-acre apartment project within Jaguar City planned for approximately 500 to 1000 units.",
+      "A apartment project within Jaguar City planned for approximately 500 to 1000 units.",
     description:
       "Jaguar City Towers adds an apartment-led option within the Jaguar City township for buyers who want community living inside the larger Doddaballapura development corridor.",
     detailTitle: "Jaguar City Towers (Apartments)",
     detailBody:
-      "Jaguar City Towers is described as a 17-acre apartment project inside the Jaguar City township at Doddaballapura, attached to NH-648. With approximately 500 to 1000 units planned, it offers a residential option for buyers who prefer apartments within a township environment.",
+      "Jaguar City Towers is described as apartment project inside the Jaguar City township at Doddaballapura, attached to NH-648. With approximately 500 to 1000 units planned, it offers a residential option for buyers who prefer apartments within a township environment.",
     highlights: [
-      "17-acre apartment project",
+      "Apartment project",
       "Approx. 500 to 1000 units",
       "Located inside Jaguar City Township",
       "Attached to NH-648, Doddaballapura"

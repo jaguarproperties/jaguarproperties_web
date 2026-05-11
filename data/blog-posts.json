@@ -27,7 +27,7 @@
     "slug": "kiadb-doddaballapura-industrial-expansion",
     "excerpt": "The brochure points to KIADB's industrial area and Science City pipeline as important context for buyers tracking future demand in the region.",
     "content": "According to the Jaguar City presentation, the KIADB Doddaballapur Industrial Area extends across more than 900 acres in multiple phases near Kempegowda International Airport. The region already supports industrial activity, textile parks, and the upcoming Science City. For plotted buyers, that broader employment and infrastructure ecosystem can be an important long-term demand signal.",
-    "coverImage": "/media/site-media/jaguar-city-community.jpeg",
+    "coverImage": "/uploads/site-media/jaguar-city-community.jpeg",
     "seoTitle": "KIADB Doddaballapura and Jaguar City",
     "seoDescription": "How the KIADB industrial area and surrounding infrastructure strengthen the Doddaballapura case.",
     "published": true,
@@ -37,7 +37,7 @@
     "media": [
       {
         "id": "local-blog-media-2",
-        "url": "/media/site-media/jaguar-city-community.jpeg",
+        "url": "/uploads/site-media/jaguar-city-community.jpeg",
         "alt": "Featured news image",
         "createdAt": "2026-05-09T05:14:47.436Z"
       }
@@ -49,7 +49,7 @@
     "slug": "jaguar-city-township-amenities",
     "excerpt": "The brochure highlights amenities such as a clubhouse, tennis court, children's play area, basketball, park and jogging space, and Jaguar International School.",
     "content": "Jaguar City's presentation positions the township as more than a plotted layout. It calls out lifestyle and family infrastructure including a clubhouse, tennis court, children's play area, basketball court, park and jogging area, and Jaguar International School. That amenity-led positioning supports both everyday livability and long-term value perception.",
-    "coverImage": "/media/site-media/jaguar-city-cover.png",
+    "coverImage": "/uploads/site-media/jaguar-city-cover.png",
     "seoTitle": "Jaguar City Amenities Overview",
     "seoDescription": "A summary of the township amenities highlighted in the Jaguar City brochure.",
     "published": true,
@@ -59,7 +59,7 @@
     "media": [
       {
         "id": "local-blog-media-3",
-        "url": "/media/site-media/jaguar-city-cover.png",
+        "url": "/uploads/site-media/jaguar-city-cover.png",
         "alt": "Featured news image",
         "createdAt": "2026-05-09T05:14:47.436Z"
       }

@@ -1,3 +1,5 @@
+import { mkdir, writeFile } from "fs/promises";
+import path from "path";
 import { randomUUID } from "crypto";
 
 import { formatDatabaseConnectionError } from "@/lib/database-url";
@@ -44,6 +46,10 @@ function sanitizeFilenameSegment(value: string) {
   return sanitized || "site-media";
 }
 
+function getPublicSiteMediaDir() {
+  return path.join(process.cwd(), "public", "uploads", "site-media");
+}
+
 export function buildStoredSiteMediaUrl(filename: string) {
   return `${SITE_MEDIA_BASE_PATH}/${filename}`;
 }
@@ -73,20 +79,30 @@ export async function saveSiteMediaToMongo(file: File, baseName: string) {
   const extension = (file.name.match(/\.[a-z0-9]+$/i)?.[0] || ".jpg").toLowerCase();
   const filename = `${sanitizeFilenameSegment(baseName)}-${id}${extension}`;
   const data = Buffer.from(await file.arrayBuffer());
-  const collection = await getSiteMediaCollection();
   const now = new Date();
 
-  await collection.insertOne({
-    _id: id,
-    id,
-    entityType: SITE_MEDIA_ENTITY_TYPE,
-    filename,
-    contentType: file.type || "application/octet-stream",
-    size: data.byteLength,
-    data,
-    createdAt: now,
-    updatedAt: now
-  });
+  await mkdir(getPublicSiteMediaDir(), { recursive: true });
+  await writeFile(path.join(getPublicSiteMediaDir(), filename), data);
+
+  try {
+    const collection = await getSiteMediaCollection();
+
+    await collection.insertOne({
+      _id: id,
+      id,
+      entityType: SITE_MEDIA_ENTITY_TYPE,
+      filename,
+      contentType: file.type || "application/octet-stream",
+      size: data.byteLength,
+      data,
+      createdAt: now,
+      updatedAt: now
+    });
+  } catch (error) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Site media saved to public uploads without Mongo mirror.", formatDatabaseConnectionError(error));
+    }
+  }
 
   return buildStoredSiteMediaUrl(filename);
 }

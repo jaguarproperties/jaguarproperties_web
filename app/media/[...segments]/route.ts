@@ -76,7 +76,9 @@ export async function GET(
         });
       }
     } catch (error) {
-      return new Response(formatSiteMediaLookupError(error), { status: 503 });
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Falling back to public site-media file after Mongo lookup failure.", formatSiteMediaLookupError(error));
+      }
     }
   }
 

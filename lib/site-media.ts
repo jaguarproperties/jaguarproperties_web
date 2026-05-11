@@ -1,5 +1,6 @@
 export const SITE_MEDIA_BASE_PATH = "/uploads/site-media";
-export const SITE_MEDIA_PUBLIC_BASE_PATH = "/media/site-media";
+export const SITE_MEDIA_PUBLIC_BASE_PATH = SITE_MEDIA_BASE_PATH;
+export const SITE_MEDIA_LEGACY_BASE_PATH = "/media/site-media";
 
 export function toSiteMediaUrl(filename: string) {
   return `${SITE_MEDIA_PUBLIC_BASE_PATH}/${filename}`;
