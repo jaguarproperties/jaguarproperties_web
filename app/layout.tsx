@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     template: "%s | Jaguar Properties"
   },
   description:
-    "Jaguar Properties builds premium residential communities and investment-led developments across Bengaluru, Qatar, and Dubai.",
+    "Jaguar Properties builds premium residential communities and investment-led developments across Bengaluru, Qatar, Calicut and Dubai.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),

@@ -28,7 +28,7 @@ export const demoSiteContent = {
     "To provide premium and affordable plots with transparent processes, quality infrastructure, and a secure path to land ownership for every family.",
   vision:
     "To develop world-class townships and become a benchmark in real estate through trust, quality, and innovation.",
-  presenceText: "Bengaluru, Qatar, and Dubai with market-specific luxury developments.",
+  presenceText: "Bengaluru, Qatar, Calicut and Dubai with market-specific luxury developments.",
   homeFeaturedProjectsTitle: "",
   homeFeaturedProjectsDescription: "",
   homeFeaturedPropertiesTitle: "Featured projects and investment-led opportunities.",
@@ -78,9 +78,9 @@ export const demoSiteContent = {
   officeAddress:
     "Bangalore – Head Office\n5, First Main Road, Second Floor\nKHB Layout, Yelahanka New Town\nBangalore – 560064, India\n\nDubai – UAE – Branch Office\n\nCalicut – India – Branch Office\n\nQatar – Branch Office",
   mapEmbedUrl: "https://www.google.com/maps?q=13.09840,77.58476&z=17&output=embed",
-  footerBlurb: "Premium real estate experiences across Bengaluru, Qatar, and Dubai.",
+  footerBlurb: "Premium real estate experiences across Bengaluru, Qatar, Calicut and Dubai.",
   footerCopyright:
-    "© 2026 JAGUAR PROPERTIES. Premium real estate developer for Bengaluru, Qatar, and Dubai.",
+    "© 2026 JAGUAR PROPERTIES. Premium real estate developer for Bengaluru, Qatar, Calicut and Dubai.",
   footerNote: "Designed for modern buyers, fast performance, and mobile responsiveness.",
   instagramUrl: "https://www.instagram.com/jaguarproperties/",
   linkedinUrl: "https://linkedin.com",
@@ -284,16 +284,16 @@ export const demoProperties = propertyShowcase.map((entry, index) => ({
 export const demoPosts = [
   {
     id: "demo-post-1",
-    title: "Why Jaguar City Sits in One of North Bengaluru's Strongest Growth Corridors",
-    slug: "jaguar-city-growth-corridor",
+    title: "Jaguar City Opens a New Standard for Premium Plotted Living in Doddaballapura",
+    slug: "jaguar-city-premium-plotted-living-doddaballapura",
     excerpt:
-      "From KWIN City to the airport-led industrial belt, Jaguar City is positioned close to major catalysts shaping Doddaballapura's future.",
+      "Jaguar City brings a large-format plotted development vision to NH-648 with long-term growth potential, strong road access, and township-style planning.",
     content:
-      "The Jaguar City brochure highlights several regional growth drivers around Doddaballapura and Devanahalli. These include KWIN City, a planned 5,800-acre knowledge and innovation district; the Information Technology Investment Region spanning 12,000 acres; and the Foxconn manufacturing investment in the wider zone. Together, they strengthen the long-term case for plotted developments positioned near North Bengaluru's evolving infrastructure spine.",
-    coverImage: siteMedia.jaguarCityGrowth,
-    seoTitle: "Jaguar City Growth Corridor",
+      "Jaguar City is positioned as one of Jaguar Properties' landmark plotted developments in North Bengaluru. Located on NH-648 at Doddaballapura Town, the project combines premium plot offerings, strong growth visibility, and a master-planned layout that appeals to both end users and long-term investors.\n\nThe location strengthens the project's value story through improving connectivity, airport-region momentum, and access to emerging industrial and knowledge corridors. Jaguar City is being presented as a flagship address for buyers who want clarity, scale, and future-ready plotted development in a fast-rising belt of Bengaluru.",
+    coverImage: siteMedia.jaguarCityCover,
+    seoTitle: "Jaguar City Premium Plotted Living",
     seoDescription:
-      "A look at KWIN City, ITIR, Foxconn, and the broader North Bengaluru momentum around Jaguar City.",
+      "Explore how Jaguar City is shaping premium plotted living in Doddaballapura with scale, connectivity, and long-term value.",
     published: true,
     publishedAt: new Date(),
     createdAt: new Date(),
@@ -301,16 +301,16 @@ export const demoPosts = [
   },
   {
     id: "demo-post-2",
-    title: "KIADB and Doddaballapura's Industrial Expansion Add Weight to Jaguar City's Positioning",
-    slug: "kiadb-doddaballapura-industrial-expansion",
+    title: "Emirates City Highlights Jaguar Properties' Township Vision Beside Jaguar City",
+    slug: "emirates-city-township-vision-jaguar-properties",
     excerpt:
-      "The brochure points to KIADB's industrial area and Science City pipeline as important context for buyers tracking future demand in the region.",
+      "Emirates City extends the Jaguar Properties vision with an integrated township format, flexible payment planning, and adjacency to the Jaguar City growth corridor.",
     content:
-      "According to the Jaguar City presentation, the KIADB Doddaballapur Industrial Area extends across more than 900 acres in multiple phases near Kempegowda International Airport. The region already supports industrial activity, textile parks, and the upcoming Science City. For plotted buyers, that broader employment and infrastructure ecosystem can be an important long-term demand signal.",
-    coverImage: siteMedia.jaguarCityCommunity,
-    seoTitle: "KIADB Doddaballapura and Jaguar City",
+      "Emirates City represents Jaguar Properties' broader township ambition in Doddaballapura. Positioned adjacent to Jaguar City on NH-648, the project is designed as an integrated plotted community divided into four blocks and supported by flexible payment options that make entry easier for a wider buyer segment.\n\nIts placement beside Jaguar City gives the project a strong narrative around scale, future infrastructure, and community-led development. For buyers comparing long-term plotted opportunities, Emirates City adds another layer to Jaguar Properties' North Bengaluru portfolio with a planning approach that balances accessibility and expansion potential.",
+    coverImage: "/uploads/site-media/emirates-city-main.png",
+    seoTitle: "Emirates City Township Vision",
     seoDescription:
-      "How the KIADB industrial area and surrounding infrastructure strengthen the Doddaballapura case.",
+      "See how Emirates City strengthens Jaguar Properties' township-focused presence in the Doddaballapura corridor.",
     published: true,
     publishedAt: new Date(),
     createdAt: new Date(),
@@ -318,16 +318,16 @@ export const demoPosts = [
   },
   {
     id: "demo-post-3",
-    title: "Jaguar City Brings Township-Style Amenities Into a Plotted Development Format",
-    slug: "jaguar-city-township-amenities",
+    title: "Green Hills Brings a Peaceful Villa Plot Option to Jaguar Properties' Growth Portfolio",
+    slug: "green-hills-villa-plot-growth-portfolio",
     excerpt:
-      "The brochure highlights amenities such as a clubhouse, tennis court, children's play area, basketball, park and jogging space, and Jaguar International School.",
+      "Green Hills expands Jaguar Properties' project mix with a quieter villa-plot community focused on long-term value, layout quality, and residential comfort.",
     content:
-      "Jaguar City's presentation positions the township as more than a plotted layout. It calls out lifestyle and family infrastructure including a clubhouse, tennis court, children's play area, basketball court, park and jogging area, and Jaguar International School. That amenity-led positioning supports both everyday livability and long-term value perception.",
-    coverImage: siteMedia.jaguarCityCover,
-    seoTitle: "Jaguar City Amenities Overview",
+      "Green Hills adds a different lifestyle proposition to the Jaguar Properties portfolio by focusing on premium villa plots in a calmer, growth-oriented setting near Bengaluru. The project emphasizes layout planning, documentation readiness, and a residential environment that appeals to buyers prioritizing both peace and future appreciation.\n\nWith its positioning around DTCP-approved planning, E-Khata support, and completed DC conversion, Green Hills strengthens Jaguar Properties' ability to serve buyers looking beyond dense urban locations. It offers a more tranquil plotted alternative while still fitting into the company's broader premium land and township strategy.",
+    coverImage: "/uploads/site-media/green-hills.jpeg",
+    seoTitle: "Green Hills Villa Plot Community",
     seoDescription:
-      "A summary of the township amenities highlighted in the Jaguar City brochure.",
+      "Discover how Green Hills adds a peaceful premium villa-plot option to Jaguar Properties' project portfolio.",
     published: true,
     publishedAt: new Date(),
     createdAt: new Date(),
