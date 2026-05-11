@@ -47,6 +47,9 @@ type RawProject = {
   seoTitle: string | null;
   seoDescription: string | null;
   createdAt?: string;
+  updatedAt?: string;
+  properties?: unknown[];
+  media?: unknown[];
 };
 
 type RawBlogPost = {
@@ -61,6 +64,8 @@ type RawBlogPost = {
   published: boolean;
   publishedAt?: string;
   createdAt?: string;
+  updatedAt?: string;
+  media?: unknown[];
 };
 
 async function readJsonFile<T>(relativePath: string): Promise<T> {
@@ -141,7 +146,7 @@ async function syncProjects() {
   const projects = await readJsonFile<RawProject[]>("data/projects.json");
 
   for (const project of projects) {
-    const { id, createdAt, status, completionDate, ...data } = project;
+    const { id, createdAt, status, completionDate } = project;
 
     const existingProject = await prisma.project.findFirst({
       where: {
@@ -151,7 +156,24 @@ async function syncProjects() {
     });
 
     const payload = {
-      ...data,
+      title: project.title,
+      slug: project.slug,
+      summary: project.summary,
+      description: project.description,
+      city: project.city,
+      location: project.location,
+      country: project.country,
+      priceRange: project.priceRange,
+      areaSqFt: project.areaSqFt,
+      areaLabel: project.areaLabel,
+      tags: project.tags,
+      featured: project.featured,
+      visible: project.visible,
+      sortOrder: project.sortOrder,
+      coverImage: project.coverImage,
+      gallery: project.gallery,
+      seoTitle: project.seoTitle,
+      seoDescription: project.seoDescription,
       status: ProjectStatus[status],
       completionDate: completionDate ? new Date(completionDate) : null
     };
@@ -198,7 +220,7 @@ async function syncBlogPosts() {
   const posts = await readJsonFile<RawBlogPost[]>("data/blog-posts.json");
 
   for (const post of posts) {
-    const { id, createdAt, publishedAt, ...data } = post;
+    const { id, createdAt, publishedAt } = post;
 
     const existingPost = await prisma.blogPost.findFirst({
       where: {
@@ -208,7 +230,14 @@ async function syncBlogPosts() {
     });
 
     const payload = {
-      ...data,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      coverImage: post.coverImage,
+      seoTitle: post.seoTitle,
+      seoDescription: post.seoDescription,
+      published: post.published,
       publishedAt: publishedAt ? new Date(publishedAt) : new Date()
     };
 
