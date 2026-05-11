@@ -90,7 +90,7 @@ async function syncSiteContent() {
 
   const targetId = existingSiteContent?.id ?? fileId;
 
-  await createOrUpdateSiteContent(prisma, targetId, siteContentData);
+  await createOrUpdateSiteContent(targetId, siteContentData);
 
   console.log(`Synced site content -> ${targetId}`);
 }

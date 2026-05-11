@@ -1,54 +1,37 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
-const SITE_CONTENT_UPDATE_BATCH_SIZE = 20;
+import { getMongoDb } from "@/lib/mongo";
 
-function chunkEntries<T>(entries: T[], size: number) {
-  const chunks: T[][] = [];
+type SiteContentDocument = Prisma.SiteContentUncheckedCreateInput & {
+  _id: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-  for (let index = 0; index < entries.length; index += size) {
-    chunks.push(entries.slice(index, index + size));
-  }
-
-  return chunks;
-}
-
-function toSiteContentUpdateInput(
-  data: Prisma.SiteContentUncheckedCreateInput
-): Prisma.SiteContentUncheckedUpdateInput[] {
-  const entries = Object.entries(data).filter(([, value]) => value !== undefined);
-
-  return chunkEntries(entries, SITE_CONTENT_UPDATE_BATCH_SIZE).map((chunk) =>
-    Object.fromEntries(chunk) as Prisma.SiteContentUncheckedUpdateInput
-  );
+function normalizeSiteContentData(data: Prisma.SiteContentUncheckedCreateInput) {
+  return Object.fromEntries(Object.entries(data).filter(([, value]) => value !== undefined));
 }
 
 export async function createOrUpdateSiteContent(
-  prisma: PrismaClient,
   id: string,
   data: Prisma.SiteContentUncheckedCreateInput
 ) {
-  const existing = await prisma.siteContent.findUnique({
-    where: { id },
-    select: { id: true }
-  });
+  const collection = (await getMongoDb()).collection<SiteContentDocument>("SiteContent");
+  const now = new Date();
+  const normalizedData = normalizeSiteContentData(data);
 
-  if (!existing) {
-    await prisma.siteContent.create({
-      data: {
-        id,
-        ...data
+  await collection.updateOne(
+    { _id: id },
+    {
+      $set: {
+        ...normalizedData,
+        updatedAt: now
+      },
+      $setOnInsert: {
+        _id: id,
+        createdAt: now
       }
-    });
-
-    return;
-  }
-
-  const updates = toSiteContentUpdateInput(data);
-
-  for (const update of updates) {
-    await prisma.siteContent.update({
-      where: { id },
-      data: update
-    });
-  }
+    },
+    { upsert: true }
+  );
 }

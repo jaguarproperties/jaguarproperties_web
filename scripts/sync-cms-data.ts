@@ -36,7 +36,7 @@ async function syncSiteContent() {
     ...data
   } = rawSiteContent;
 
-  await createOrUpdateSiteContent(prisma, id, data as any);
+  await createOrUpdateSiteContent(id, data as any);
 
   console.log(`Synced site content: ${id}`);
 }

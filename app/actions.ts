@@ -1180,7 +1180,7 @@ export async function updateSiteContent(formData: FormData) {
     const { id, ...data } = parsed.data;
     const targetId = id || randomUUID();
 
-    await createOrUpdateSiteContent(prisma, targetId, data as any);
+    await createOrUpdateSiteContent(targetId, data as any);
 
     revalidatePublicSiteContent();
     revalidatePath("/admin/content");
