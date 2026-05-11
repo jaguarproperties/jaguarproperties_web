@@ -1,6 +1,7 @@
 import { readFile } from "fs/promises";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
+import { createOrUpdateSiteContent } from "@/lib/site-content-persistence";
 
 const prisma = new PrismaClient();
 
@@ -35,14 +36,7 @@ async function syncSiteContent() {
     ...data
   } = rawSiteContent;
 
-  await prisma.siteContent.upsert({
-    where: { id },
-    update: data,
-    create: {
-      id,
-      ...(data as any)
-    }
-  });
+  await createOrUpdateSiteContent(prisma, id, data as any);
 
   console.log(`Synced site content: ${id}`);
 }

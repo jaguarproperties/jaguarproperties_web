@@ -16,6 +16,7 @@ import { getCareerBySlug } from "@/lib/careers";
 import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
 import { prisma } from "@/lib/prisma";
+import { createOrUpdateSiteContent } from "@/lib/site-content-persistence";
 import { saveSiteMediaToMongo } from "@/lib/site-media-storage";
 import { deleteLocalProject, listLocalProjects, upsertLocalProject } from "@/lib/local-projects";
 import { createTestimonial, deleteTestimonialById, updateTestimonial } from "@/lib/testimonials";
@@ -1177,20 +1178,9 @@ export async function updateSiteContent(formData: FormData) {
   try {
     ensureDatabase();
     const { id, ...data } = parsed.data;
+    const targetId = id || randomUUID();
 
-    if (id) {
-      await prisma.siteContent.update({
-        where: { id },
-        data
-      });
-    } else {
-      await prisma.siteContent.create({
-        data: {
-          id: randomUUID(),
-          ...data
-        }
-      });
-    }
+    await createOrUpdateSiteContent(prisma, targetId, data as any);
 
     revalidatePublicSiteContent();
     revalidatePath("/admin/content");

@@ -3,6 +3,7 @@ import path from "path";
 
 import { loadEnvConfig } from "@next/env";
 import { MediaEntityType, Prisma, PrismaClient, ProjectStatus } from "@prisma/client";
+import { createOrUpdateSiteContent } from "@/lib/site-content-persistence";
 
 loadEnvConfig(process.cwd());
 
@@ -89,14 +90,7 @@ async function syncSiteContent() {
 
   const targetId = existingSiteContent?.id ?? fileId;
 
-  await prisma.siteContent.upsert({
-    where: { id: targetId },
-    update: siteContentData,
-    create: {
-      id: targetId,
-      ...siteContentData
-    }
-  });
+  await createOrUpdateSiteContent(prisma, targetId, siteContentData);
 
   console.log(`Synced site content -> ${targetId}`);
 }
