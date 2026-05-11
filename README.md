@@ -57,6 +57,8 @@ CLOUDINARY_API_SECRET=
 - Set `NEXTAUTH_URL` and `NEXT_PUBLIC_SITE_URL` to your real production domain, for example `https://your-site.vercel.app`.
 - Use a production MongoDB Atlas `DATABASE_URL`.
 - If SRV DNS lookups are blocked in your environment and `mongodb+srv://...` fails, also set `DATABASE_DIRECT_URL` to the non-SRV `mongodb://...` URI from Atlas.
+- Each `npm run build` now syncs `data/site-content.json`, `data/projects.json`, `data/blog-posts.json`, and `data/testimonials.json` into MongoDB before the Next.js build starts.
+- You can run `npm run sync:deploy` manually any time you want to push the latest local JSON content into the configured MongoDB database.
 - Testimonial images are uploaded into MongoDB and stored there as binary media. The testimonial record keeps the generated `/media/testimonials/<id>` URL.
 - Store website images in `public/images` or use external URLs. This project no longer depends on local runtime uploads.
 
