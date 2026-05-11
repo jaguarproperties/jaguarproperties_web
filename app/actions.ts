@@ -523,68 +523,69 @@ export async function createOrUpdateProject(formData: FormData) {
   await requireRoleAccess(canEditProjects);
   const id = String(formData.get("id") || "").trim() || undefined;
   const title = String(formData.get("title") || "").trim();
-  const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
-  const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
-  const mainImageFile = formData.get("mainImageFile");
-  const galleryFiles = formData
-    .getAll("galleryFiles")
-    .filter((entry): entry is File => entry instanceof File && entry.size > 0);
-
-  const coverImage =
-    mainImageFile instanceof File && mainImageFile.size > 0
-      ? await saveSiteImage(mainImageFile, title || "project", "projects")
-      : existingCoverImage;
-
-  const uploadedGallery = await Promise.all(
-    galleryFiles.map((file, index) => saveSiteImage(file, `${title || "project"}-${index + 1}`, "projects"))
-  );
-
-  const normalizedGallery = dedupeImageList([coverImage, ...retainedGallery, ...uploadedGallery]);
-
-  const parsed = projectSchema.safeParse({
-    id,
-    title,
-    summary: formData.get("summary"),
-    description: formData.get("description"),
-    city: formData.get("city"),
-    location: formData.get("location"),
-    country: formData.get("country"),
-    priceRange: formData.get("priceRange"),
-    areaSqFt: formData.get("areaSqFt") || undefined,
-    areaLabel: formData.get("areaLabel") || undefined,
-    tags: formData.get("tags") || undefined,
-    status: formData.get("status"),
-    completionDate: formData.get("completionDate") || undefined,
-    featured: parseBoolean(formData.get("featured")),
-    visible: parseBoolean(formData.get("visible")),
-    sortOrder: formData.get("sortOrder") || 0,
-    coverImage,
-    gallery: normalizedGallery.join(", "),
-    seoTitle: formData.get("seoTitle") || undefined,
-    seoDescription: formData.get("seoDescription") || undefined
-  });
-
-  if (!parsed.success) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Invalid project payload", parsed.error.flatten().fieldErrors);
-    }
-
-    redirect(id ? `/admin/projects/${id}?error=1` : "/admin/projects?error=1");
-  }
-
-  const nextSlug = slugify(parsed.data.title);
-  const { id: _projectId, ...projectValues } = parsed.data;
-  const data = {
-    ...projectValues,
-    slug: nextSlug,
-    tags: parseStringList(parsed.data.tags),
-    gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
-    areaSqFt: parsed.data.areaSqFt ?? null,
-    areaLabel: parsed.data.areaLabel?.trim() || null,
-    completionDate: parsed.data.completionDate ? new Date(parsed.data.completionDate) : null
-  };
 
   try {
+    const existingCoverImage = String(formData.get("existingCoverImage") || "").trim();
+    const retainedGallery = safeSplitGallery(String(formData.get("existingGallery") || ""));
+    const mainImageFile = formData.get("mainImageFile");
+    const galleryFiles = formData
+      .getAll("galleryFiles")
+      .filter((entry): entry is File => entry instanceof File && entry.size > 0);
+
+    const coverImage =
+      mainImageFile instanceof File && mainImageFile.size > 0
+        ? await saveSiteImage(mainImageFile, title || "project", "projects")
+        : existingCoverImage;
+
+    const uploadedGallery = await Promise.all(
+      galleryFiles.map((file, index) => saveSiteImage(file, `${title || "project"}-${index + 1}`, "projects"))
+    );
+
+    const normalizedGallery = dedupeImageList([coverImage, ...retainedGallery, ...uploadedGallery]);
+
+    const parsed = projectSchema.safeParse({
+      id,
+      title,
+      summary: formData.get("summary"),
+      description: formData.get("description"),
+      city: formData.get("city"),
+      location: formData.get("location"),
+      country: formData.get("country"),
+      priceRange: formData.get("priceRange"),
+      areaSqFt: formData.get("areaSqFt") || undefined,
+      areaLabel: formData.get("areaLabel") || undefined,
+      tags: formData.get("tags") || undefined,
+      status: formData.get("status"),
+      completionDate: formData.get("completionDate") || undefined,
+      featured: parseBoolean(formData.get("featured")),
+      visible: parseBoolean(formData.get("visible")),
+      sortOrder: formData.get("sortOrder") || 0,
+      coverImage,
+      gallery: normalizedGallery.join(", "),
+      seoTitle: formData.get("seoTitle") || undefined,
+      seoDescription: formData.get("seoDescription") || undefined
+    });
+
+    if (!parsed.success) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("Invalid project payload", parsed.error.flatten().fieldErrors);
+      }
+
+      redirect(id ? `/admin/projects/${id}?error=1` : "/admin/projects?error=1");
+    }
+
+    const nextSlug = slugify(parsed.data.title);
+    const { id: _projectId, ...projectValues } = parsed.data;
+    const data = {
+      ...projectValues,
+      slug: nextSlug,
+      tags: parseStringList(parsed.data.tags),
+      gallery: dedupeImageList(safeSplitGallery(parsed.data.gallery ?? "")),
+      areaSqFt: parsed.data.areaSqFt ?? null,
+      areaLabel: parsed.data.areaLabel?.trim() || null,
+      completionDate: parsed.data.completionDate ? new Date(parsed.data.completionDate) : null
+    };
+
     let projectId = parsed.data.id;
     let previousSlug: string | undefined;
     let wasExistingProject = false;
