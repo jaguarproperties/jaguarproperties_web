@@ -9,7 +9,9 @@ import { siteMedia } from "@/lib/site-media";
 loadEnvConfig(process.cwd());
 
 const prisma = new PrismaClient();
-const DEFAULT_ADMIN_EMPLOYEE_CODE = "JP2026A0001";
+const DEFAULT_SUPER_ADMIN_EMPLOYEE_CODE = "JP2026SA0001";
+const DEFAULT_HR_EMPLOYEE_CODE = "JP2026H0001";
+const DEFAULT_EMPLOYEE_EMPLOYEE_CODE = "JP2026E0001";
 const LEGACY_ADMIN_USERNAME = "jaguarproperties2023";
 const LEGACY_ADMIN_EMAIL = "admin@jaguarproperties.in";
 const projectSeedData = [
@@ -150,37 +152,49 @@ const seededProjectIdsByTitle = {
   "Jaguar Diamond City": "seed-project-jaguar-diamond-city"
 } as const;
 
-async function syncDefaultAdminUser({
+async function syncSeedUser({
   username,
   email,
-  passwordHash
+  employeeCode,
+  passwordHash,
+  role,
+  name,
+  department
 }: {
   username: string;
   email: string;
+  employeeCode: string;
   passwordHash: string;
+  role: "SUPER_ADMIN" | "HR" | "EMPLOYEE";
+  name: string;
+  department: string;
 }) {
-  const adminData = {
+  const userData = {
     username,
-    employeeCode: DEFAULT_ADMIN_EMPLOYEE_CODE,
+    employeeCode,
     email,
     passwordHash,
-    role: "ADMIN" as const,
-    name: "Jaguar Admin",
-    department: "Administration",
+    role,
+    name,
+    department,
     defaultWorkType: "OFFICE" as const,
     casualLeaveBalance: 0,
     sickLeaveBalance: 0,
-    paidLeaveBalance: 24,
+    paidLeaveBalance: role === "EMPLOYEE" ? 12 : 24,
     unpaidLeaveBalance: 0
   };
-  const adminUsernames = Array.from(new Set([username, LEGACY_ADMIN_USERNAME]));
-  const adminEmails = Array.from(new Set([email, LEGACY_ADMIN_EMAIL]));
+  const usernames = Array.from(
+    new Set(role === "SUPER_ADMIN" ? [username, LEGACY_ADMIN_USERNAME] : [username])
+  );
+  const emails = Array.from(
+    new Set(role === "SUPER_ADMIN" ? [email, LEGACY_ADMIN_EMAIL] : [email])
+  );
   const matchingUsers = await prisma.user.findMany({
     where: {
       OR: [
-        { employeeCode: DEFAULT_ADMIN_EMPLOYEE_CODE },
-        { username: { in: adminUsernames } },
-        { email: { in: adminEmails } }
+        { employeeCode },
+        { username: { in: usernames } },
+        { email: { in: emails } }
       ]
     },
     orderBy: { createdAt: "asc" },
@@ -197,7 +211,7 @@ async function syncDefaultAdminUser({
     matchingUsers[0];
 
   if (!primaryUser) {
-    await prisma.user.create({ data: adminData });
+    await prisma.user.create({ data: userData });
     return;
   }
 
@@ -211,22 +225,21 @@ async function syncDefaultAdminUser({
 
   await prisma.user.update({
     where: { id: primaryUser.id },
-    data: adminData
+    data: userData
   });
 }
 
 async function main() {
-  const adminUsername = process.env.ADMIN_USERNAME ?? "jaguaradmin";
-  const adminEmail = process.env.ADMIN_EMAIL ?? "admin@jaguarproperties.in";
-  const adminPassword = process.env.ADMIN_PASSWORD ?? "Jaguar2023@";
-  const passwordHash = await bcrypt.hash(adminPassword, 10);
+  const superAdminUsername = process.env.SUPER_ADMIN_USERNAME ?? process.env.ADMIN_USERNAME ?? "jaguaradmin";
+  const superAdminEmail = process.env.SUPER_ADMIN_EMAIL ?? process.env.ADMIN_EMAIL ?? "admin@jaguarproperties.in";
+  const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD ?? process.env.ADMIN_PASSWORD ?? "Jaguar2023@";
+  const hrUsername = process.env.HR_USERNAME ?? "hrjaguar";
+  const hrEmail = process.env.HR_EMAIL ?? "hr@jaguarproperties.in";
+  const hrPassword = process.env.HR_PASSWORD ?? "Jaguar2023@";
+  const employeeUsername = process.env.EMPLOYEE_USERNAME ?? "shantosh";
+  const employeeEmail = process.env.EMPLOYEE_EMAIL ?? "shantosh@jaguarproperties.in";
+  const employeePassword = process.env.EMPLOYEE_PASSWORD ?? "Shantosh2023@";
   const { id: _demoId, createdAt: _demoCreatedAt, updatedAt: _demoUpdatedAt, ...siteContentSeed } = demoSiteContent;
-
-  await syncDefaultAdminUser({
-    username: adminUsername,
-    email: adminEmail,
-    passwordHash
-  });
 
   await Promise.all(
     (Object.keys(systemRoleDetails) as Array<keyof typeof systemRoleDetails>).map((role) =>
@@ -244,6 +257,36 @@ async function main() {
       })
     )
   );
+
+  await syncSeedUser({
+    username: superAdminUsername,
+    email: superAdminEmail,
+    employeeCode: DEFAULT_SUPER_ADMIN_EMPLOYEE_CODE,
+    passwordHash: await bcrypt.hash(superAdminPassword, 10),
+    role: "SUPER_ADMIN",
+    name: "Jaguar Super Admin",
+    department: "Administration"
+  });
+
+  await syncSeedUser({
+    username: hrUsername,
+    email: hrEmail,
+    employeeCode: DEFAULT_HR_EMPLOYEE_CODE,
+    passwordHash: await bcrypt.hash(hrPassword, 10),
+    role: "HR",
+    name: "Jaguar HR",
+    department: "Human Resources"
+  });
+
+  await syncSeedUser({
+    username: employeeUsername,
+    email: employeeEmail,
+    employeeCode: DEFAULT_EMPLOYEE_EMPLOYEE_CODE,
+    passwordHash: await bcrypt.hash(employeePassword, 10),
+    role: "EMPLOYEE",
+    name: "Shantosh",
+    department: "Operations"
+  });
 
   const existingSiteContent = await prisma.siteContent.findUnique({
     where: { id: "default-site-content" },
