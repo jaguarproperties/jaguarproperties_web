@@ -15,7 +15,6 @@ import { auth } from "@/lib/auth";
 import { getCareerBySlug } from "@/lib/careers";
 import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database-url";
 import { replaceHolidayCalendar } from "@/lib/holidays";
-import { getMongoDb } from "@/lib/mongo";
 import { prisma } from "@/lib/prisma";
 import { saveSiteMediaToMongo } from "@/lib/site-media-storage";
 import { deleteLocalProject, listLocalProjects, upsertLocalProject } from "@/lib/local-projects";
@@ -97,6 +96,7 @@ function revalidatePublicSiteContent() {
   }
 
   revalidatePath("/", "layout");
+  revalidateTag("site-content");
 }
 
 function parseBoolean(value: FormDataEntryValue | null) {
@@ -1177,28 +1177,18 @@ export async function updateSiteContent(formData: FormData) {
   try {
     ensureDatabase();
     const { id, ...data } = parsed.data;
-    const now = new Date();
-    const siteContentCollection = (await getMongoDb()).collection("SiteContent") as {
-      updateOne: (filter: Record<string, unknown>, update: Record<string, unknown>) => Promise<unknown>;
-      insertOne: (document: Record<string, unknown>) => Promise<unknown>;
-    };
 
     if (id) {
-      await siteContentCollection.updateOne(
-        { _id: id },
-        {
-          $set: {
-            ...data,
-            updatedAt: now
-          }
-        }
-      );
+      await prisma.siteContent.update({
+        where: { id },
+        data
+      });
     } else {
-      await siteContentCollection.insertOne({
-        _id: randomUUID(),
-        ...data,
-        createdAt: now,
-        updatedAt: now
+      await prisma.siteContent.create({
+        data: {
+          id: randomUUID(),
+          ...data
+        }
       });
     }
 
