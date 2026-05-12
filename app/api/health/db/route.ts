@@ -5,17 +5,28 @@ import { prisma } from "@/lib/prisma";
 import { getMongoDb } from "@/lib/mongo";
 
 function sanitizeMongoUrl(uri: string) {
-  const sanitized = new URL(uri);
-
-  if (sanitized.username) sanitized.username = "***";
-  if (sanitized.password) sanitized.password = "***";
+  const [schemeAndAuthority, query = ""] = uri.split("?", 2);
+  const protocolSeparatorIndex = schemeAndAuthority.indexOf("://");
+  const protocol =
+    protocolSeparatorIndex === -1 ? "mongodb:" : `${schemeAndAuthority.slice(0, protocolSeparatorIndex)}:`;
+  const afterProtocol =
+    protocolSeparatorIndex === -1
+      ? schemeAndAuthority
+      : schemeAndAuthority.slice(protocolSeparatorIndex + 3);
+  const slashIndex = afterProtocol.indexOf("/");
+  const authority = slashIndex === -1 ? afterProtocol : afterProtocol.slice(0, slashIndex);
+  const databasePath = slashIndex === -1 ? "" : afterProtocol.slice(slashIndex + 1);
+  const atIndex = authority.lastIndexOf("@");
+  const hosts = atIndex === -1 ? authority : authority.slice(atIndex + 1);
+  const sanitizedAuthority = atIndex === -1 ? authority : `***:***@${hosts}`;
+  const sanitizedQuery = new URLSearchParams(query);
 
   return {
-    protocol: sanitized.protocol,
-    hosts: sanitized.host,
-    database: sanitized.pathname.replace(/^\//, "") || null,
-    params: Object.fromEntries(sanitized.searchParams.entries()),
-    sanitizedUrl: sanitized.toString()
+    protocol,
+    hosts,
+    database: databasePath || null,
+    params: Object.fromEntries(sanitizedQuery.entries()),
+    sanitizedUrl: `${protocol}//${sanitizedAuthority}${databasePath ? `/${databasePath}` : ""}${query ? `?${query}` : ""}`
   };
 }
 
