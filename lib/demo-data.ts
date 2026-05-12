@@ -284,54 +284,54 @@ export const demoProperties = propertyShowcase.map((entry, index) => ({
 export const demoPosts = [
   {
     id: "demo-post-1",
-    title: "Jaguar City Opens a New Standard for Premium Plotted Living in Doddaballapura",
-    slug: "jaguar-city-premium-plotted-living-doddaballapura",
+    title: "Jaguar Properties Strengthens Investment Opportunities in North Bangalore",
+    slug: "jaguar-properties-strengthens-investment-opportunities-in-north-bangalore",
     excerpt:
-      "Jaguar City brings a large-format plotted development vision to NH-648 with long-term growth potential, strong road access, and township-style planning.",
+      "Jaguar Properties continues to create attractive investment opportunities through premium plotted developments in the fast-growing North Bangalore region.",
     content:
-      "Jaguar City is positioned as one of Jaguar Properties' landmark plotted developments in North Bengaluru. Located on NH-648 at Doddaballapura Town, the project combines premium plot offerings, strong growth visibility, and a master-planned layout that appeals to both end users and long-term investors.\n\nThe location strengthens the project's value story through improving connectivity, airport-region momentum, and access to emerging industrial and knowledge corridors. Jaguar City is being presented as a flagship address for buyers who want clarity, scale, and future-ready plotted development in a fast-rising belt of Bengaluru.",
-    coverImage: siteMedia.jaguarCityCover,
-    seoTitle: "Jaguar City Premium Plotted Living",
+      "Jaguar Properties is focusing on expanding premium plotted developments in North Bangalore, one of the fastest-growing real estate corridors in the city. With improved connectivity, infrastructure development, and increasing demand for residential plots, the region has become a preferred choice for investors and homebuyers.\n\nThe company’s projects are designed to provide organized layouts, wide roads, and essential infrastructure to ensure long-term value for buyers. By focusing on quality development and strategic locations, Jaguar Properties aims to provide secure and profitable real estate investment options.",
+    coverImage: "/uploads/site-media/news-clipping-investment-opportunities.svg",
+    seoTitle: "Jaguar Properties North Bangalore Investment Opportunities",
     seoDescription:
-      "Explore how Jaguar City is shaping premium plotted living in Doddaballapura with scale, connectivity, and long-term value.",
+      "Jaguar Properties expands premium plotted developments in North Bangalore with a strong focus on long-term investment value.",
     published: true,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date()
+    publishedAt: new Date("2026-05-07T09:00:00.000Z"),
+    createdAt: new Date("2026-05-07T09:00:00.000Z"),
+    updatedAt: new Date("2026-05-07T09:00:00.000Z")
   },
   {
     id: "demo-post-2",
-    title: "Emirates City Highlights Jaguar Properties' Township Vision Beside Jaguar City",
-    slug: "emirates-city-township-vision-jaguar-properties",
+    title: "New Residential Plot Projects by Jaguar Properties Attract Buyers",
+    slug: "new-residential-plot-projects-by-jaguar-properties-attract-buyers",
     excerpt:
-      "Emirates City extends the Jaguar Properties vision with an integrated township format, flexible payment planning, and adjacency to the Jaguar City growth corridor.",
+      "New plotted developments introduced by Jaguar Properties are gaining attention from buyers seeking affordable land investment opportunities.",
     content:
-      "Emirates City represents Jaguar Properties' broader township ambition in Doddaballapura. Positioned adjacent to Jaguar City on NH-648, the project is designed as an integrated plotted community divided into four blocks and supported by flexible payment options that make entry easier for a wider buyer segment.\n\nIts placement beside Jaguar City gives the project a strong narrative around scale, future infrastructure, and community-led development. For buyers comparing long-term plotted opportunities, Emirates City adds another layer to Jaguar Properties' North Bengaluru portfolio with a planning approach that balances accessibility and expansion potential.",
-    coverImage: "/uploads/site-media/emirates-city-main.png",
-    seoTitle: "Emirates City Township Vision",
+      "Jaguar Properties has introduced new residential plot developments designed to meet the growing demand for land investments in Bangalore. These projects provide well-planned plots with proper road connectivity and essential infrastructure.\n\nMany investors prefer plotted developments because they offer flexibility to build homes according to personal preferences. Jaguar Properties focuses on delivering reliable developments that combine affordability, accessibility, and long-term investment potential.",
+    coverImage: "/uploads/site-media/news-clipping-residential-plots.svg",
+    seoTitle: "Jaguar Properties Residential Plot Projects",
     seoDescription:
-      "See how Emirates City strengthens Jaguar Properties' township-focused presence in the Doddaballapura corridor.",
+      "New residential plot projects by Jaguar Properties are drawing buyer attention with affordability and long-term investment potential.",
     published: true,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date()
+    publishedAt: new Date("2026-05-08T09:00:00.000Z"),
+    createdAt: new Date("2026-05-08T09:00:00.000Z"),
+    updatedAt: new Date("2026-05-08T09:00:00.000Z")
   },
   {
     id: "demo-post-3",
-    title: "Green Hills Brings a Peaceful Villa Plot Option to Jaguar Properties' Growth Portfolio",
-    slug: "green-hills-villa-plot-growth-portfolio",
+    title: "Jaguar Properties Plans Modern Infrastructure in Upcoming Projects",
+    slug: "jaguar-properties-plans-modern-infrastructure-in-upcoming-projects",
     excerpt:
-      "Green Hills expands Jaguar Properties' project mix with a quieter villa-plot community focused on long-term value, layout quality, and residential comfort.",
+      "Upcoming projects by Jaguar Properties will feature modern infrastructure, wide internal roads, and essential utilities for a comfortable residential environment.",
     content:
-      "Green Hills adds a different lifestyle proposition to the Jaguar Properties portfolio by focusing on premium villa plots in a calmer, growth-oriented setting near Bengaluru. The project emphasizes layout planning, documentation readiness, and a residential environment that appeals to buyers prioritizing both peace and future appreciation.\n\nWith its positioning around DTCP-approved planning, E-Khata support, and completed DC conversion, Green Hills strengthens Jaguar Properties' ability to serve buyers looking beyond dense urban locations. It offers a more tranquil plotted alternative while still fitting into the company's broader premium land and township strategy.",
-    coverImage: "/uploads/site-media/green-hills.jpeg",
-    seoTitle: "Green Hills Villa Plot Community",
+      "Jaguar Properties is planning to introduce advanced infrastructure features in its upcoming plotted developments. These projects will include wide internal roads, electricity connections, water supply facilities, and efficient drainage systems.\n\nThe goal is to create organized communities where residents can enjoy a comfortable lifestyle while benefiting from property value appreciation. With careful planning and strategic location selection, Jaguar Properties aims to deliver projects that meet modern residential standards.",
+    coverImage: "/uploads/site-media/news-clipping-modern-infrastructure.svg",
+    seoTitle: "Jaguar Properties Modern Infrastructure Plans",
     seoDescription:
-      "Discover how Green Hills adds a peaceful premium villa-plot option to Jaguar Properties' project portfolio.",
+      "Upcoming Jaguar Properties projects will feature modern infrastructure and utilities designed for comfortable residential living.",
     published: true,
-    publishedAt: new Date(),
-    createdAt: new Date(),
-    updatedAt: new Date()
+    publishedAt: new Date("2026-05-09T09:00:00.000Z"),
+    createdAt: new Date("2026-05-09T09:00:00.000Z"),
+    updatedAt: new Date("2026-05-09T09:00:00.000Z")
   }
 ];
 

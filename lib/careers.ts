@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isDatabaseEnabled } from "@/lib/database-url";
 import { slugify } from "@/lib/utils";
 
 type StaticCareer = {
@@ -111,7 +112,7 @@ function normalizeCareerJob(job: JobPostingSource): CareerOpening {
 }
 
 function canQueryCareerOpenings() {
-  return Boolean(process.env.DATABASE_URL && prisma.jobPosting);
+  return isDatabaseEnabled() && Boolean((process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL) && prisma.jobPosting);
 }
 
 export async function getCareerOpenings() {

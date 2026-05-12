@@ -19,7 +19,7 @@ import {
   resolveSiteContent
 } from "@/lib/site-content";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 function getYoutubeEmbedUrl(url: unknown) {
   if (typeof url !== "string" || !url.trim()) {

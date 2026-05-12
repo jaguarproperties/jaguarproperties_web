@@ -8,19 +8,19 @@ const globalForMongo = globalThis as unknown as {
   hasLoggedMongoConnection?: boolean;
 };
 
-export const mongoClient =
-  globalForMongo.mongoClient ??
-  new MongoClient(getDatabaseUrl(), {
-    appName: "jaguar-properties"
-  });
+function getMongoClient() {
+  if (!globalForMongo.mongoClient) {
+    globalForMongo.mongoClient = new MongoClient(getDatabaseUrl(), {
+      appName: "jaguar-properties"
+    });
+  }
 
-if (process.env.NODE_ENV !== "production") {
-  globalForMongo.mongoClient = mongoClient;
+  return globalForMongo.mongoClient;
 }
 
 async function connectMongoClient() {
   if (!globalForMongo.mongoConnectPromise) {
-    globalForMongo.mongoConnectPromise = mongoClient.connect().catch((error) => {
+    globalForMongo.mongoConnectPromise = getMongoClient().connect().catch((error) => {
       globalForMongo.mongoConnectPromise = undefined;
       throw error;
     });

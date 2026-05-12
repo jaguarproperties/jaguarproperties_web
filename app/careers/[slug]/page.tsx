@@ -8,7 +8,7 @@ import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { CareerApplicationForm } from "@/components/site/career-application-form";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params

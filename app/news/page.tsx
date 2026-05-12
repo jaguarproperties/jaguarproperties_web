@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { getBlogPosts, getSiteContent } from "@/lib/data";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "News & Updates",

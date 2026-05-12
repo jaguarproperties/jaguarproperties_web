@@ -72,14 +72,14 @@ export function Hero({
       <div className="absolute inset-0 bg-hero-gradient opacity-90" />
       <div className="animate-pulse-glow absolute left-[8%] top-24 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
       <div className="animate-float-soft absolute bottom-20 right-[10%] h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-      <div className="container relative flex min-h-[78vh] items-center py-20 sm:py-24 lg:min-h-[84vh]">
-        <div className="grid w-full items-end gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-12">
+      <div className="container relative flex min-h-[70vh] items-center py-14 sm:py-16 lg:min-h-[76vh]">
+        <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-10">
           <FadeIn>
             <div className="max-w-3xl">
               <p className="text-xs uppercase tracking-[0.45em] text-primary">
                 <Translate id="hero.brand" defaultText="Jaguar Properties" />
               </p>
-              <h1 className="mt-6 max-w-4xl font-display text-5xl leading-[1.02] text-white md:text-6xl xl:text-7xl">{title}</h1>
+              <h1 className="mt-6 max-w-4xl font-display text-4xl leading-[1.02] text-white md:text-5xl xl:text-6xl">{title}</h1>
               <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-200 md:text-lg">{subtitle}</p>
               <div className="mt-10 flex flex-wrap gap-3 sm:gap-4">
                 <Button asChild size="lg">

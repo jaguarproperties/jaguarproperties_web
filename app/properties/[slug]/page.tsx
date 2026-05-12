@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getProjectBySlug } from "@/lib/data";
 
+export const dynamic = "force-dynamic";
+
 function dedupeImages(images: string[]) {
   return Array.from(new Set(images.map((image) => image.trim()).filter(Boolean)));
 }

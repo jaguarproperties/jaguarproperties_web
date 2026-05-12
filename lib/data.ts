@@ -1,108 +1,21 @@
 import { unstable_cache } from "next/cache";
-import { MediaEntityType } from "@prisma/client";
 import type { JobApplication, Lead, Prisma, Project } from "@prisma/client";
 
+import { demoApplications, demoLeads, demoPosts, demoProjects, demoProperties, demoSiteContent, demoTestimonials } from "@/lib/demo-data";
 import { isDatabaseEnabled } from "@/lib/database-url";
-import { prisma } from "@/lib/prisma";
-import { careerOpenings } from "@/lib/careers";
+import { listLocalPublishedBlogPosts, getLocalBlogPostBySlug } from "@/lib/local-blog-posts";
 import { getLocalProjectBySlug, listLocalProjects } from "@/lib/local-projects";
+import { readLocalSiteContent } from "@/lib/local-site-content";
+import { listLocalPublishedTestimonials } from "@/lib/local-testimonials";
+import { prisma } from "@/lib/prisma";
 import { allowedPropertyTitles } from "@/lib/property-showcase";
 import { listAllTestimonials, listPublishedTestimonials } from "@/lib/testimonials";
-import {
-  demoApplications,
-  demoLeads,
-  demoPosts,
-  demoProjects,
-  demoProperties,
-  demoSiteContent,
-  demoTestimonials
-} from "@/lib/demo-data";
 
 const hasDatabase = isDatabaseEnabled() && Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL);
 
 function assertDatabaseAvailable() {
   if (!hasDatabase) {
     throw new Error("DATABASE_URL is not configured. This application is configured to use MongoDB for all data.");
-  }
-}
-
-function dedupeProjectImages(coverImage: string, gallery: string[]) {
-  return Array.from(new Set([coverImage, ...gallery].filter(Boolean)));
-}
-
-async function syncProjectMediaForDatabase(projectId: string, coverImage: string, gallery: string[]) {
-  const urls = dedupeProjectImages(coverImage, gallery);
-
-  await prisma.media.deleteMany({
-    where: { projectId }
-  });
-
-  if (!urls.length) return;
-
-  await Promise.all(
-    urls.map((url, index) =>
-      prisma.media.create({
-        data: {
-          url,
-          alt: index === 0 ? "Featured project image" : "Project gallery image",
-          entityType: MediaEntityType.PROJECT,
-          projectId
-        }
-      })
-    )
-  );
-}
-
-async function syncLocalProjectsToDatabase() {
-  if (!hasDatabase) return;
-
-  const localProjects = await listLocalProjects();
-
-  for (const project of localProjects) {
-    const payload = {
-      title: project.title,
-      slug: project.slug,
-      summary: project.summary,
-      description: project.description,
-      city: project.city,
-      location: project.location,
-      country: project.country,
-      priceRange: project.priceRange,
-      areaSqFt: project.areaSqFt,
-      areaLabel: project.areaLabel,
-      tags: project.tags,
-      status: project.status,
-      completionDate: project.completionDate,
-      featured: project.featured,
-      visible: project.visible,
-      sortOrder: project.sortOrder,
-      coverImage: project.coverImage,
-      gallery: project.gallery,
-      seoTitle: project.seoTitle,
-      seoDescription: project.seoDescription
-    };
-
-    const existingProject = await prisma.project.findFirst({
-      where: {
-        OR: [{ id: project.id }, { slug: project.slug }]
-      },
-      select: { id: true }
-    });
-
-    const savedProject = existingProject
-      ? await prisma.project.update({
-          where: { id: existingProject.id },
-          data: payload
-        })
-      : await prisma.project.create({
-          data: {
-            id: project.id,
-            ...payload,
-            createdAt: project.createdAt
-          }
-        });
-
-    await syncProjectMediaForDatabase(savedProject.id, project.coverImage, project.gallery);
   }
 }
 
@@ -191,33 +104,10 @@ type AdminCollections = {
   applications: JobApplication[];
   siteContent: NonNullable<Awaited<ReturnType<typeof getSiteContent>>>;
 };
-
-type PropertyRecord = (typeof demoProperties)[number];
 const allowedPropertyTitleSet = new Set<string>(allowedPropertyTitles.map((title) => title.toLowerCase()));
 
 function normalizePropertyTitle(title: string) {
   return title.trim().toLowerCase();
-}
-
-function getFallbackAdminJobPostings(): AdminJobPosting[] {
-  return careerOpenings.map((job, index) => ({
-    id: `fallback-job-${index + 1}`,
-    title: job.title,
-    department: "General",
-    location: "Bengaluru",
-    description: job.requirements.join("\n"),
-    requirements: job.requirements.join("\n"),
-    openings: job.openings,
-    qualification: job.qualification,
-    experience: job.experience,
-    salary: null,
-    type: "FULL_TIME",
-    isActive: true,
-    postedAt: new Date(),
-    expiresAt: null,
-    createdAt: new Date(),
-    updatedAt: new Date()
-  }));
 }
 
 export type PropertyFilterParams = {
@@ -237,29 +127,57 @@ export type ProjectFilterParams = {
 };
 
 async function withFallback<T>(query: () => Promise<T>, _fallback: T) {
-  if (!hasDatabase) {
-    return _fallback;
+  assertDatabaseAvailable();
+  return query();
+}
+
+function isDatabaseConnectionFailure(error: unknown) {
+  if (!(error instanceof Error)) {
+    return false;
   }
+
+  const message = error.message.toLowerCase();
+
+  return [
+    "error creating a database connection",
+    "dns resolution",
+    "no route to host",
+    "server selection timeout",
+    "can't reach database server",
+    "connection refused",
+    "timed out"
+  ].some((pattern) => message.includes(pattern));
+}
+
+async function withConnectionFallback<T>(
+  query: () => Promise<T>,
+  fallback: T | (() => Promise<T> | T),
+  context: string
+) {
+  assertDatabaseAvailable();
 
   try {
     return await query();
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Database query failed, serving fallback data instead.", error);
+    if (!isDatabaseConnectionFailure(error)) {
+      throw error;
     }
 
-    return _fallback;
+    console.warn(`[data] ${context} falling back to local content because the database is unreachable.`, error);
+
+    return typeof fallback === "function" ? await (fallback as () => Promise<T> | T)() : fallback;
   }
 }
 
 const getCachedSiteContent = unstable_cache(
   async () =>
-    withFallback(
+    withConnectionFallback(
       () =>
         prisma.siteContent.findFirst({
           orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
         }),
-      demoSiteContent
+      () => readLocalSiteContent(),
+      "site content"
     ),
   ["site-content"],
   { revalidate: 300, tags: ["site-content"] }
@@ -278,7 +196,7 @@ const getCachedFeaturedProperties = unstable_cache(
 
         return restrictToAllowedProperties(properties.filter((property) => property.featured)).slice(0, 3);
       },
-      restrictToAllowedProperties(demoProperties.filter((property) => property.featured)).slice(0, 3)
+      []
     ),
   ["featured-properties"],
   { revalidate: 300, tags: ["properties"] }
@@ -298,19 +216,9 @@ const sortProjectsForDisplay = <T extends {
     return rightTime - leftTime;
   });
 
-async function getLocalVisibleProjects() {
-  return sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.visible));
-}
-
-async function getLocalFeaturedProjects() {
-  return (await getLocalVisibleProjects()).filter((project) => project.featured).slice(0, 3);
-}
-
 const getCachedFeaturedProjects = unstable_cache(
-  async () => {
-    const localFeaturedProjects = await getLocalFeaturedProjects();
-
-    return withFallback(
+  async () =>
+    withConnectionFallback(
       async () => {
         const projects = await prisma.project.findMany({
           where: {
@@ -322,119 +230,94 @@ const getCachedFeaturedProjects = unstable_cache(
 
         return sortProjectsForDisplay(projects).slice(0, 3);
       },
-      localFeaturedProjects.length
-        ? localFeaturedProjects
-        : sortProjectsForDisplay(demoProjects.filter((project) => project.featured && project.visible)).slice(0, 3)
-    );
-  },
+      async () => sortProjectsForDisplay((await listLocalProjects()).filter((project) => project.featured && project.visible)).slice(0, 3),
+      "featured projects"
+    ),
   ["featured-projects"],
   { revalidate: 300, tags: ["projects"] }
 );
 
 const getCachedBlogPosts = unstable_cache(
   async () =>
-    withFallback(
+    withConnectionFallback(
       () =>
         prisma.blogPost.findMany({
           where: { published: true },
           orderBy: { publishedAt: "desc" }
         }),
-      demoPosts
+      () => listLocalPublishedBlogPosts(),
+      "blog posts"
     ),
   ["blog-posts"],
   { revalidate: 300, tags: ["posts"] }
 );
 
 const getCachedTestimonials = unstable_cache(
-  async () => withFallback(() => listPublishedTestimonials(), demoTestimonials.filter((item) => item.published)),
+  async () =>
+    withConnectionFallback(
+      () => listPublishedTestimonials(),
+      () => listLocalPublishedTestimonials(),
+      "testimonials"
+    ),
   ["testimonials"],
   { revalidate: 300, tags: ["testimonials"] }
 );
 
 const getCachedProperties = unstable_cache(
   async () =>
-    withFallback(
+    withConnectionFallback(
       () =>
         prisma.property.findMany({
           include: { project: true },
           orderBy: { createdAt: "desc" }
         }),
-      demoProperties
+      () => demoProperties,
+      "properties"
     ),
   ["all-properties"],
   { revalidate: 300, tags: ["properties"] }
 );
 
 const getCachedProjects = unstable_cache(
-  async () => {
-    const localProjects = await getLocalVisibleProjects();
-
-    return withFallback(
+  async () =>
+    withConnectionFallback(
       () =>
         prisma.project.findMany({
           where: { visible: true },
           orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }]
         }),
-      localProjects.length ? localProjects : demoProjects.filter((project) => project.visible)
-    );
-  },
+      async () => (await listLocalProjects()).filter((project) => project.visible),
+      "projects"
+    ),
   ["all-projects"],
   { revalidate: 300, tags: ["projects"] }
 );
 
 const getCachedDashboardOverview = unstable_cache(
   async (): Promise<DashboardOverview> => {
-    const fallbackJobPostings = getFallbackAdminJobPostings();
-    const fallbackOpenings = fallbackJobPostings.reduce((sum, job) => sum + job.openings, 0);
+    assertDatabaseAvailable();
 
-    if (!hasDatabase) {
-      return {
-        leads: demoLeads.length,
-        properties: demoProperties.length,
-        projects: demoProjects.length,
-        posts: demoPosts.length,
-        applications: demoApplications.length,
-        jobs: fallbackJobPostings.length,
-        openings: fallbackOpenings
-      };
-    }
+    const [leads, properties, projects, posts, applications, jobs] = await Promise.all([
+      prisma.lead.count(),
+      prisma.property.count(),
+      prisma.project.count(),
+      prisma.blogPost.count(),
+      prisma.jobApplication.count(),
+      prisma.jobPosting.findMany({
+        where: { isActive: true },
+        select: { openings: true }
+      })
+    ]);
 
-    try {
-      const [leads, properties, projects, posts, applications, jobs] = await Promise.all([
-        prisma.lead.count(),
-        prisma.property.count(),
-        prisma.project.count(),
-        prisma.blogPost.count(),
-        prisma.jobApplication.count(),
-        prisma.jobPosting.findMany({
-          where: { isActive: true },
-          select: { openings: true }
-        })
-      ]);
-
-      return {
-        leads,
-        properties,
-        projects,
-        posts,
-        applications,
-        jobs: jobs.length,
-        openings: jobs.reduce((sum, job) => sum + (job.openings ?? 0), 0)
-      };
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Job posting data unavailable on dashboard, serving fallback openings instead.", error);
-      }
-      return {
-        leads: demoLeads.length,
-        properties: demoProperties.length,
-        projects: demoProjects.length,
-        posts: demoPosts.length,
-        applications: demoApplications.length,
-        jobs: fallbackJobPostings.length,
-        openings: fallbackOpenings
-      };
-    }
+    return {
+      leads,
+      properties,
+      projects,
+      posts,
+      applications,
+      jobs: jobs.length,
+      openings: jobs.reduce((sum, job) => sum + (job.openings ?? 0), 0)
+    };
   },
   ["admin-dashboard-overview"],
   { revalidate: 60, tags: ["admin-dashboard"] }
@@ -483,11 +366,11 @@ const getCachedAdminDashboardPreview = unstable_cache(
         };
       },
       {
-        recentLeads: demoLeads.slice(0, 5),
-        leadCount: demoLeads.length,
-        siteContent: demoSiteContent,
-        jobPostingCount: getFallbackAdminJobPostings().length,
-        recentJobPostings: getFallbackAdminJobPostings().slice(0, 6)
+        recentLeads: [],
+        leadCount: 0,
+        siteContent: null,
+        jobPostingCount: 0,
+        recentJobPostings: []
       }
     ),
   ["admin-dashboard-preview"],
@@ -496,49 +379,24 @@ const getCachedAdminDashboardPreview = unstable_cache(
 
 const getCachedUserDepartments = unstable_cache(
   async (): Promise<string[]> => {
-    if (!hasDatabase) {
-      const users = await getNotificationAudienceUsers();
+    assertDatabaseAvailable();
 
-      return Array.from(
-        new Set(
-          users
-            .map((user) => user.department?.trim())
-            .filter((department): department is string => Boolean(department))
-        )
-      ).sort((a, b) => a.localeCompare(b));
-    }
+    const departments = await prisma.user.findMany({
+      where: {
+        department: {
+          not: null
+        }
+      },
+      select: {
+        department: true
+      },
+      distinct: ["department"]
+    });
 
-    try {
-      const departments = await prisma.user.findMany({
-        where: {
-          department: {
-            not: null
-          }
-        },
-        select: {
-          department: true
-        },
-        distinct: ["department"]
-      });
-
-      return departments
-        .map((item) => item.department?.trim())
-        .filter((department): department is string => Boolean(department))
-        .sort((a, b) => a.localeCompare(b));
-    } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("Falling back to derived user departments.", error);
-      }
-
-      const users = await getNotificationAudienceUsers();
-      return Array.from(
-        new Set(
-          users
-            .map((user) => user.department?.trim())
-            .filter((department): department is string => Boolean(department))
-        )
-      ).sort((a, b) => a.localeCompare(b));
-    }
+    return departments
+      .map((item) => item.department?.trim())
+      .filter((department): department is string => Boolean(department))
+      .sort((a, b) => a.localeCompare(b));
   },
   ["user-departments"],
   { revalidate: 300, tags: ["users"] }
@@ -549,22 +407,15 @@ export async function getSiteContent() {
 }
 
 export async function getProjectBySlug(slug: string) {
-  if (!hasDatabase) {
-    return getLocalProjectBySlug(slug);
-  }
-
-  try {
-    return await prisma.project.findFirst({
-      where: { slug, visible: true },
-      include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
-    });
-  } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Project lookup failed, serving local project fallback instead.", error);
-    }
-
-    return getLocalProjectBySlug(slug);
-  }
+  return withConnectionFallback(
+    () =>
+      prisma.project.findFirst({
+        where: { slug, visible: true },
+        include: { properties: true, media: { orderBy: { createdAt: "asc" } } }
+      }),
+    () => getLocalProjectBySlug(slug),
+    `project ${slug}`
+  );
 }
 
 function filterProjects<T extends Pick<Project, "title" | "summary" | "description" | "location" | "city" | "status" | "tags">>(
@@ -761,32 +612,6 @@ function restrictToAllowedProperties<T extends { title: string; createdAt?: Date
   return Array.from(deduped.values());
 }
 
-function mergePropertyRecords<T extends { slug: string; createdAt?: Date | string | null }>(primary: T[], secondary: T[]) {
-  const merged = new Map<string, T>();
-
-  for (const item of sortPropertiesByNewest(primary)) {
-    const key = "title" in item && typeof item.title === "string" && isAllowedPropertyTitle(item.title)
-      ? `title:${normalizePropertyTitle(item.title)}`
-      : `slug:${item.slug}`;
-
-    if (!merged.has(key)) {
-      merged.set(key, item);
-    }
-  }
-
-  for (const item of sortPropertiesByNewest(secondary)) {
-    const key = "title" in item && typeof item.title === "string" && isAllowedPropertyTitle(item.title)
-      ? `title:${normalizePropertyTitle(item.title)}`
-      : `slug:${item.slug}`;
-
-    if (!merged.has(key)) {
-      merged.set(key, item);
-    }
-  }
-
-  return sortPropertiesByNewest(Array.from(merged.values()));
-}
-
 export async function getProperties(filters: PropertyFilterParams = {}) {
   const properties = await getCachedProperties();
   return filterProperties(restrictToAllowedProperties(properties), filters);
@@ -820,17 +645,20 @@ export async function getTestimonials() {
 
 export async function getBlogPostBySlug(slug: string) {
   return unstable_cache(
-    async () => {
-      assertDatabaseAvailable();
-      return prisma.blogPost.findUnique({
-        where: { slug },
-        include: {
-          media: {
-            orderBy: { createdAt: "asc" }
-          }
-        }
-      });
-    },
+    async () =>
+      withConnectionFallback(
+        () =>
+          prisma.blogPost.findUnique({
+            where: { slug },
+            include: {
+              media: {
+                orderBy: { createdAt: "asc" }
+              }
+            }
+          }),
+        () => getLocalBlogPostBySlug(slug),
+        `blog post ${slug}`
+      ),
     ["blog-post", slug],
     { revalidate: 300, tags: ["posts"] }
   )();
@@ -841,21 +669,9 @@ export async function getDashboardOverview(): Promise<DashboardOverview> {
 }
 
 export async function getAdminCollections(): Promise<AdminCollections> {
-  if (!hasDatabase) {
-    return {
-      projects: await listLocalProjects(),
-      properties: restrictToAllowedProperties(demoProperties),
-      posts: demoPosts.map((post) => ({ ...post, media: [] })),
-      testimonials: demoTestimonials,
-      leads: demoLeads,
-      applications: demoApplications,
-      siteContent: demoSiteContent
-    };
-  }
+  assertDatabaseAvailable();
 
   try {
-    await syncLocalProjectsToDatabase();
-
     const [projects, properties, posts, leads, applications, siteContent] = await Promise.all([
       prisma.project.findMany({ orderBy: [{ sortOrder: "asc" }, { updatedAt: "desc" }] }),
       prisma.property.findMany({ include: { project: true }, orderBy: { createdAt: "desc" } }),
@@ -874,6 +690,10 @@ export async function getAdminCollections(): Promise<AdminCollections> {
 
     const testimonials = await listAllTestimonials();
 
+    if (!siteContent) {
+      throw new Error("Site content is missing from the database.");
+    }
+
     return {
       projects,
       properties: restrictToAllowedProperties(properties),
@@ -881,12 +701,14 @@ export async function getAdminCollections(): Promise<AdminCollections> {
       testimonials,
       leads,
       applications,
-      siteContent: siteContent ?? demoSiteContent
+      siteContent
     };
   } catch (error) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("Admin collections unavailable from database, serving local fallback instead.", error);
+    if (!isDatabaseConnectionFailure(error)) {
+      throw error;
     }
+
+    console.warn("[data] admin collections falling back to local/demo content because the database is unreachable.", error);
 
     return {
       projects: await listLocalProjects(),
@@ -895,7 +717,7 @@ export async function getAdminCollections(): Promise<AdminCollections> {
       testimonials: demoTestimonials,
       leads: demoLeads,
       applications: demoApplications,
-      siteContent: demoSiteContent
+      siteContent: (await getSiteContent()) ?? demoSiteContent
     };
   }
 }
@@ -910,7 +732,7 @@ export async function getAdminJobPostings(): Promise<AdminJobPosting[]> {
       prisma.jobPosting.findMany({
         orderBy: { createdAt: "desc" }
       }),
-    getFallbackAdminJobPostings()
+    []
   );
 }
 

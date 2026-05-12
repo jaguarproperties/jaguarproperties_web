@@ -11,7 +11,7 @@ import { HoverLift } from "@/components/motion/hover-lift";
 import { getSiteContent } from "@/lib/data";
 import { parseLocationItems, resolveSiteContent } from "@/lib/site-content";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Careers",

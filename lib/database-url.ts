@@ -16,8 +16,20 @@ function parseBooleanEnv(value: string | undefined) {
   return ["1", "true", "yes", "on"].includes(value.trim().toLowerCase());
 }
 
+function isNextProductionBuildPhase() {
+  return process.env.NEXT_PHASE === "phase-production-build";
+}
+
 export function isDatabaseEnabled() {
   return !parseBooleanEnv(process.env.DISABLE_DATABASE);
+}
+
+export function isBuildPhaseWithoutDatabase() {
+  return isNextProductionBuildPhase() && !hasDatabaseUrl();
+}
+
+export function hasDatabaseUrl() {
+  return Boolean(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL);
 }
 
 export function getDatabaseUrl() {
@@ -27,19 +39,21 @@ export function getDatabaseUrl() {
     throw new Error("DATABASE_URL is not configured.");
   }
 
-  const url = new URL(rawUrl);
+  const [base, query = ""] = rawUrl.split("?", 2);
+  const searchParams = new URLSearchParams(query);
 
   for (const [key, value] of Object.entries(DEFAULT_TIMEOUTS)) {
-    if (!url.searchParams.has(key)) {
-      url.searchParams.set(key, value);
+    if (!searchParams.has(key)) {
+      searchParams.set(key, value);
     }
   }
 
-  if (!url.searchParams.has("appName")) {
-    url.searchParams.set("appName", "jaguar-properties");
+  if (!searchParams.has("appName")) {
+    searchParams.set("appName", "jaguar-properties");
   }
 
-  return url.toString();
+  const serializedQuery = searchParams.toString();
+  return serializedQuery ? `${base}?${serializedQuery}` : base;
 }
 
 export function formatDatabaseConnectionError(error: unknown) {

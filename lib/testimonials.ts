@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 
-import { getMongoDb } from "@/lib/mongo";
 import { deleteStoredTestimonialImageByUrl } from "@/lib/testimonial-images";
+import { prisma } from "@/lib/prisma";
 
 type TestimonialRecord = {
   id: string;
@@ -20,50 +20,54 @@ type TestimonialInput = {
   published: boolean;
 };
 
-function normalizeTestimonialDocument(document: Record<string, any>): TestimonialRecord {
+function normalizeTestimonialDocument(document: {
+  id: string;
+  name: string;
+  message: string;
+  image: string;
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}): TestimonialRecord {
   return {
-    id: String(document.id ?? document._id),
-    name: String(document.name ?? ""),
-    message: String(document.message ?? ""),
-    image: String(document.image ?? ""),
-    published: Boolean(document.published),
-    createdAt: document.createdAt instanceof Date ? document.createdAt : new Date(document.createdAt ?? Date.now()),
-    updatedAt: document.updatedAt instanceof Date ? document.updatedAt : new Date(document.updatedAt ?? Date.now())
+    id: document.id,
+    name: document.name,
+    message: document.message,
+    image: document.image,
+    published: document.published,
+    createdAt: document.createdAt,
+    updatedAt: document.updatedAt
   };
 }
 
-async function getTestimonialCollection() {
-  return (await getMongoDb()).collection("Testimonial") as any;
-}
-
 export async function listPublishedTestimonials() {
-  const documents = (await (await getTestimonialCollection())
-    .find({ published: true })
-    .sort({ updatedAt: -1, createdAt: -1 })
-    .toArray()) as Array<Record<string, any>>;
+  const documents = await prisma.testimonial.findMany({
+    where: { published: true },
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
+  });
 
-  return documents.map((document: Record<string, any>) => normalizeTestimonialDocument(document));
+  return documents.map((document) => normalizeTestimonialDocument(document));
 }
 
 export async function listAllTestimonials() {
-  const documents = (await (await getTestimonialCollection())
-    .find({})
-    .sort({ updatedAt: -1, createdAt: -1 })
-    .toArray()) as Array<Record<string, any>>;
+  const documents = await prisma.testimonial.findMany({
+    orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }]
+  });
 
-  return documents.map((document: Record<string, any>) => normalizeTestimonialDocument(document));
+  return documents.map((document) => normalizeTestimonialDocument(document));
 }
 
 export async function createTestimonial(data: TestimonialInput) {
   const now = new Date();
   const id = randomUUID();
 
-  await (await getTestimonialCollection()).insertOne({
-    _id: id,
-    id,
-    ...data,
-    createdAt: now,
-    updatedAt: now
+  await prisma.testimonial.create({
+    data: {
+      id,
+      ...data,
+      createdAt: now,
+      updatedAt: now
+    }
   });
 
   return {
@@ -76,35 +80,28 @@ export async function createTestimonial(data: TestimonialInput) {
 
 export async function updateTestimonial(id: string, data: TestimonialInput) {
   const updatedAt = new Date();
-
-  const collection = await getTestimonialCollection();
-  const existingDocument = await collection.findOne({
-    $or: [{ _id: id }, { id }]
+  const existingDocument = await prisma.testimonial.findUnique({
+    where: { id }
   });
 
   if (!existingDocument) {
     throw new Error("Testimonial not found.");
   }
 
-  const previousImage = String(existingDocument.image ?? "");
+  const previousImage = existingDocument.image;
 
-  await collection.updateOne(
-    { $or: [{ _id: id }, { id }] },
-    {
-      $set: {
-        ...data,
-        updatedAt
-      }
+  await prisma.testimonial.update({
+    where: { id },
+    data: {
+      ...data,
+      updatedAt
     }
-  );
+  });
 
   const result = {
     id,
     ...data,
-    createdAt:
-      existingDocument.createdAt instanceof Date
-        ? existingDocument.createdAt
-        : new Date(existingDocument.createdAt ?? updatedAt),
+    createdAt: existingDocument.createdAt,
     updatedAt
   };
 
@@ -116,14 +113,13 @@ export async function updateTestimonial(id: string, data: TestimonialInput) {
 }
 
 export async function deleteTestimonialById(id: string) {
-  const collection = await getTestimonialCollection();
-  const existingDocument = await collection.findOne({
-    $or: [{ _id: id }, { id }]
+  const existingDocument = await prisma.testimonial.findUnique({
+    where: { id }
   });
 
-  await collection.deleteOne({
-    $or: [{ _id: id }, { id }]
+  await prisma.testimonial.delete({
+    where: { id }
   });
 
-  await deleteStoredTestimonialImageByUrl(String(existingDocument?.image ?? ""));
+  await deleteStoredTestimonialImageByUrl(existingDocument?.image ?? "");
 }

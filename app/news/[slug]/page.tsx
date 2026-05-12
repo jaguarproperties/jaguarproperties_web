@@ -3,11 +3,10 @@ import { notFound } from "next/navigation";
 import { format } from "date-fns";
 
 import { PageShell } from "@/components/layout/page-shell";
-import { PropertyGallery } from "@/components/site/property-gallery";
 import { Card } from "@/components/ui/card";
 import { getBlogPostBySlug } from "@/lib/data";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params
@@ -31,10 +30,6 @@ export default async function BlogDetailPage({
   const post = await getBlogPostBySlug(params.slug);
   if (!post) notFound();
 
-  const galleryImages = Array.from(
-    new Set([post.coverImage, ...(post.media ?? []).map((item) => item.url)].filter(Boolean))
-  );
-
   return (
     <PageShell>
       <section className="container py-20">
@@ -44,9 +39,6 @@ export default async function BlogDetailPage({
               {format(post.publishedAt, "dd MMMM yyyy")}
             </p>
             <h1 className="mt-4 font-display text-5xl text-foreground dark:text-white">{post.title}</h1>
-            <div className="mt-8">
-              <PropertyGallery images={galleryImages} title={post.title} />
-            </div>
             <div className="prose-luxe mt-8">
               {post.content.split("\n").map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>

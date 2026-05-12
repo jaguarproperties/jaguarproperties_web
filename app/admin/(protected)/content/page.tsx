@@ -1,5 +1,5 @@
 import { ContentForm } from "@/components/admin/content-form";
-import { getAdminCollections } from "@/lib/data";
+import { getSiteContent } from "@/lib/data";
 import { resolveSiteContent } from "@/lib/site-content";
 
 export default async function AdminContentPage({
@@ -7,7 +7,7 @@ export default async function AdminContentPage({
 }: {
   searchParams?: { saved?: string; error?: string; mode?: string };
 }) {
-  const { siteContent } = await getAdminCollections();
+  const siteContent = await getSiteContent();
   const resolvedContent = resolveSiteContent(siteContent);
   const wasSaved = searchParams?.saved === "1";
   const errorMessage = searchParams?.error;
