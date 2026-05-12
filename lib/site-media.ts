@@ -8,11 +8,18 @@ export function toSiteMediaUrl(filename: string) {
 
 export const siteMedia = {
   emiratesCity: toSiteMediaUrl("emirates-city.jpeg"),
+  emiratesCityMain: toSiteMediaUrl("emirates-city-main.png"),
+  emiratesCityProject: toSiteMediaUrl("emirates-city-project.png"),
+  greenHills: toSiteMediaUrl("green-hills.jpeg"),
+  greenHillsProject: toSiteMediaUrl("green-hills-project.jpeg"),
   jaguarFarmLands: toSiteMediaUrl("jaguar-farm-lands-8e280089-13a4-4408-aa70-bc1dd5e463c3.png"),
   jaguarPropertiesLogo: toSiteMediaUrl("jaguar-properties-logo.svg"),
   jaguarBrochureCover: toSiteMediaUrl("jaguar-brochure-cover.png"),
   jaguarCity: toSiteMediaUrl("jaguar-city.jpeg"),
   jaguarCityCommunity: toSiteMediaUrl("jaguar-city-community.jpeg"),
   jaguarCityCover: toSiteMediaUrl("jaguar-city-cover.png"),
-  jaguarCityGrowth: toSiteMediaUrl("jaguar-city-growth.jpeg")
+  jaguarCityProject: toSiteMediaUrl("jaguar-city-project.png"),
+  jaguarCityGrowth: toSiteMediaUrl("jaguar-city-growth.jpeg"),
+  jaguarDiamondCityMain: toSiteMediaUrl("jaguar-diamond-city-main.png"),
+  jaguarDiamondCityProject: toSiteMediaUrl("jaguar-diamond-city-project.png")
 } as const;

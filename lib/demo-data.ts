@@ -97,29 +97,30 @@ export const demoProjects = [
     title: "Jaguar City",
     slug: "jaguar-city",
     summary:
-      "Premium Plotted Development divided into 4 blocks at NH-648, Doddaballapura Town, Bangalore North.",
+      "Premium plotted development divided into multiple blocks on NH-648, Doddaballapura Town, Bangalore North.",
     description:
-      "JAGUAR CITY is a strategically located large-scale premium plotted development divided into four blocks. Located on NH-648 at Doddaballapura Town in Bangalore North, the project is currently under process and offers excellent connectivity along with strong long-term investment potential.",
+      "Jaguar City is a large-scale plotted development strategically located along NH-648 in the fast-growing corridor of Doddaballapura, Bangalore North. Designed for both investors and future homeowners, the project offers well-planned residential plots with strong appreciation potential. Key features include a master-planned layout, well-structured residential blocks, wide internal roads, gated community planning, drainage and underground infrastructure planning, and excellent highway connectivity. Located in one of North Bangalore's emerging growth zones, Jaguar City offers strong ROI potential due to expanding infrastructure and proximity to industrial and residential hubs.",
     city: "Bangalore North",
     location: "NH-648, Doddaballapura Town",
     country: "India",
     priceRange: "Premium Plotted Development",
     areaSqFt: 2400,
-    areaLabel: "4 Blocks",
-    tags: ["Under Process", "Premium Plots", "High Investment Potential"],
+    areaLabel: "Multiple Blocks",
+    tags: ["Under Process", "Premium Plots", "Master-Planned Layout", "High ROI Potential"],
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
     visible: true,
     sortOrder: 1,
-    coverImage: siteMedia.jaguarCityCover,
+    coverImage: siteMedia.jaguarCityProject,
     gallery: [
-      siteMedia.jaguarCity,
+      siteMedia.jaguarCityProject,
       siteMedia.jaguarCityCommunity,
       siteMedia.jaguarCityGrowth
     ],
     seoTitle: "Jaguar City | Premium Plotted Development",
-    seoDescription: "Explore Jaguar City, a premium four-block project at NH-648, Doddaballapura Town, Bangalore North.",
+    seoDescription:
+      "Explore Jaguar City, a premium plotted development on NH-648 in Doddaballapura Town with strong connectivity and appreciation potential.",
     createdAt: new Date(),
     updatedAt: new Date(),
     properties: []
@@ -161,29 +162,30 @@ export const demoProjects = [
     title: "Green Hills",
     slug: "green-hills",
     summary:
-      "Premium Villa Plots for a Better Tomorrow near Bengaluru in a peaceful, growth-focused community.",
+      "Premium villa plots for a better tomorrow at Gauribidanur, near Bengaluru.",
     description:
-      "GREEN HILLS is a peaceful villa plot community at Gauribidanur near Bengaluru, designed for comfortable living and long-term growth. The project is under process and highlights DTCP approved layout planning with E-Khata and completed DC conversion.",
+      "Green Hills is a premium villa plot development designed for peaceful living and long-term investment. Surrounded by natural greenery, the project offers a serene environment away from city congestion while maintaining accessibility. Project highlights include a DTCP approved layout, E-Khata availability, DC conversion completed, readiness for registration, clear legal documentation, and spacious villa plots. Ideal for those seeking a calm environment, Green Hills combines legal clarity, open spaces, and future development potential in a fast-developing location.",
     city: "Near Bengaluru",
     location: "Gauribidanur",
     country: "India",
     priceRange: "Premium Villa Plots",
     areaSqFt: 1200,
-    areaLabel: "DTCP Approved · E-Khata · DC Conversion",
-    tags: ["Under Process", "Villa Plots", "Long-Term Growth"],
+    areaLabel: "DTCP Approved Layout",
+    tags: ["Under Process", "Villa Plots", "E-Khata", "Ready for Registration"],
     status: ProjectStatus.LAUNCHING,
     completionDate: null,
     featured: true,
     visible: true,
     sortOrder: 3,
-    coverImage: "/uploads/site-media/green-hills.jpeg",
+    coverImage: siteMedia.greenHillsProject,
     gallery: [
-      siteMedia.jaguarCityGrowth,
-      siteMedia.jaguarCityCommunity,
-      siteMedia.jaguarCityCover
+      siteMedia.greenHillsProject,
+      siteMedia.greenHills,
+      siteMedia.jaguarCityGrowth
     ],
     seoTitle: "Green Hills | Premium Villa Plots Near Bengaluru",
-    seoDescription: "Explore Green Hills, a peaceful villa plot community with DTCP approved layout planning, E-Khata, and completed DC conversion.",
+    seoDescription:
+      "Explore Green Hills, premium villa plots near Bengaluru with DTCP approval, E-Khata, legal clarity, and registration readiness.",
     createdAt: new Date(),
     updatedAt: new Date(),
     properties: []
@@ -193,29 +195,30 @@ export const demoProjects = [
     title: "Emirates City",
     slug: "emirates-city",
     summary:
-      "Integrated Township divided into 4 blocks adjacent to Jaguar City on NH-648, Doddaballapura.",
+      "Integrated township development divided into multiple blocks adjacent to Jaguar City on NH-648, Doddaballapura.",
     description:
-      "EMIRATES CITY is an integrated township divided into four blocks and positioned adjacent to Jaguar City on NH-648, Doddaballapura. The project is upcoming and offers flexible payment plans from 18 to 36 months for buyers seeking a large-scale plotted township opportunity.",
-    city: "Adjacent to Jaguar City",
+      "Emirates City is a proposed integrated township offering a blend of residential plots and future-ready infrastructure. Positioned adjacent to Jaguar City, this project is planned to create a modern community experience. Key features include township-style development, planned residential blocks, flexible payment plans, strategic highway access, and future community amenities. Its flexible payment structure makes it ideal for investors looking to secure property with manageable installments in a high-growth corridor.",
+    city: "Doddaballapura",
     location: "NH-648, Doddaballapura",
     country: "India",
-    priceRange: "Flexible Payment Plans (18 - 36 Months)",
+    priceRange: "Flexible Payment Plans Available",
     areaSqFt: 2400,
-    areaLabel: "4 Blocks",
-    tags: ["Upcoming", "Integrated Township", "Flexible Payment Plan"],
+    areaLabel: "Multiple Blocks",
+    tags: ["Upcoming", "Integrated Township", "Flexible Payment Plans", "High-Growth Corridor"],
     status: ProjectStatus.UPCOMING,
     completionDate: null,
     featured: true,
     visible: true,
     sortOrder: 4,
-    coverImage: "/uploads/site-media/emirates-city-main.png",
+    coverImage: siteMedia.emiratesCityProject,
     gallery: [
+      siteMedia.emiratesCityProject,
       siteMedia.emiratesCity,
-      siteMedia.jaguarCityCommunity,
-      siteMedia.jaguarCityCover
+      siteMedia.jaguarCityGrowth
     ],
     seoTitle: "Emirates City | Integrated Township",
-    seoDescription: "Explore Emirates City, an integrated township beside Jaguar City with flexible 18 to 36 month payment plans.",
+    seoDescription:
+      "Explore Emirates City, an integrated township in Doddaballapura with flexible payment plans and future-ready community planning.",
     createdAt: new Date(),
     updatedAt: new Date(),
     properties: []
@@ -225,29 +228,30 @@ export const demoProjects = [
     title: "Jaguar Diamond City",
     slug: "jaguar-diamond-city",
     summary:
-      "Premium Plotted Project on SH-74 with strong Doddaballapura to Nelamangala highway connectivity.",
+      "Premium plotted project on SH-74, Doddaballapura to Nelamangala Highway.",
     description:
-      "JAGUAR DIAMOND CITY is a well-planned premium plotted development located on SH-74, Doddaballapura to Nelamangala Highway. The project is upcoming and is positioned for buyers who value a compact project footprint with excellent highway connectivity.",
+      "Jaguar Diamond City is a boutique plotted development strategically positioned along SH-74. Designed for focused residential planning, it offers premium plots with strong connectivity to Nelamangala and surrounding hubs. Key features include a well-planned layout, highway-facing location, planned infrastructure development, and investment-friendly plot options. The project also offers direct access to SH-74, easy reach to Nelamangala Highway, and smooth connectivity to Bangalore North.",
     city: "Doddaballapura",
     location: "SH-74, Doddaballapura – Nelamangala Highway",
     country: "India",
     priceRange: "Premium Plotted Project",
     areaSqFt: 1800,
-    areaLabel: "Premium Plotted Project",
-    tags: ["Upcoming", "Highway Connectivity", "Premium Plots"],
+    areaLabel: "Highway-Facing Location",
+    tags: ["Upcoming", "Premium Plots", "Highway Connectivity", "Investment-Friendly"],
     status: ProjectStatus.UPCOMING,
     completionDate: null,
     featured: true,
     visible: true,
     sortOrder: 5,
-    coverImage: "/uploads/site-media/jaguar-diamond-city-main.png",
+    coverImage: siteMedia.jaguarDiamondCityProject,
     gallery: [
-      siteMedia.jaguarCity,
-      siteMedia.jaguarCityGrowth,
-      siteMedia.jaguarCityCover
+      siteMedia.jaguarDiamondCityProject,
+      siteMedia.jaguarDiamondCityMain,
+      siteMedia.jaguarCityGrowth
     ],
     seoTitle: "Jaguar Diamond City | Premium Plotted Project",
-    seoDescription: "Explore Jaguar Diamond City, a premium plotted project on SH-74 with excellent highway connectivity.",
+    seoDescription:
+      "Explore Jaguar Diamond City, a premium plotted project on SH-74 with direct highway access and smooth connectivity to Bangalore North.",
     createdAt: new Date(),
     updatedAt: new Date(),
     properties: []
