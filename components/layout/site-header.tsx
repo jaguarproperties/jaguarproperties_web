@@ -4,8 +4,6 @@ import Image from "next/image";
 import { LanguageSelector } from "@/components/site/language-selector";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Translate } from "@/components/site/translate";
-import { siteMedia } from "@/lib/site-media";
-import { shouldBypassImageOptimization } from "@/lib/image";
 
 const navItems = [
   { href: "/", id: "nav.home", label: "Home" },
@@ -25,16 +23,16 @@ const mobileSectionLinks = [
 export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/88 backdrop-blur-2xl dark:border-white/10">
-      <div className="container flex min-h-[76px] items-center justify-between gap-6 py-2 md:min-h-[84px]">
-        <Link href="/" className="flex items-center">
+      <div className="container flex min-h-[112px] items-center justify-between gap-6 py-0 md:min-h-[128px]">
+        <Link href="/" className="flex h-[112px] items-center md:h-[128px]">
           <Image
-            src={siteMedia.jaguarPropertiesLogo}
+            src="/uploads/site-media/jaguarlogo.png"
             alt="Jaguar Properties"
-            width={935}
-            height={424}
+            width={1536}
+            height={1024}
             priority
-            className="h-auto w-[108px] object-contain sm:w-[124px] md:w-[150px]"
-            unoptimized={shouldBypassImageOptimization(siteMedia.jaguarPropertiesLogo)}
+            className="h-full w-auto max-w-none object-contain"
+            unoptimized
           />
         </Link>
         <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
