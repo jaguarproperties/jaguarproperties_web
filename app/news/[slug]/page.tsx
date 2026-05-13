@@ -4,9 +4,20 @@ import { format } from "date-fns";
 
 import { PageShell } from "@/components/layout/page-shell";
 import { Card } from "@/components/ui/card";
-import { getBlogPostBySlug } from "@/lib/data";
+import { getBlogPostBySlug, getBlogPosts } from "@/lib/data";
+import {
+  JsonLd,
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+  buildMetadata
+} from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const posts = await getBlogPosts();
+  return posts.map((post) => ({ slug: post.slug }));
+}
 
 export async function generateMetadata({
   params
@@ -16,10 +27,19 @@ export async function generateMetadata({
   const post = await getBlogPostBySlug(params.slug);
   if (!post) return {};
 
-  return {
+  return buildMetadata({
     title: post.seoTitle ?? post.title,
-    description: post.seoDescription ?? post.excerpt
-  };
+    description: post.seoDescription ?? post.excerpt,
+    path: `/news/${post.slug}`,
+    image: post.coverImage,
+    type: "article",
+    keywords: [
+      post.title,
+      "bangalore real estate",
+      "property investment",
+      "plot investment"
+    ]
+  });
 }
 
 export default async function BlogDetailPage({
@@ -32,6 +52,22 @@ export default async function BlogDetailPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={[
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "News", path: "/news" },
+            { name: post.title, path: `/news/${post.slug}` }
+          ]),
+          buildArticleSchema({
+            title: post.title,
+            description: post.seoDescription ?? post.excerpt,
+            slug: post.slug,
+            publishedAt: post.publishedAt,
+            image: post.coverImage
+          })
+        ]}
+      />
       <section className="container py-20">
         <Card className="overflow-hidden">
           <div className="p-8 md:p-12">

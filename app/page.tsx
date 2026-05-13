@@ -14,12 +14,31 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { HoverLift } from "@/components/motion/hover-lift";
 import { getBlogPosts, getFeaturedProjects, getSiteContent, getTestimonials } from "@/lib/data";
 import {
+  JsonLd,
+  absoluteUrl,
+  buildBreadcrumbSchema,
+  buildMetadata
+} from "@/lib/seo";
+import {
   parseLocationItems,
   parseStatItems,
   resolveSiteContent
 } from "@/lib/site-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+export const metadata = buildMetadata({
+  title: "Plots in Bangalore & North Bengaluru",
+  description:
+    "Explore premium residential plots, gated community layouts, and investment plots in Bangalore and North Bengaluru with Jaguar Properties.",
+  path: "/",
+  keywords: [
+    "plots in bangalore",
+    "plots near north bangalore",
+    "premium plots in bangalore",
+    "investment plots in bangalore"
+  ]
+});
 
 function getYoutubeEmbedUrl(url: unknown) {
   if (typeof url !== "string" || !url.trim()) {
@@ -69,10 +88,26 @@ export default async function HomePage() {
 
   return (
     <PageShell>
+      <JsonLd
+        data={[
+          buildBreadcrumbSchema([{ name: "Home", path: "/" }]),
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: projects.map((project, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(`/properties/${project.slug}`),
+              name: project.title
+            }))
+          }
+        ]}
+      />
       <Hero
         title={siteContent.heroTitle}
         subtitle={siteContent.heroSubtitle}
         image={siteContent.heroImage}
+        imageAlt="Jaguar Properties premium residential plots and plotted development in North Bengaluru"
         primaryCta={{
           label: siteContent.homePrimaryCtaLabel,
           href: siteContent.homePrimaryCtaHref

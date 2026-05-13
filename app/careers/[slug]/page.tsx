@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { getCareerBySlug } from "@/lib/careers";
+import { careerOpenings, getCareerBySlug } from "@/lib/careers";
 import { PageShell } from "@/components/layout/page-shell";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { CareerApplicationForm } from "@/components/site/career-application-form";
+import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  return careerOpenings.map((job) => ({ slug: job.slug }));
+}
 
 export async function generateMetadata({
   params
@@ -18,10 +23,12 @@ export async function generateMetadata({
   const job = await getCareerBySlug(params.slug);
   if (!job) return {};
 
-  return {
-    title: `${job.title} Careers`,
-    description: `Apply for the ${job.title} role at Jaguar Properties.`
-  };
+  return buildMetadata({
+    title: `${job.title} Career`,
+    description: `Apply for the ${job.title} role at Jaguar Properties and explore real estate career opportunities in Bengaluru.`,
+    path: `/careers/${job.slug}`,
+    keywords: [job.title, "jaguar properties career", "real estate jobs bangalore"]
+  });
 }
 
 export default async function CareerDetailPage({
@@ -34,6 +41,13 @@ export default async function CareerDetailPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Careers", path: "/careers" },
+          { name: job.title, path: `/careers/${job.slug}` }
+        ])}
+      />
       <section className="container py-20">
         <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
           <div>

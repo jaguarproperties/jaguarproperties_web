@@ -8,14 +8,23 @@ import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/data";
+import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: "Contact Jaguar Properties for premium real estate inquiries."
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Contact Jaguar Properties",
+  description:
+    "Contact Jaguar Properties for premium plots in Bangalore, site visits, pricing, documentation support, and real estate investment guidance.",
+  path: "/contact",
+  keywords: [
+    "contact jaguar properties",
+    "plots in bangalore contact",
+    "real estate bangalore contact",
+    "site visit jaguar properties"
+  ]
+});
 
 export default async function ContactPage() {
   const siteContent = resolveSiteContent(await getSiteContent());
@@ -25,6 +34,12 @@ export default async function ContactPage() {
 
   return (
     <PageShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" }
+        ])}
+      />
       <section className="container py-16 md:py-20">
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.02fr] lg:gap-10">
           <div>

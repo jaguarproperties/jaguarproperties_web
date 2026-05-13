@@ -12,6 +12,7 @@ export function Hero({
   title,
   subtitle,
   image,
+  imageAlt,
   primaryCta,
   secondaryCta,
   locations,
@@ -21,6 +22,7 @@ export function Hero({
   title: React.ReactNode;
   subtitle: React.ReactNode;
   image: string;
+  imageAlt?: string;
   primaryCta: { label: string; href: string };
   secondaryCta: { label: string; href: string };
   locations: string[];
@@ -34,6 +36,7 @@ export function Hero({
 }) {
   const resolvedImage = resolveImageSrc(image);
   const isAnimatedAsset = /\.(gif|webp|apng)(\?.*)?$/i.test(resolvedImage);
+  const heroAlt = imageAlt?.trim() || "Jaguar Properties premium plotted development in North Bengaluru";
 
   return (
     <section className="relative isolate overflow-hidden bg-[#12110f]">
@@ -55,13 +58,14 @@ export function Hero({
       {isAnimatedAsset ? (
         <img
           src={resolvedImage}
-          alt="Luxury real estate development"
+          alt={heroAlt}
+          loading="eager"
           className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-screen"
         />
       ) : (
         <Image
           src={resolvedImage}
-          alt="Luxury real estate development"
+          alt={heroAlt}
           fill
           className="object-cover opacity-32 mix-blend-screen"
           priority

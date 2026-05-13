@@ -10,12 +10,23 @@ import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { getProjectBySlug } from "@/lib/data";
+import { getProjectBySlug, getProjects } from "@/lib/data";
+import {
+  JsonLd,
+  buildBreadcrumbSchema,
+  buildMetadata,
+  buildProjectSchema
+} from "@/lib/seo";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 function dedupeImages(images: string[]) {
   return Array.from(new Set(images.map((image) => image.trim()).filter(Boolean)));
+}
+
+export async function generateStaticParams() {
+  const projects = await getProjects();
+  return projects.map((project) => ({ slug: project.slug }));
 }
 
 export async function generateMetadata({
@@ -26,10 +37,19 @@ export async function generateMetadata({
   const project = await getProjectBySlug(params.slug);
   if (!project) return {};
 
-  return {
-    title: project.seoTitle || project.title,
-    description: project.seoDescription || project.summary
-  };
+  return buildMetadata({
+    title: project.seoTitle || `${project.title} Plots`,
+    description: project.seoDescription || project.summary,
+    path: `/properties/${project.slug}`,
+    image: project.coverImage,
+    keywords: [
+      project.title,
+      `${project.title} plots`,
+      `${project.location} plots`,
+      `${project.city} real estate`,
+      "plot investment"
+    ]
+  });
 }
 
 export default async function ProjectDetailsPage({
@@ -46,6 +66,27 @@ export default async function ProjectDetailsPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={[
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/properties" },
+            { name: project.title, path: `/properties/${project.slug}` }
+          ]),
+          buildProjectSchema({
+            title: project.title,
+            summary: project.summary,
+            description: project.description,
+            slug: project.slug,
+            image: project.coverImage,
+            location: project.location,
+            city: project.city,
+            country: project.country,
+            priceRange: project.priceRange,
+            tags: project.tags
+          })
+        ]}
+      />
       <section className="container py-16 md:py-20">
         <div className="space-y-8">
           <Button asChild variant="ghost" className="w-fit">

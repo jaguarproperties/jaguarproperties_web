@@ -8,14 +8,23 @@ import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getBlogPosts, getSiteContent } from "@/lib/data";
+import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "News & Updates",
-  description: "Jaguar Properties market insights and latest development updates."
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Bangalore Real Estate News",
+  description:
+    "Read Jaguar Properties updates, Bangalore real estate insights, plot investment guidance, and market news focused on North Bengaluru growth corridors.",
+  path: "/news",
+  keywords: [
+    "bangalore real estate news",
+    "plot investment news",
+    "north bangalore real estate updates",
+    "property investment insights"
+  ]
+});
 
 export default async function NewsPage() {
   const [posts, rawSiteContent] = await Promise.all([getBlogPosts(), getSiteContent()]);
@@ -25,6 +34,12 @@ export default async function NewsPage() {
 
   return (
     <PageShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "News", path: "/news" }
+        ])}
+      />
       <section className="container py-16 md:py-20">
         <SectionHeading
           eyebrow={<Translate id="news.page.eyebrow" defaultText="Editorial" />}

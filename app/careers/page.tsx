@@ -9,14 +9,23 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HoverLift } from "@/components/motion/hover-lift";
 import { getSiteContent } from "@/lib/data";
+import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
 import { parseLocationItems, resolveSiteContent } from "@/lib/site-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Careers",
-  description: "Explore careers and current openings at Jaguar Properties."
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Careers at Jaguar Properties",
+  description:
+    "Explore Jaguar Properties careers across sales, marketing, HR, and customer engagement in Bengaluru and growing real estate markets.",
+  path: "/careers",
+  keywords: [
+    "jaguar properties careers",
+    "real estate jobs bangalore",
+    "sales jobs bengaluru",
+    "property careers"
+  ]
+});
 
 export default async function CareersPage() {
   const [careerOpenings, rawSiteContent] = await Promise.all([getCareerOpenings(), getSiteContent()]);
@@ -25,6 +34,12 @@ export default async function CareersPage() {
 
   return (
     <PageShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Careers", path: "/careers" }
+        ])}
+      />
       <section className="container py-20">
         <SectionHeading
           eyebrow={<Translate id="careers.page.eyebrow" defaultText="Careers" />}

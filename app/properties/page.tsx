@@ -8,14 +8,29 @@ import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getProjects, getSiteContent } from "@/lib/data";
+import {
+  JsonLd,
+  absoluteUrl,
+  buildBreadcrumbSchema,
+  buildMetadata,
+  buildProjectSchema
+} from "@/lib/seo";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
-export const metadata: Metadata = {
-  title: "Projects",
-  description: "Browse Jaguar projects and premium opportunities across North Bengaluru."
-};
+export const metadata: Metadata = buildMetadata({
+  title: "Plots in North Bangalore",
+  description:
+    "Browse Jaguar Properties projects offering premium plots in Bangalore, North Bengaluru, and high-growth plotted developments for buyers and investors.",
+  path: "/properties",
+  keywords: [
+    "plots in north bangalore",
+    "residential plots in bangalore",
+    "premium plots",
+    "dtcp plots bangalore"
+  ]
+});
 
 export default async function PropertiesPage({
   searchParams
@@ -43,6 +58,38 @@ export default async function PropertiesPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={[
+          buildBreadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Projects", path: "/properties" }
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            itemListElement: properties.map((project, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(`/properties/${project.slug}`),
+              name: project.title
+            }))
+          },
+          ...properties.map((project) =>
+            buildProjectSchema({
+              title: project.title,
+              summary: project.summary,
+              description: project.description,
+              slug: project.slug,
+              image: project.coverImage,
+              location: project.location,
+              city: project.city,
+              country: project.country,
+              priceRange: project.priceRange,
+              tags: project.tags
+            })
+          )
+        ]}
+      />
       <section className="container py-16 md:py-20">
         <div className="space-y-8">
           <SectionHeading

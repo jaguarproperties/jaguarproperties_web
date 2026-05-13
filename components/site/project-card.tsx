@@ -35,14 +35,20 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
   return (
     <Card className="overflow-hidden">
       <div className="relative h-72">
-        <Image
-          src={coverImageSrc}
-          alt={project.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
-          className="object-cover"
-          unoptimized={shouldBypassImageOptimization(coverImageSrc)}
-        />
+        <Link
+          href={`/properties/${project.slug}`}
+          aria-label={`View ${project.title} project details`}
+          className="absolute inset-0 block"
+        >
+          <Image
+            src={coverImageSrc}
+            alt={`${project.title} premium plotted development in ${project.location}, ${project.city}`}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+            className="object-cover"
+            unoptimized={shouldBypassImageOptimization(coverImageSrc)}
+          />
+        </Link>
         <div className="absolute left-5 top-5 rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-primary-foreground">
           <TranslateText text={getPrimaryTag(project)} />
         </div>
@@ -53,7 +59,11 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
           <p className="text-sm font-medium text-primary">
             <TranslateText text={project.location} />, <TranslateText text={project.city} />
           </p>
-          <h3 className="mt-2 font-display text-3xl text-foreground"><TranslateText text={project.title} /></h3>
+          <h3 className="mt-2 font-display text-3xl text-foreground">
+            <Link href={`/properties/${project.slug}`} className="hover:text-primary">
+              <TranslateText text={project.title} />
+            </Link>
+          </h3>
           <p className="mt-3 line-clamp-4 text-sm leading-7 text-zinc-700 dark:text-zinc-300">
             <TranslateText text={project.summary} />
           </p>

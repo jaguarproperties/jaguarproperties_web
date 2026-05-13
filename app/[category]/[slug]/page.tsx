@@ -12,13 +12,14 @@ import {
 } from "lucide-react";
 import { notFound } from "next/navigation";
 
-import { getFooterPage } from "@/lib/footer-pages";
+import { footerPages, getFooterPage } from "@/lib/footer-pages";
 import { PageShell } from "@/components/layout/page-shell";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmiCalculator } from "@/components/site/emi-calculator";
+import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
 
 const iconMap = {
   "Our Journey": Compass,
@@ -28,6 +29,15 @@ const iconMap = {
   default: ShieldCheck
 };
 
+export const revalidate = 300;
+
+export function generateStaticParams() {
+  return Object.keys(footerPages).map((key) => {
+    const [category, slug] = key.split("/");
+    return { category, slug };
+  });
+}
+
 export async function generateMetadata({
   params
 }: {
@@ -36,10 +46,12 @@ export async function generateMetadata({
   const page = getFooterPage(params.category, params.slug);
   if (!page) return {};
 
-  return {
+  return buildMetadata({
     title: page.title,
-    description: page.description
-  };
+    description: page.description,
+    path: page.href,
+    keywords: [page.title, "jaguar properties", "real estate guide bangalore"]
+  });
 }
 
 export default function FooterContentPage({
@@ -54,6 +66,12 @@ export default function FooterContentPage({
 
   return (
     <PageShell>
+      <JsonLd
+        data={buildBreadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: page.title, path: page.href }
+        ])}
+      />
       <section className="container py-20">
         <SectionHeading
           eyebrow={<Translate id={page.eyebrow} defaultText={page.eyebrow} />}
