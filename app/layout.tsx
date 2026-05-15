@@ -13,6 +13,7 @@ import {
   buildWebSiteSchema,
   siteConfig
 } from "@/lib/seo";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: {
@@ -111,6 +112,7 @@ gtag('config', '${gaId}', { anonymize_ip: true });`}
           {children}
           <Toaster richColors position="top-right" />
         </LanguageProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
