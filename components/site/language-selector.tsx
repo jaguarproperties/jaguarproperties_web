@@ -14,7 +14,7 @@ export function LanguageSelector() {
   const { language, setLanguage, t } = useLanguage();
 
   return (
-    <div className="min-w-[140px]">
+    <div className="min-w-[110px] sm:min-w-[140px]">
       <label htmlFor="language-select" className="sr-only">
         {t("language.choose", "Choose language")}
       </label>
@@ -22,7 +22,7 @@ export function LanguageSelector() {
         id="language-select"
         value={language}
         onChange={(event) => setLanguage(event.target.value as typeof language)}
-        className="max-w-[160px]"
+        className="max-w-[120px] sm:max-w-[160px]"
       >
         {languages.map((languageOption) => (
           <option key={languageOption.value} value={languageOption.value}>

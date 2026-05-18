@@ -75,7 +75,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   }, [testimonial.id, testimonial.image]);
 
   return (
-    <Card className="w-[300px] shrink-0 rounded-[28px] border-black/10 bg-white/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] md:w-[360px]">
+    <Card className="w-[calc(100vw-2.5rem)] max-w-[300px] shrink-0 rounded-[28px] border-black/10 bg-white/70 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] sm:w-[300px] sm:max-w-none sm:p-6 md:w-[360px]">
       <div className="flex items-start gap-4">
         <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/15 via-primary/10 to-amber-100 text-lg font-semibold text-primary">
           {imageSrc && !hasImageError ? (

@@ -3,13 +3,14 @@ import { Clock3, Headphones, MapPinned } from "lucide-react";
 
 import { PageShell } from "@/components/layout/page-shell";
 import { LeadForm } from "@/components/site/lead-form";
+import { FormattedTextLine } from "@/components/site/formatted-text-line";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/data";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
-import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
+import { parseHighlightItems, parseOfficeBranches, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
@@ -29,6 +30,7 @@ export const metadata: Metadata = buildMetadata({
 export default async function ContactPage() {
   const siteContent = resolveSiteContent(await getSiteContent());
   const supportPoints = parseHighlightItems(siteContent.contactSupportPoints);
+  const officeBranches = parseOfficeBranches(siteContent.officeAddress);
   const icons = [Headphones, Clock3, MapPinned];
   const jaguarMapsLink = "https://www.google.com/maps/search/?api=1&query=13.09840,77.58476";
 
@@ -67,7 +69,25 @@ export default async function ContactPage() {
             <div className="mt-8 rounded-[28px] border border-black/10 bg-white/35 p-6 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
               <p>{siteContent?.contactEmail}</p>
               <p>{siteContent?.contactPhone}</p>
-              <p>{siteContent?.officeAddress}</p>
+              <div className="mt-5">
+                <p className="text-xs uppercase tracking-[0.28em] text-primary">
+                  <Translate id="contact.offices" defaultText="OUR BRANCHES" />
+                </p>
+                <ul className="mt-4 space-y-5">
+                  {officeBranches.map((branch, index) => (
+                    <li key={`${branch[0]}-${index}`} className="flex gap-3">
+                      <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                      <div className="space-y-1">
+                        {branch.map((line) => (
+                          <p key={line}>
+                            <FormattedTextLine text={line} />
+                          </p>
+                        ))}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
             <a
               href={jaguarMapsLink}

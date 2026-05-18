@@ -331,6 +331,7 @@ export function ContentForm({ content }: { content?: Record<string, any> | null 
           required
           rows={6}
         />
+        <CmsHint>Use a blank line between branches. Wrap text in `**double asterisks**` to make it bold, for example `**Bangalore Head Office**`.</CmsHint>
         <Input name="mapEmbedUrl" placeholder="Google Maps embed URL" defaultValue={content?.mapEmbedUrl} required />
         <Textarea name="footerBlurb" placeholder="Footer intro text" defaultValue={content?.footerBlurb} required rows={3} />
         <Textarea

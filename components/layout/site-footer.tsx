@@ -5,14 +5,12 @@ import { getSiteContent } from "@/lib/data";
 import { footerNavigationColumns } from "@/lib/footer-pages";
 import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
-import { resolveSiteContent } from "@/lib/site-content";
+import { FormattedTextLine } from "@/components/site/formatted-text-line";
+import { parseOfficeBranches, resolveSiteContent } from "@/lib/site-content";
 
 export async function SiteFooter() {
   const content = resolveSiteContent(await getSiteContent());
-  const officeBranches = content.officeAddress
-    .split(/\n\s*\n/)
-    .map((branch) => branch.split("\n").map((line) => line.trim()).filter(Boolean))
-    .filter((branch) => branch.length > 0);
+  const officeBranches = parseOfficeBranches(content.officeAddress);
   const socialLinks = [
     { label: "Instagram", href: content?.instagramUrl, icon: Instagram },
     { label: "LinkedIn", href: content?.linkedinUrl, icon: Linkedin },
@@ -40,7 +38,9 @@ export async function SiteFooter() {
                 <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                 <div className="space-y-1">
                   {branch.map((line) => (
-                    <p key={line}><TranslateText text={line} /></p>
+                    <p key={line}>
+                      <FormattedTextLine text={line} />
+                    </p>
                   ))}
                 </div>
               </li>

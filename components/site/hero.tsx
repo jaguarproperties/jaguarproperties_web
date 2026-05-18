@@ -165,6 +165,26 @@ export function Hero({
               <TranslateText text={signatureText} />
             </p>
           </div>
+          <div className="rounded-[24px] border border-white/15 bg-black/30 p-5 shadow-2xl backdrop-blur-xl">
+            <div className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-primary">
+              <Building2 className="h-5 w-5" />
+              <span><TranslateText text={spotlight.label} /></span>
+            </div>
+            <div className="mt-4 rounded-[24px] bg-white/10 p-4 text-zinc-100 shadow-xl">
+              <p className="text-xs uppercase tracking-[0.3em] text-zinc-300">
+                <TranslateText text={spotlight.label} />
+              </p>
+              <p className="mt-3 whitespace-pre-line text-3xl font-semibold leading-tight text-white sm:text-4xl">
+                <TranslateText text={spotlight.title} />
+              </p>
+              <p className="mt-3 text-sm leading-7 text-zinc-300">
+                <TranslateText text={spotlight.text} />
+              </p>
+              <p className="mt-4 text-sm font-semibold text-primary">
+                <TranslateText text={spotlight.price} />
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

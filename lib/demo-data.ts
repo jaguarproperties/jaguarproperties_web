@@ -76,7 +76,7 @@ export const demoSiteContent = {
   contactEmail: "info@jaguarproperties.in",
   contactPhone: "+91 78299 56789",
   officeAddress:
-    "Bangalore – Head Office\n5, First Main Road, Second Floor\nKHB Layout, Yelahanka New Town\nBangalore – 560064, India\n\nDubai – UAE – Branch Office\n\nCalicut – India – Branch Office\n\nQatar – Branch Office",
+    "**Bangalore – Head Office**\n5, First Main Road, Second Floor\nKHB Layout, Yelahanka New Town\nBangalore – 560064, India\n\nDubai – UAE – Branch Office\n\nCalicut – India – Branch Office\n\nQatar – Branch Office",
   mapEmbedUrl: "https://www.google.com/maps?q=13.09840,77.58476&z=17&output=embed",
   footerBlurb: "Premium real estate experiences across Bengaluru, Qatar, Calicut and Dubai.",
   footerCopyright:

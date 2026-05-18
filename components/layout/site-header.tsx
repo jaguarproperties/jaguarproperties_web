@@ -23,8 +23,8 @@ const mobileSectionLinks = [
 export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/88 backdrop-blur-2xl dark:border-white/10">
-      <div className="container flex min-h-[112px] items-center justify-between gap-6 py-0 md:min-h-[128px]">
-        <Link href="/" className="flex h-[112px] items-center md:h-[128px]">
+      <div className="container flex min-h-[96px] items-center justify-between gap-3 py-0 sm:gap-4 md:min-h-[128px] md:gap-6">
+        <Link href="/" className="flex h-[96px] items-center md:h-[128px]">
           <Image
             src="/uploads/site-media/jaguarlogo.png"
             alt="Jaguar Properties"
@@ -46,7 +46,7 @@ export async function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="relative flex shrink-0 items-center gap-2 md:gap-3">
+        <div className="relative flex shrink-0 items-center gap-2">
           <details className="group lg:hidden">
             <summary className="flex h-11 cursor-pointer list-none items-center rounded-full border border-black/10 bg-black/[0.03] px-4 text-sm font-semibold text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200">
               Menu
