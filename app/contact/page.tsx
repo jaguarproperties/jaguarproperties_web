@@ -78,8 +78,11 @@ export default async function ContactPage() {
                     <li key={`${branch[0]}-${index}`} className="flex gap-3">
                       <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-primary" />
                       <div className="space-y-1">
-                        {branch.map((line) => (
-                          <p key={line}>
+                        {branch.map((line, lineIndex) => (
+                          <p
+                            key={line}
+                            className={lineIndex === 0 ? "font-semibold text-foreground dark:text-white" : undefined}
+                          >
                             <FormattedTextLine text={line} />
                           </p>
                         ))}
