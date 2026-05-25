@@ -44,7 +44,7 @@ export default async function ContactPage() {
       />
       <section className="container py-16 md:py-20">
         <div className="grid items-start gap-8 lg:grid-cols-[1fr_1.02fr] lg:gap-10">
-          <div>
+          <div className="order-2 lg:order-1">
             <SectionHeading
               eyebrow={<Translate id="contact.eyebrow" defaultText="Contact" />}
               title={<TranslateText text={siteContent.contactTitle} />}
@@ -113,7 +113,7 @@ export default async function ContactPage() {
               </div>
             </a>
           </div>
-          <Card className="p-6 sm:p-8">
+          <Card className="order-1 p-6 sm:p-8 lg:order-2">
             <LeadForm />
           </Card>
         </div>
