@@ -19,6 +19,8 @@ import {
   buildBreadcrumbSchema,
   buildMetadata
 } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 import {
   parseLocationItems,
   parseStatItems,
@@ -27,18 +29,23 @@ import {
 
 export const revalidate = 300;
 
-export const metadata = buildMetadata({
-  title: "Plots in Bangalore & North Bengaluru",
-  description:
-    "Explore premium residential plots, gated community layouts, and investment plots in Bangalore and North Bengaluru with Jaguar Properties.",
-  path: "/",
-  keywords: [
-    "plots in bangalore",
-    "plots near north bangalore",
-    "premium plots in bangalore",
-    "investment plots in bangalore"
-  ]
-});
+export async function generateMetadata() {
+  const locale = getRequestLocale();
+
+  return buildMetadata({
+    title: "Plots in Bangalore & North Bengaluru",
+    description:
+      "Explore premium residential plots, gated community layouts, and investment plots in Bangalore and North Bengaluru with Jaguar Properties.",
+    path: "/",
+    locale,
+    keywords: [
+      "plots in bangalore",
+      "plots near north bangalore",
+      "premium plots in bangalore",
+      "investment plots in bangalore"
+    ]
+  });
+}
 
 function getYoutubeEmbedUrl(url: unknown) {
   if (typeof url !== "string" || !url.trim()) {
@@ -74,6 +81,7 @@ function getYoutubeEmbedUrl(url: unknown) {
 }
 
 export default async function HomePage() {
+  const locale = getRequestLocale();
   const [rawSiteContent, projects, posts, testimonials] = await Promise.all([
     getSiteContent(),
     getFeaturedProjects(),
@@ -90,14 +98,14 @@ export default async function HomePage() {
     <PageShell>
       <JsonLd
         data={[
-          buildBreadcrumbSchema([{ name: "Home", path: "/" }]),
+          buildBreadcrumbSchema([{ name: "Home", path: getLocalizedPath("/", locale) }]),
           {
             "@context": "https://schema.org",
             "@type": "ItemList",
             itemListElement: projects.map((project, index) => ({
               "@type": "ListItem",
               position: index + 1,
-              url: absoluteUrl(`/properties/${project.slug}`),
+              url: absoluteUrl(getLocalizedPath(`/properties/${project.slug}`, locale)),
               name: project.title
             }))
           }
@@ -127,11 +135,11 @@ export default async function HomePage() {
       />
 
       <section id="about" className="container scroll-mt-32 py-16 md:py-20">
-        <SectionHeading
-          eyebrow={<Translate id="about.eyebrow" defaultText="About Us" />}
-          title={<TranslateText text={siteContent.aboutTitle} />}
-          description={<TranslateText text={siteContent.aboutBody} />}
-        />
+          <SectionHeading
+            eyebrow={<Translate id="about.eyebrow" defaultText="About Us" />}
+            title={<TranslateText text={siteContent.aboutTitle} />}
+            description={<TranslateText text={siteContent.aboutBody} />}
+          />
         <div className="mt-10 grid gap-4 md:grid-cols-3">
           {marketHighlights.map((item, index) => (
             <Card key={`${item.value}-${index}`} className="p-6">

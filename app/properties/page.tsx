@@ -15,22 +15,29 @@ import {
   buildMetadata,
   buildProjectSchema
 } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = buildMetadata({
-  title: "Plots in North Bangalore",
-  description:
-    "Browse Jaguar Properties projects offering premium plots in Bangalore, North Bengaluru, and high-growth plotted developments for buyers and investors.",
-  path: "/properties",
-  keywords: [
-    "plots in north bangalore",
-    "residential plots in bangalore",
-    "premium plots",
-    "dtcp plots bangalore"
-  ]
-});
+export async function generateMetadata() {
+  const locale = getRequestLocale();
+
+  return buildMetadata({
+    title: "Plots in North Bangalore",
+    description:
+      "Browse Jaguar Properties projects offering premium plots in Bangalore, North Bengaluru, and high-growth plotted developments for buyers and investors.",
+    path: "/properties",
+    locale,
+    keywords: [
+      "plots in north bangalore",
+      "residential plots in bangalore",
+      "premium plots",
+      "dtcp plots bangalore"
+    ]
+  });
+}
 
 export default async function PropertiesPage({
   searchParams
@@ -44,6 +51,7 @@ export default async function PropertiesPage({
     category?: string;
   };
 }) {
+  const locale = getRequestLocale();
   const [properties, rawSiteContent] = await Promise.all([
     getProjects({
       search: searchParams?.search,
@@ -61,8 +69,8 @@ export default async function PropertiesPage({
       <JsonLd
         data={[
           buildBreadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Projects", path: "/properties" }
+            { name: "Home", path: getLocalizedPath("/", locale) },
+            { name: "Projects", path: getLocalizedPath("/properties", locale) }
           ]),
           {
             "@context": "https://schema.org",
@@ -70,7 +78,7 @@ export default async function PropertiesPage({
             itemListElement: properties.map((project, index) => ({
               "@type": "ListItem",
               position: index + 1,
-              url: absoluteUrl(`/properties/${project.slug}`),
+              url: absoluteUrl(getLocalizedPath(`/properties/${project.slug}`, locale)),
               name: project.title
             }))
           },
@@ -86,7 +94,7 @@ export default async function PropertiesPage({
               country: project.country,
               priceRange: project.priceRange,
               tags: project.tags
-            })
+            }, locale)
           )
         ]}
       />

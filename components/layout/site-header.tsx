@@ -4,6 +4,8 @@ import Image from "next/image";
 import { LanguageSelector } from "@/components/site/language-selector";
 import { ThemeToggle } from "@/components/site/theme-toggle";
 import { Translate } from "@/components/site/translate";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 const navItems = [
   { href: "/", id: "nav.home", label: "Home" },
@@ -21,10 +23,12 @@ const mobileSectionLinks = [
 ];
 
 export async function SiteHeader() {
+  const locale = getRequestLocale();
+
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/88 backdrop-blur-2xl dark:border-white/10">
       <div className="container flex min-h-[96px] items-center justify-between gap-3 py-0 sm:gap-4 md:min-h-[128px] md:gap-6">
-        <Link href="/" className="flex h-[96px] items-center md:h-[128px]">
+        <Link href={getLocalizedPath("/", locale)} className="flex h-[96px] items-center md:h-[128px]">
           <Image
             src="/uploads/site-media/jaguarlogo.png"
             alt="Jaguar Properties"
@@ -37,11 +41,11 @@ export async function SiteHeader() {
         </Link>
         <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
           {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-base font-semibold text-zinc-700 hover:text-primary dark:text-zinc-300 xl:text-lg"
-            >
+              <Link
+                key={item.href}
+              href={getLocalizedPath(item.href, locale)}
+                className="text-base font-semibold text-zinc-700 hover:text-primary dark:text-zinc-300 xl:text-lg"
+              >
               <Translate id={item.id} defaultText={item.label} />
             </Link>
           ))}
@@ -49,14 +53,14 @@ export async function SiteHeader() {
         <div className="relative flex shrink-0 items-center gap-2">
           <details className="group lg:hidden">
             <summary className="flex h-11 cursor-pointer list-none items-center rounded-full border border-black/10 bg-black/[0.03] px-4 text-sm font-semibold text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200">
-              Menu
+              <Translate id="nav.menu" defaultText="Menu" />
             </summary>
             <div className="scrollbar-thin absolute right-5 top-[calc(100%-0.25rem)] z-50 mt-3 max-h-[75vh] w-[min(92vw,360px)] overflow-y-auto rounded-[28px] border border-black/10 bg-background/95 p-5 shadow-2xl dark:border-white/10">
               <div className="space-y-2">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
-                    href={item.href}
+                    href={getLocalizedPath(item.href, locale)}
                     className="block rounded-2xl border border-black/5 px-4 py-3 text-sm font-semibold text-zinc-700 transition hover:border-primary/30 hover:bg-black/[0.03] dark:border-white/5 dark:text-zinc-200 dark:hover:bg-white/5"
                   >
                     <Translate id={item.id} defaultText={item.label} />
@@ -64,12 +68,14 @@ export async function SiteHeader() {
                 ))}
               </div>
               <div className="mt-5">
-                <p className="text-xs uppercase tracking-[0.28em] text-primary">Home Sections</p>
+                <p className="text-xs uppercase tracking-[0.28em] text-primary">
+                  <Translate id="nav.homeSections" defaultText="Home Sections" />
+                </p>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   {mobileSectionLinks.map((item) => (
                     <Link
                       key={item.href}
-                      href={item.href}
+                      href={getLocalizedPath(item.href, locale)}
                       className="rounded-2xl border border-black/5 px-3 py-3 text-center text-sm text-zinc-700 transition hover:border-primary/30 hover:bg-black/[0.03] dark:border-white/5 dark:text-zinc-200 dark:hover:bg-white/5"
                     >
                       {item.label}

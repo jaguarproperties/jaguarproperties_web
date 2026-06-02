@@ -2,6 +2,7 @@ import { PrismaClient, ProjectStatus, PropertyStatus } from "@prisma/client";
 import { loadEnvConfig } from "@next/env";
 import bcrypt from "bcryptjs";
 import { demoSiteContent } from "@/lib/demo-data";
+import { syncTranslationFields } from "@/lib/content-localizer";
 import { defaultRolePermissions, systemRoleDetails, toLegacyPermissionFlags } from "@/lib/permissions";
 import { propertyShowcase } from "@/lib/property-showcase";
 import { siteMedia } from "@/lib/site-media";
@@ -302,6 +303,54 @@ async function main() {
         id: "default-site-content"
       }
     });
+    await syncTranslationFields(siteContentSeed as Record<string, unknown>, [
+      "heroTitle",
+      "heroSubtitle",
+      "homePrimaryCtaLabel",
+      "homeSecondaryCtaLabel",
+      "homePresenceLocations",
+      "homeSignatureText",
+      "homeSpotlightLabel",
+      "homeSpotlightTitle",
+      "homeSpotlightText",
+      "homeSpotlightPrice",
+      "homeStats",
+      "aboutTitle",
+      "aboutBody",
+      "mission",
+      "vision",
+      "presenceText",
+      "homeFeaturedProjectsTitle",
+      "homeFeaturedProjectsDescription",
+      "homeFeaturedPropertiesTitle",
+      "homeFeaturedPropertiesDescription",
+      "homePortfolioTitle",
+      "homePortfolioDescription",
+      "homePortfolioItems",
+      "homeNewsTitle",
+      "homeNewsDescription",
+      "homeConciergeTitle",
+      "homeConciergeButtonLabel",
+      "propertiesTitle",
+      "propertiesDescription",
+      "propertiesHighlights",
+      "newsTitle",
+      "newsDescription",
+      "newsHighlights",
+      "portfolioTitle",
+      "portfolioDescription",
+      "portfolioGallery",
+      "contactTitle",
+      "contactDescription",
+      "contactSupportPoints",
+      "careersTitle",
+      "careersDescription",
+      "careersCulturePoints",
+      "footerBlurb",
+      "footerCopyright",
+      "footerNote",
+      "officeAddress"
+    ]);
   }
 
   await prisma.project.deleteMany({
@@ -316,11 +365,27 @@ async function main() {
     projectSeedData.map((project) => {
       const { id, ...projectData } = project;
 
-      return prisma.project.upsert({
-        where: { id },
-        update: projectData,
-        create: project
-      });
+      return prisma.project
+        .upsert({
+          where: { id },
+          update: projectData,
+          create: project
+        })
+        .then(() =>
+          syncTranslationFields(projectData as Record<string, unknown>, [
+            "title",
+            "summary",
+            "description",
+            "city",
+            "location",
+            "country",
+            "priceRange",
+            "areaLabel",
+            "tags",
+            "seoTitle",
+            "seoDescription"
+          ])
+        );
     })
   );
 
@@ -334,46 +399,50 @@ async function main() {
 
   await Promise.all(
     propertyShowcase.map((entry, index) =>
-      prisma.property.upsert({
-        where: { slug: entry.slug },
-        update: {
-          title: entry.title,
-          description: entry.description,
-          city: entry.city,
-          location: entry.location,
-          address: entry.address,
-          price: entry.price,
-          bedrooms: null,
-          bathrooms: null,
-          areaSqFt: entry.areaSqFt,
-          status: PropertyStatus.AVAILABLE,
-          featured: index < 3,
-          coverImage: entry.image,
-          gallery: entry.gallery,
-          projectId:
-            seededProjectIdsByTitle[entry.title as keyof typeof seededProjectIdsByTitle] ??
-            "seed-project-jaguar-city"
-        },
-        create: {
-          title: entry.title,
-          slug: entry.slug,
-          description: entry.description,
-          city: entry.city,
-          location: entry.location,
-          address: entry.address,
-          price: entry.price,
-          bedrooms: null,
-          bathrooms: null,
-          areaSqFt: entry.areaSqFt,
-          status: PropertyStatus.AVAILABLE,
-          featured: index < 3,
-          coverImage: entry.image,
-          gallery: entry.gallery,
-          projectId:
-            seededProjectIdsByTitle[entry.title as keyof typeof seededProjectIdsByTitle] ??
-            "seed-project-jaguar-city"
-        }
-      })
+      prisma.property
+        .upsert({
+          where: { slug: entry.slug },
+          update: {
+            title: entry.title,
+            description: entry.description,
+            city: entry.city,
+            location: entry.location,
+            address: entry.address,
+            price: entry.price,
+            bedrooms: null,
+            bathrooms: null,
+            areaSqFt: entry.areaSqFt,
+            status: PropertyStatus.AVAILABLE,
+            featured: index < 3,
+            coverImage: entry.image,
+            gallery: entry.gallery,
+            projectId:
+              seededProjectIdsByTitle[entry.title as keyof typeof seededProjectIdsByTitle] ??
+              "seed-project-jaguar-city"
+          },
+          create: {
+            title: entry.title,
+            slug: entry.slug,
+            description: entry.description,
+            city: entry.city,
+            location: entry.location,
+            address: entry.address,
+            price: entry.price,
+            bedrooms: null,
+            bathrooms: null,
+            areaSqFt: entry.areaSqFt,
+            status: PropertyStatus.AVAILABLE,
+            featured: index < 3,
+            coverImage: entry.image,
+            gallery: entry.gallery,
+            projectId:
+              seededProjectIdsByTitle[entry.title as keyof typeof seededProjectIdsByTitle] ??
+              "seed-project-jaguar-city"
+          }
+        })
+        .then(() =>
+          syncTranslationFields(entry as Record<string, unknown>, ["title", "description", "city", "location", "address"])
+        )
     )
   );
 

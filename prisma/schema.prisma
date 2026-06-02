@@ -478,3 +478,14 @@ model SiteContent {
   updatedAt        DateTime  @updatedAt
   createdAt        DateTime  @default(now())
 }
+
+model TranslationEntry {
+  id           String   @id @default(cuid()) @map("_id")
+  sourceHash   String   @unique
+  sourceLocale String   @default("en")
+  sourceText   String
+  translations Json?
+  status       String   @default("pending")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}

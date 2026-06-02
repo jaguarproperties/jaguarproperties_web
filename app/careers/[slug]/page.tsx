@@ -8,6 +8,8 @@ import { Translate } from "@/components/site/translate";
 import { Card } from "@/components/ui/card";
 import { CareerApplicationForm } from "@/components/site/career-application-form";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export const revalidate = 300;
 
@@ -20,13 +22,20 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const job = await getCareerBySlug(params.slug);
+  const locale = getRequestLocale();
+  const job = (await getCareerBySlug(params.slug)) as
+    | {
+        title: string;
+        slug: string;
+      }
+    | null;
   if (!job) return {};
 
   return buildMetadata({
     title: `${job.title} Career`,
     description: `Apply for the ${job.title} role at Jaguar Properties and explore real estate career opportunities in Bengaluru.`,
     path: `/careers/${job.slug}`,
+    locale,
     keywords: [job.title, "jaguar properties career", "real estate jobs bangalore"]
   });
 }
@@ -36,16 +45,26 @@ export default async function CareerDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const job = await getCareerBySlug(params.slug);
+  const locale = getRequestLocale();
+  const job = (await getCareerBySlug(params.slug)) as
+    | {
+        title: string;
+        slug: string;
+        openings: number;
+        requirements: string[];
+        qualification: string;
+        experience: string;
+      }
+    | null;
   if (!job) notFound();
 
   return (
     <PageShell>
       <JsonLd
         data={buildBreadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Careers", path: "/careers" },
-          { name: job.title, path: `/careers/${job.slug}` }
+          { name: "Home", path: getLocalizedPath("/", locale) },
+          { name: "Careers", path: getLocalizedPath("/careers", locale) },
+          { name: job.title, path: getLocalizedPath(`/careers/${job.slug}`, locale) }
         ])}
       />
       <section className="container py-20">

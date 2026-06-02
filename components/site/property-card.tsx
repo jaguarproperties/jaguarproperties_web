@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 import { propertyShowcaseBySlug } from "@/lib/property-showcase";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export function PropertyCard({
   property
 }: {
   property: Property & { project?: Project | null };
 }) {
+  const locale = getRequestLocale();
   const coverImageSrc = resolveImageSrc(property.coverImage);
   const details = propertyShowcaseBySlug[property.slug];
   const areaLabel = details?.areaLabel ?? (property.areaSqFt ? `${property.areaSqFt} sq.ft.` : "Size on request");
@@ -58,7 +61,7 @@ export function PropertyCard({
         <div className="flex items-center justify-between gap-4">
           <span className="text-xl font-semibold text-foreground">{property.price}</span>
           <Button asChild variant="secondary">
-            <Link href={`/properties/${property.slug}`}>
+            <Link href={getLocalizedPath(`/properties/${property.slug}`, locale)}>
               <Translate id="property.viewDetails" defaultText="View Details" />
               <ArrowRight className="h-4 w-4" />
             </Link>

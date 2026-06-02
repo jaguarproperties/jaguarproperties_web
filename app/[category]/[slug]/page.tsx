@@ -20,6 +20,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EmiCalculator } from "@/components/site/emi-calculator";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 const iconMap = {
   "Our Journey": Compass,
@@ -43,23 +45,26 @@ export async function generateMetadata({
 }: {
   params: { category: string; slug: string };
 }): Promise<Metadata> {
-  const page = getFooterPage(params.category, params.slug);
+  const locale = getRequestLocale();
+  const page = await getFooterPage(params.category, params.slug);
   if (!page) return {};
 
   return buildMetadata({
     title: page.title,
     description: page.description,
     path: page.href,
+    locale,
     keywords: [page.title, "jaguar properties", "real estate guide bangalore"]
   });
 }
 
-export default function FooterContentPage({
+export default async function FooterContentPage({
   params
 }: {
   params: { category: string; slug: string };
 }) {
-  const page = getFooterPage(params.category, params.slug);
+  const locale = getRequestLocale();
+  const page = await getFooterPage(params.category, params.slug);
   if (!page) notFound();
 
   const Icon = iconMap[page.category as keyof typeof iconMap] ?? iconMap.default;
@@ -68,8 +73,8 @@ export default function FooterContentPage({
     <PageShell>
       <JsonLd
         data={buildBreadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: page.title, path: page.href }
+          { name: "Home", path: getLocalizedPath("/", locale) },
+          { name: page.title, path: getLocalizedPath(page.href, locale) }
         ])}
       />
       <section className="container py-20">
@@ -147,20 +152,20 @@ export default function FooterContentPage({
                 <Translate id="footer.continueExploring" defaultText="Continue Exploring" />
               </p>
               <div className="mt-6 space-y-3">
-                <Button asChild className="w-full justify-between">
-                  <Link href="/properties">
+                  <Button asChild className="w-full justify-between">
+                  <Link href={getLocalizedPath("/properties", locale)}>
                     <Translate id="button.viewProjects" defaultText="View Projects" />
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" className="w-full justify-between">
-                  <Link href="/contact">
+                  <Link href={getLocalizedPath("/contact", locale)}>
                     <Translate id="button.contactJaguar" defaultText="Contact Jaguar" />
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" className="w-full justify-between">
-                  <Link href="/news">
+                  <Link href={getLocalizedPath("/news", locale)}>
                     <Translate id="button.readInsights" defaultText="Read Insights" />
                     <ArrowRight className="h-4 w-4" />
                   </Link>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { siteMedia } from "@/lib/site-media";
+import { defaultLocale, getLocalizedPath, locales, type Locale } from "@/lib/i18n";
 
 const fallbackSiteUrl = "https://jaguarproperties.in";
 
@@ -59,6 +60,7 @@ type SeoPageInput = {
   title: string;
   description: string;
   path: string;
+  locale?: Locale;
   keywords?: string[];
   image?: string;
   type?: "website" | "article";
@@ -69,20 +71,25 @@ export function buildMetadata({
   title,
   description,
   path,
+  locale = defaultLocale,
   keywords = [],
   image,
   type = "website",
   noIndex = false
 }: SeoPageInput): Metadata {
-  const url = absoluteUrl(path);
+  const url = absoluteUrl(getLocalizedPath(path, locale));
   const ogImage = absoluteUrl(image ?? siteConfig.defaultOgImage);
+  const alternateLanguages = Object.fromEntries(
+    locales.map((nextLocale) => [nextLocale, absoluteUrl(getLocalizedPath(path, nextLocale))])
+  );
 
   return {
     title,
     description,
     keywords: [...siteConfig.defaultKeywords, ...keywords],
     alternates: {
-      canonical: url
+      canonical: url,
+      languages: alternateLanguages
     },
     openGraph: {
       type,
@@ -90,7 +97,7 @@ export function buildMetadata({
       title,
       description,
       siteName: siteConfig.name,
-      locale: "en_IN",
+      locale: locale === "ar" ? "ar_AE" : "en_IN",
       images: [
         {
           url: ogImage,
@@ -173,7 +180,7 @@ export function buildOrganizationSchema() {
       email: siteConfig.companyEmail,
       telephone: siteConfig.companyPhone,
       areaServed: ["Bengaluru", "North Bengaluru", "Karnataka", "India"],
-      availableLanguage: ["English", "Hindi", "Kannada"]
+      availableLanguage: ["English", "Arabic"]
     }
   };
 }
@@ -221,20 +228,20 @@ export function buildRealEstateAgentSchema() {
   };
 }
 
-export function buildWebSiteSchema() {
+export function buildWebSiteSchema(locale: Locale = defaultLocale) {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": `${absoluteUrl("/")}#website`,
-    url: absoluteUrl("/"),
+    url: absoluteUrl(getLocalizedPath("/", locale)),
     name: siteConfig.name,
     publisher: {
-      "@id": `${absoluteUrl("/")}#organization`
+      "@id": `${absoluteUrl(getLocalizedPath("/", locale))}#organization`
     },
-    inLanguage: "en-IN",
+    inLanguage: locale === "ar" ? "ar-AE" : "en-IN",
     potentialAction: {
       "@type": "SearchAction",
-      target: `${absoluteUrl("/properties")}?search={search_term_string}`,
+      target: `${absoluteUrl(getLocalizedPath("/properties", locale))}?search={search_term_string}`,
       "query-input": "required name=search_term_string"
     }
   };
@@ -253,7 +260,7 @@ type ProjectSchemaInput = {
   tags?: string[];
 };
 
-export function buildProjectSchema(project: ProjectSchemaInput) {
+export function buildProjectSchema(project: ProjectSchemaInput, locale: Locale = defaultLocale) {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -265,7 +272,7 @@ export function buildProjectSchema(project: ProjectSchemaInput) {
       name: siteConfig.name
     },
     image: project.image ? [absoluteUrl(project.image)] : [absoluteUrl(siteConfig.defaultOgImage)],
-    url: absoluteUrl(`/properties/${project.slug}`),
+    url: absoluteUrl(getLocalizedPath(`/properties/${project.slug}`, locale)),
     additionalProperty: (project.tags ?? []).map((tag) => ({
       "@type": "PropertyValue",
       name: "Project highlight",
@@ -285,9 +292,9 @@ export function buildProjectSchema(project: ProjectSchemaInput) {
         name: `${project.location}, ${project.city}, ${project.country}`
       },
       seller: {
-        "@id": `${absoluteUrl("/")}#organization`
+        "@id": `${absoluteUrl(getLocalizedPath("/", locale))}#organization`
       },
-      url: absoluteUrl(`/properties/${project.slug}`)
+      url: absoluteUrl(getLocalizedPath(`/properties/${project.slug}`, locale))
     }
   };
 }
@@ -300,7 +307,7 @@ type ArticleSchemaInput = {
   image?: string;
 };
 
-export function buildArticleSchema(article: ArticleSchemaInput) {
+export function buildArticleSchema(article: ArticleSchemaInput, locale: Locale = defaultLocale) {
   return {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -308,14 +315,14 @@ export function buildArticleSchema(article: ArticleSchemaInput) {
     description: article.description,
     datePublished: new Date(article.publishedAt).toISOString(),
     dateModified: new Date(article.publishedAt).toISOString(),
-    mainEntityOfPage: absoluteUrl(`/news/${article.slug}`),
+    mainEntityOfPage: absoluteUrl(getLocalizedPath(`/news/${article.slug}`, locale)),
     image: [absoluteUrl(article.image ?? siteConfig.defaultOgImage)],
     author: {
       "@type": "Organization",
       name: siteConfig.name
     },
     publisher: {
-      "@id": `${absoluteUrl("/")}#organization`
+      "@id": `${absoluteUrl(getLocalizedPath("/", locale))}#organization`
     }
   };
 }

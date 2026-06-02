@@ -10,24 +10,35 @@ import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getSiteContent } from "@/lib/data";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 import { parseHighlightItems, parseOfficeBranches, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = buildMetadata({
-  title: "Contact Jaguar Properties",
-  description:
-    "Contact Jaguar Properties for premium plots in Bangalore, site visits, pricing, documentation support, and real estate investment guidance.",
-  path: "/contact",
-  keywords: [
-    "contact jaguar properties",
-    "plots in bangalore contact",
-    "real estate bangalore contact",
-    "site visit jaguar properties"
-  ]
-});
+export async function generateMetadata() {
+  const locale = getRequestLocale();
+
+  return buildMetadata({
+    title: "Contact Jaguar Properties",
+    description:
+      "Contact Jaguar Properties for premium plots in Bangalore, site visits, pricing, documentation support, and real estate investment guidance.",
+    path: "/contact",
+    locale,
+    keywords: [
+      "contact jaguar properties",
+      "plots in bangalore contact",
+      "real estate bangalore contact",
+      "plots in Qatar contact",
+      "plots in Dubai contact",
+      "plots in Calicut contact",
+      "site visit jaguar properties"
+    ]
+  });
+}
 
 export default async function ContactPage() {
+  const locale = getRequestLocale();
   const siteContent = resolveSiteContent(await getSiteContent());
   const supportPoints = parseHighlightItems(siteContent.contactSupportPoints);
   const officeBranches = parseOfficeBranches(siteContent.officeAddress);
@@ -38,8 +49,8 @@ export default async function ContactPage() {
     <PageShell>
       <JsonLd
         data={buildBreadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Contact", path: "/contact" }
+          { name: "Home", path: getLocalizedPath("/", locale) },
+          { name: "Contact", path: getLocalizedPath("/contact", locale) }
         ])}
       />
       <section className="container py-16 md:py-20">
@@ -68,7 +79,9 @@ export default async function ContactPage() {
             </div>
             <div className="mt-8 rounded-[28px] border border-black/10 bg-white/35 p-6 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
               <p>{siteContent?.contactEmail}</p>
-              <p>{siteContent?.contactPhone}</p>
+              <p>
+                <bdi dir="ltr">{siteContent?.contactPhone}</bdi>
+              </p>
               <div className="mt-5">
                 <p className="text-xs uppercase tracking-[0.28em] text-primary">
                   <Translate id="contact.offices" defaultText="OUR BRANCHES" />

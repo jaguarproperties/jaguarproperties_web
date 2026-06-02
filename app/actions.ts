@@ -17,6 +17,7 @@ import { formatDatabaseConnectionError, isDatabaseEnabled } from "@/lib/database
 import { replaceHolidayCalendar } from "@/lib/holidays";
 import { prisma } from "@/lib/prisma";
 import { createOrUpdateSiteContent } from "@/lib/site-content-persistence";
+import { syncTranslationFields } from "@/lib/content-localizer";
 import { saveSiteMediaToMongo } from "@/lib/site-media-storage";
 import { createTestimonial, deleteTestimonialById, updateTestimonial } from "@/lib/testimonials";
 import { slugify, safeSplitGallery } from "@/lib/utils";
@@ -395,8 +396,9 @@ export async function submitCareerApplication(
     });
   }
 
-  const requirementText = job
-    ? job.requirements.map((item: string, index: number) => `${index + 1}. ${item}`).join("\n")
+  const jobRequirements = Array.isArray(job?.requirements) ? (job.requirements as string[]) : [];
+  const requirementText = jobRequirements.length
+    ? jobRequirements.map((item, index) => `${index + 1}. ${item}`).join("\n")
     : "Role details were not found in the current opening list.";
 
   let message = "Application submitted successfully. Our team will review it shortly.";
@@ -539,6 +541,19 @@ export async function createOrUpdateProject(formData: FormData) {
 
     if (projectId) {
       await syncProjectMedia(projectId, data.coverImage, data.gallery);
+      await syncTranslationFields(data, [
+        "title",
+        "summary",
+        "description",
+        "city",
+        "location",
+        "country",
+        "priceRange",
+        "areaLabel",
+        "tags",
+        "seoTitle",
+        "seoDescription"
+      ]);
     }
 
     revalidatePath("/");
@@ -688,6 +703,8 @@ export async function createOrUpdateProperty(formData: FormData) {
     await syncPropertyMedia(propertyId, data.coverImage, data.gallery);
   }
 
+  await syncTranslationFields(data, ["title", "description", "city", "location", "address"]);
+
   revalidateTag("properties");
   revalidatePath("/");
   revalidatePath("/properties");
@@ -796,6 +813,8 @@ export async function createOrUpdateBlogPost(formData: FormData) {
       await syncBlogPostMedia(postId, coverImage, normalizedGallery);
     }
 
+    await syncTranslationFields(data, ["title", "excerpt", "content", "seoTitle", "seoDescription"]);
+
     revalidateTag("posts");
     revalidatePath("/");
     revalidatePath("/news");
@@ -878,6 +897,7 @@ export async function createOrUpdateTestimonial(formData: FormData) {
 
     if (parsed.data.id) {
       await updateTestimonial(parsed.data.id, data);
+      await syncTranslationFields(data, ["name", "message"]);
       revalidateTag("testimonials");
       revalidatePath("/");
       revalidatePath("/admin");
@@ -886,6 +906,7 @@ export async function createOrUpdateTestimonial(formData: FormData) {
     }
 
     await createTestimonial(data);
+    await syncTranslationFields(data, ["name", "message"]);
     revalidateTag("testimonials");
     revalidatePath("/");
     revalidatePath("/admin");
@@ -984,6 +1005,17 @@ export async function createOrUpdateJobPosting(formData: FormData) {
   } else {
     await prisma.jobPosting.create({ data });
   }
+
+  await syncTranslationFields(data, [
+    "title",
+    "department",
+    "location",
+    "description",
+    "requirements",
+    "qualification",
+    "experience",
+    "salary"
+  ]);
 
   revalidatePath("/admin");
   revalidatePath("/admin/jobs");
@@ -1088,6 +1120,54 @@ export async function updateSiteContent(formData: FormData) {
     const targetId = id || randomUUID();
 
     await createOrUpdateSiteContent(targetId, data as any);
+    await syncTranslationFields(data as Record<string, unknown>, [
+      "heroTitle",
+      "heroSubtitle",
+      "homePrimaryCtaLabel",
+      "homeSecondaryCtaLabel",
+      "homePresenceLocations",
+      "homeSignatureText",
+      "homeSpotlightLabel",
+      "homeSpotlightTitle",
+      "homeSpotlightText",
+      "homeSpotlightPrice",
+      "homeStats",
+      "aboutTitle",
+      "aboutBody",
+      "mission",
+      "vision",
+      "presenceText",
+      "homeFeaturedProjectsTitle",
+      "homeFeaturedProjectsDescription",
+      "homeFeaturedPropertiesTitle",
+      "homeFeaturedPropertiesDescription",
+      "homePortfolioTitle",
+      "homePortfolioDescription",
+      "homePortfolioItems",
+      "homeNewsTitle",
+      "homeNewsDescription",
+      "homeConciergeTitle",
+      "homeConciergeButtonLabel",
+      "propertiesTitle",
+      "propertiesDescription",
+      "propertiesHighlights",
+      "newsTitle",
+      "newsDescription",
+      "newsHighlights",
+      "portfolioTitle",
+      "portfolioDescription",
+      "portfolioGallery",
+      "contactTitle",
+      "contactDescription",
+      "contactSupportPoints",
+      "careersTitle",
+      "careersDescription",
+      "careersCulturePoints",
+      "footerBlurb",
+      "footerCopyright",
+      "footerNote",
+      "officeAddress"
+    ]);
 
     revalidatePublicSiteContent();
     revalidatePath("/admin/content");

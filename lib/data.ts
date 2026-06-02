@@ -3,6 +3,8 @@ import type { JobApplication, Lead, Prisma, Project } from "@prisma/client";
 
 import { demoApplications, demoLeads, demoPosts, demoProjects, demoProperties, demoSiteContent, demoTestimonials } from "@/lib/demo-data";
 import { isDatabaseEnabled } from "@/lib/database-url";
+import { getRequestLocale } from "@/lib/request-locale";
+import { translateFields } from "@/lib/content-localizer";
 import { listLocalPublishedBlogPosts, getLocalBlogPostBySlug } from "@/lib/local-blog-posts";
 import { getLocalProjectBySlug, listLocalProjects } from "@/lib/local-projects";
 import { readLocalSiteContent } from "@/lib/local-site-content";
@@ -168,6 +170,74 @@ async function withConnectionFallback<T>(
     return typeof fallback === "function" ? await (fallback as () => Promise<T> | T)() : fallback;
   }
 }
+
+const siteContentFields = [
+  "heroTitle",
+  "heroSubtitle",
+  "homePrimaryCtaLabel",
+  "homeSecondaryCtaLabel",
+  "homePresenceLocations",
+  "homeSignatureText",
+  "homeSpotlightLabel",
+  "homeSpotlightTitle",
+  "homeSpotlightText",
+  "homeSpotlightPrice",
+  "homeStats",
+  "aboutTitle",
+  "aboutBody",
+  "mission",
+  "vision",
+  "presenceText",
+  "homeFeaturedProjectsTitle",
+  "homeFeaturedProjectsDescription",
+  "homeFeaturedPropertiesTitle",
+  "homeFeaturedPropertiesDescription",
+  "homePortfolioTitle",
+  "homePortfolioDescription",
+  "homePortfolioItems",
+  "homeNewsTitle",
+  "homeNewsDescription",
+  "homeConciergeTitle",
+  "homeConciergeButtonLabel",
+  "propertiesTitle",
+  "propertiesDescription",
+  "propertiesHighlights",
+  "newsTitle",
+  "newsDescription",
+  "newsHighlights",
+  "portfolioTitle",
+  "portfolioDescription",
+  "portfolioGallery",
+  "contactTitle",
+  "contactDescription",
+  "contactSupportPoints",
+  "careersTitle",
+  "careersDescription",
+  "careersCulturePoints",
+  "footerBlurb",
+  "footerCopyright",
+  "footerNote",
+  "officeAddress"
+] as const;
+
+const projectFields = [
+  "title",
+  "summary",
+  "description",
+  "city",
+  "location",
+  "country",
+  "priceRange",
+  "areaLabel",
+  "tags",
+  "seoTitle",
+  "seoDescription"
+] as const;
+
+const propertyFields = ["title", "description", "city", "location", "address"] as const;
+const blogFields = ["title", "excerpt", "content", "seoTitle", "seoDescription"] as const;
+const testimonialFields = ["name", "message"] as const;
+const jobFields = ["title", "department", "location", "description", "requirements", "qualification", "experience", "salary"] as const;
 
 const getCachedSiteContent = unstable_cache(
   async () =>
@@ -403,11 +473,15 @@ const getCachedUserDepartments = unstable_cache(
 );
 
 export async function getSiteContent() {
-  return getCachedSiteContent();
+  const locale = getRequestLocale();
+  const content = await getCachedSiteContent();
+
+  return (await translateFields(content as Record<string, unknown>, locale, [...siteContentFields])) ?? content;
 }
 
 export async function getProjectBySlug(slug: string) {
-  return withConnectionFallback(
+  const locale = getRequestLocale();
+  const project = await withConnectionFallback(
     () =>
       prisma.project.findFirst({
         where: { slug, visible: true },
@@ -416,6 +490,8 @@ export async function getProjectBySlug(slug: string) {
     () => getLocalProjectBySlug(slug),
     `project ${slug}`
   );
+
+  return ((await translateFields(project as Record<string, unknown> | null, locale, [...projectFields])) ?? project) as any;
 }
 
 function filterProjects<T extends Pick<Project, "title" | "summary" | "description" | "location" | "city" | "status" | "tags">>(
@@ -613,13 +689,22 @@ function restrictToAllowedProperties<T extends { title: string; createdAt?: Date
 }
 
 export async function getProperties(filters: PropertyFilterParams = {}) {
+  const locale = getRequestLocale();
   const properties = await getCachedProperties();
-  return filterProperties(restrictToAllowedProperties(properties), filters);
+  const localized = await Promise.all(
+    restrictToAllowedProperties(properties).map((property) =>
+      translateFields(property as Record<string, unknown>, locale, [...propertyFields])
+    )
+  );
+
+  return filterProperties(localized.filter(Boolean) as any[], filters);
 }
 
 export async function getPropertyBySlug(slug: string) {
+  const locale = getRequestLocale();
   const properties = await getCachedProperties();
-  return restrictToAllowedProperties(properties).find((property) => property.slug === slug) ?? null;
+  const property = restrictToAllowedProperties(properties).find((item) => item.slug === slug) ?? null;
+  return ((await translateFields(property as Record<string, unknown> | null, locale, [...propertyFields])) ?? property) as any;
 }
 
 export async function getFeaturedProperties() {
@@ -631,20 +716,36 @@ export async function getFeaturedProjects() {
 }
 
 export async function getProjects(filters: ProjectFilterParams = {}) {
+  const locale = getRequestLocale();
   const projects = await getCachedProjects();
-  return filterProjects(projects, filters);
+  const localized = await Promise.all(
+    projects.map((project) => translateFields(project as Record<string, unknown>, locale, [...projectFields]))
+  );
+
+  return filterProjects(localized.filter(Boolean) as any[], filters);
 }
 
 export async function getBlogPosts() {
-  return getCachedBlogPosts();
+  const locale = getRequestLocale();
+  const posts = await getCachedBlogPosts();
+  return (await Promise.all(
+    posts.map((post) => translateFields(post as Record<string, unknown>, locale, [...blogFields]))
+  )) as any[];
 }
 
 export async function getTestimonials() {
-  return getCachedTestimonials();
+  const locale = getRequestLocale();
+  const testimonials = await getCachedTestimonials();
+  return (await Promise.all(
+    testimonials.map((testimonial) =>
+      translateFields(testimonial as Record<string, unknown>, locale, [...testimonialFields])
+    )
+  )) as any[];
 }
 
 export async function getBlogPostBySlug(slug: string) {
-  return unstable_cache(
+  const locale = getRequestLocale();
+  const post = await unstable_cache(
     async () =>
       withConnectionFallback(
         () =>
@@ -662,6 +763,8 @@ export async function getBlogPostBySlug(slug: string) {
     ["blog-post", slug],
     { revalidate: 300, tags: ["posts"] }
   )();
+
+  return ((await translateFields(post as Record<string, unknown> | null, locale, [...blogFields])) ?? post) as any;
 }
 
 export async function getDashboardOverview(): Promise<DashboardOverview> {

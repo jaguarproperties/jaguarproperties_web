@@ -33,7 +33,7 @@ export function EmiCalculator() {
   }, [interestRate, loanAmount, tenureYears]);
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat(language === "ar" ? "ar" : language === "hi" ? "hi-IN" : language === "kn" ? "kn-IN" : "en-IN", {
+    new Intl.NumberFormat(language === "ar" ? "ar" : "en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0

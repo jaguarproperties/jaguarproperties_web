@@ -11,6 +11,8 @@ import {
   buildBreadcrumbSchema,
   buildMetadata
 } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export const revalidate = 300;
 
@@ -24,13 +26,24 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const post = await getBlogPostBySlug(params.slug);
+  const locale = getRequestLocale();
+  const post = (await getBlogPostBySlug(params.slug)) as
+    | {
+        title: string;
+        slug: string;
+        excerpt: string;
+        seoTitle?: string | null;
+        seoDescription?: string | null;
+        coverImage: string;
+      }
+    | null;
   if (!post) return {};
 
   return buildMetadata({
     title: post.seoTitle ?? post.title,
     description: post.seoDescription ?? post.excerpt,
     path: `/news/${post.slug}`,
+    locale,
     image: post.coverImage,
     type: "article",
     keywords: [
@@ -47,7 +60,18 @@ export default async function BlogDetailPage({
 }: {
   params: { slug: string };
 }) {
-  const post = await getBlogPostBySlug(params.slug);
+  const locale = getRequestLocale();
+  const post = (await getBlogPostBySlug(params.slug)) as
+    | {
+        title: string;
+        slug: string;
+        excerpt: string;
+        content: string;
+        coverImage: string;
+        seoDescription?: string | null;
+        publishedAt: Date | string;
+      }
+    | null;
   if (!post) notFound();
 
   return (
@@ -55,9 +79,9 @@ export default async function BlogDetailPage({
       <JsonLd
         data={[
           buildBreadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "News", path: "/news" },
-            { name: post.title, path: `/news/${post.slug}` }
+            { name: "Home", path: getLocalizedPath("/", locale) },
+            { name: "News", path: getLocalizedPath("/news", locale) },
+            { name: post.title, path: getLocalizedPath(`/news/${post.slug}`, locale) }
           ]),
           buildArticleSchema({
             title: post.title,
@@ -65,7 +89,7 @@ export default async function BlogDetailPage({
             slug: post.slug,
             publishedAt: post.publishedAt,
             image: post.coverImage
-          })
+          }, locale)
         ]}
       />
       <section className="container py-20">

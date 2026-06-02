@@ -7,8 +7,11 @@ import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { FormattedTextLine } from "@/components/site/formatted-text-line";
 import { parseOfficeBranches, resolveSiteContent } from "@/lib/site-content";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export async function SiteFooter() {
+  const locale = getRequestLocale();
   const content = resolveSiteContent(await getSiteContent());
   const officeBranches = parseOfficeBranches(content.officeAddress);
   const socialLinks = [
@@ -56,9 +59,11 @@ export async function SiteFooter() {
           </p>
           <div className="mt-4 space-y-3 text-sm text-zinc-700 dark:text-zinc-300">
             <p>{content?.contactEmail}</p>
-            <p>{content?.contactPhone}</p>
+            <p>
+              <bdi dir="ltr">{content?.contactPhone}</bdi>
+            </p>
             <Link
-              href="/admin/login"
+              href={getLocalizedPath("/admin/login", locale)}
               className="inline-block font-semibold hover:text-primary"
             >
               <Translate id="footer.adminLogin" defaultText="Admin Login" />
@@ -77,7 +82,7 @@ export async function SiteFooter() {
                 {column.links.map(([label, href]) => (
                   <Link
                     key={href}
-                    href={href}
+                    href={getLocalizedPath(href, locale)}
                     className="block text-sm leading-6 text-zinc-700 transition hover:text-primary dark:text-zinc-300"
                   >
                     <Translate id={label} defaultText={label} />

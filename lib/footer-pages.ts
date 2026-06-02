@@ -1,3 +1,6 @@
+import { getRequestLocale } from "@/lib/request-locale";
+import { translateFields } from "@/lib/content-localizer";
+
 export type FooterPage = {
   title: string;
   category: string;
@@ -531,6 +534,39 @@ export const footerPages: Record<string, FooterPage> = {
   }
 };
 
-export function getFooterPage(category: string, slug: string) {
-  return footerPages[`${category}/${slug}`] ?? null;
+async function localizeFooterPage(page: FooterPage) {
+  const locale = getRequestLocale();
+  if (locale === "en") {
+    return page;
+  }
+
+  const localized = (await translateFields(page as Record<string, unknown>, locale, [
+    "title",
+    "category",
+    "eyebrow",
+    "description",
+    "intro",
+    "highlights"
+  ])) as FooterPage;
+
+  localized.sections = await Promise.all(
+    page.sections.map(async (section) => {
+      const translatedSection = (await translateFields(section as Record<string, unknown>, locale, [
+        "heading",
+        "body",
+        "bullets"
+      ])) as FooterPage["sections"][number];
+
+      return translatedSection;
+    })
+  );
+
+  return localized;
+}
+
+export async function getFooterPage(category: string, slug: string) {
+  const page = footerPages[`${category}/${slug}`] ?? null;
+  if (!page) return null;
+
+  return localizeFooterPage(page);
 }

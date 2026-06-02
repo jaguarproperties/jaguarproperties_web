@@ -506,7 +506,7 @@ export async function getHrmWorkspace(
     getEmployeesInScope(viewer),
     getMonthlyAttendanceMap(viewer, month)
   ]);
-  const letterheadSampleUrl = await getStoredLetterheadSample(siteContent?.id ?? null);
+  const letterheadSampleUrl = await getStoredLetterheadSample(String(siteContent?.id ?? "") || null);
 
   const records = employees.map((employee) => {
     const attendance = attendanceByEmployee.get(employee.id);

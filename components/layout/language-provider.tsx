@@ -1,7 +1,9 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+
 import { defaultLocale, getDirection, locales, translations, type Locale } from "@/lib/translations";
+import { normalizeLocale } from "@/lib/i18n";
 
 type LanguageContextValue = {
   language: Locale;
@@ -32,7 +34,10 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const stored = window.localStorage.getItem("site-language") as Locale | null;
-    const nextLanguage = stored && locales.includes(stored) ? stored : defaultLocale;
+    const htmlLanguage = normalizeLocale(document.documentElement.lang);
+    const nextLanguage =
+      (stored && locales.includes(stored) ? stored : null) ?? htmlLanguage ?? defaultLocale;
+
     setLanguageState(nextLanguage);
     document.documentElement.lang = nextLanguage;
     document.documentElement.dir = getDirection(nextLanguage);
@@ -42,6 +47,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     if (!locales.includes(nextLanguage)) return;
     setLanguageState(nextLanguage);
     window.localStorage.setItem("site-language", nextLanguage);
+    document.cookie = `site-language=${nextLanguage}; path=/; max-age=31536000; samesite=lax`;
     document.documentElement.lang = nextLanguage;
     document.documentElement.dir = getDirection(nextLanguage);
   };

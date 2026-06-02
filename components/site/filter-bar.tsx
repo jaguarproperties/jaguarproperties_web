@@ -7,12 +7,13 @@ import { useLanguage } from "@/components/layout/language-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { getLocalizedPath } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export function FilterBar() {
   const router = useRouter();
   const params = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const locations = [
     { value: "All Locations", label: t("filter.allLocations", "All Locations") },
     { value: "Doddaballapur", label: t("filter.doddaballapur", "Doddaballapur") },
@@ -77,7 +78,7 @@ export function FilterBar() {
       }
     });
 
-    router.push(`/properties${next.toString() ? `?${next.toString()}` : ""}`);
+    router.push(`${getLocalizedPath("/properties", language)}${next.toString() ? `?${next.toString()}` : ""}`);
   };
 
   return (
@@ -152,7 +153,7 @@ export function FilterBar() {
             type="button"
             variant="secondary"
             className="w-full md:w-auto"
-            onClick={() => router.push("/properties")}
+            onClick={() => router.push(getLocalizedPath("/properties", language))}
           >
             <RotateCcw className="h-4 w-4" />
             {t("button.reset", "Reset")}

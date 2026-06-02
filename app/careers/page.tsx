@@ -5,62 +5,96 @@ import { getCareerOpenings } from "@/lib/careers";
 import { PageShell } from "@/components/layout/page-shell";
 import { SectionHeading } from "@/components/site/section-heading";
 import { Translate } from "@/components/site/translate";
+import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { HoverLift } from "@/components/motion/hover-lift";
 import { getSiteContent } from "@/lib/data";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
-import { parseLocationItems, resolveSiteContent } from "@/lib/site-content";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
+import { resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = buildMetadata({
-  title: "Careers at Jaguar Properties",
-  description:
-    "Explore Jaguar Properties careers across sales, marketing, HR, and customer engagement in Bengaluru and growing real estate markets.",
-  path: "/careers",
-  keywords: [
-    "jaguar properties careers",
-    "real estate jobs bangalore",
-    "sales jobs bengaluru",
-    "property careers"
-  ]
-});
+const careerCulturePoints = [
+  {
+    id: "careers.culture.1",
+    text: "A fast-moving real estate environment with exposure to sales, customer advisory, and project operations."
+  },
+  {
+    id: "careers.culture.2",
+    text: "Opportunities to grow with a brand focused on premium housing, plotted developments, and market expansion."
+  },
+  {
+    id: "careers.culture.3",
+    text: "A team culture built around ownership, relationship-building, and consistent client experience."
+  }
+];
+
+export async function generateMetadata() {
+  const locale = getRequestLocale();
+
+  return buildMetadata({
+    title: "Careers at Jaguar Properties",
+    description:
+      "Explore Jaguar Properties careers across sales, marketing, HR, and customer engagement in Bengaluru and growing real estate markets.",
+    path: "/careers",
+    locale,
+    keywords: [
+      "jaguar properties careers",
+      "real estate jobs bangalore",
+      "sales jobs bengaluru",
+      "property careers"
+    ]
+  });
+}
 
 export default async function CareersPage() {
-  const [careerOpenings, rawSiteContent] = await Promise.all([getCareerOpenings(), getSiteContent()]);
+  const locale = getRequestLocale();
+  const [careerOpenings, rawSiteContent] = await Promise.all([
+    getCareerOpenings(),
+    getSiteContent()
+  ]);
+  const typedCareerOpenings = careerOpenings as Array<{
+    slug: string;
+    title: string;
+    openings: number;
+    requirements: string[];
+    qualification: string;
+    experience: string;
+  }>;
   const siteContent = resolveSiteContent(rawSiteContent);
-  const culturePoints = parseLocationItems(siteContent.careersCulturePoints);
 
   return (
     <PageShell>
       <JsonLd
         data={buildBreadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Careers", path: "/careers" }
+          { name: "Home", path: getLocalizedPath("/", locale) },
+          { name: "Careers", path: getLocalizedPath("/careers", locale) }
         ])}
       />
       <section className="container py-20">
         <SectionHeading
           eyebrow={<Translate id="careers.page.eyebrow" defaultText="Careers" />}
-          title={siteContent.careersTitle}
-          description={siteContent.careersDescription}
+          title={<TranslateText text={siteContent.careersTitle} />}
+          description={<TranslateText text={siteContent.careersDescription} />}
         />
         <Card className="mt-10 p-8">
           <h2 className="font-display text-4xl text-foreground dark:text-white">
             <Translate id="careers.whyWork" defaultText="Why work with JaguarProperties" />
           </h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {culturePoints.map((point, index) => (
-              <p key={point} className="rounded-[24px] border border-black/10 bg-black/[0.03] p-5 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
-                <Translate id={`careers.culture.${index + 1}`} defaultText={point} />
+            {careerCulturePoints.map((point) => (
+              <p key={point.id} className="rounded-[24px] border border-black/10 bg-black/[0.03] p-5 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
+                <Translate id={point.id} defaultText={point.text} />
               </p>
             ))}
           </div>
         </Card>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2">
-          {careerOpenings.map((job) => (
+          {typedCareerOpenings.map((job) => (
             <HoverLift key={job.slug}>
               <Card className="h-full p-8">
                 <p className="text-xs uppercase tracking-[0.35em] text-primary">

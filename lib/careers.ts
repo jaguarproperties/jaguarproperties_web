@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { isDatabaseEnabled } from "@/lib/database-url";
+import { getRequestLocale } from "@/lib/request-locale";
+import { translateFields } from "@/lib/content-localizer";
 import { slugify } from "@/lib/utils";
 
 type StaticCareer = {
@@ -116,31 +118,70 @@ function canQueryCareerOpenings() {
 }
 
 export async function getCareerOpenings() {
+  const locale = getRequestLocale();
+
   if (canQueryCareerOpenings()) {
     try {
       const jobPostings = await prisma.jobPosting.findMany({
         where: { isActive: true },
         orderBy: { postedAt: "desc" }
       });
-      return jobPostings.map(normalizeCareerJob);
+      return Promise.all(
+        jobPostings.map(async (job) =>
+          (await translateFields(normalizeCareerJob(job) as Record<string, unknown>, locale, [
+            "title",
+            "requirements",
+            "qualification",
+            "experience"
+          ])) ?? normalizeCareerJob(job)
+        )
+      );
     } catch {
-      return careerOpenings;
+      return Promise.all(
+        careerOpenings.map(async (job) =>
+          (await translateFields(job as Record<string, unknown>, locale, ["title", "requirements", "qualification", "experience"])) ?? job
+        )
+      );
     }
   }
 
-  return careerOpenings;
+  return Promise.all(
+    careerOpenings.map(async (job) =>
+      (await translateFields(job as Record<string, unknown>, locale, ["title", "requirements", "qualification", "experience"])) ?? job
+    )
+  );
 }
 
 export async function getCareerBySlug(slug: string) {
+  const locale = getRequestLocale();
+
   if (canQueryCareerOpenings()) {
     try {
       const jobPostings = await prisma.jobPosting.findMany({ where: { isActive: true } });
       const job = jobPostings.find((item) => slugify(item.title) === slug);
-      return job ? normalizeCareerJob(job) : null;
+      const normalized = job ? normalizeCareerJob(job) : null;
+      return (await translateFields(normalized as Record<string, unknown> | null, locale, [
+        "title",
+        "requirements",
+        "qualification",
+        "experience"
+      ])) ?? normalized;
     } catch {
-      return careerOpenings.find((job) => job.slug === slug) ?? null;
+      const job = careerOpenings.find((item) => item.slug === slug) ?? null;
+      return (await translateFields(job as Record<string, unknown> | null, locale, [
+        "title",
+        "requirements",
+        "qualification",
+        "experience"
+      ])) ?? job;
     }
   }
 
-  return careerOpenings.find((job) => job.slug === slug) ?? null;
+  const job = careerOpenings.find((item) => item.slug === slug) ?? null;
+  return (await translateFields(job as Record<string, unknown> | null, locale, [
+    "title",
+    "requirements",
+    "qualification",
+    "experience"
+  ])) ?? job;
 }

@@ -17,6 +17,8 @@ import {
   buildMetadata,
   buildProjectSchema
 } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export const revalidate = 300;
 
@@ -34,6 +36,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
+  const locale = getRequestLocale();
   const project = await getProjectBySlug(params.slug);
   if (!project) return {};
 
@@ -41,6 +44,7 @@ export async function generateMetadata({
     title: project.seoTitle || `${project.title} Plots`,
     description: project.seoDescription || project.summary,
     path: `/properties/${project.slug}`,
+    locale,
     image: project.coverImage,
     keywords: [
       project.title,
@@ -57,21 +61,24 @@ export default async function ProjectDetailsPage({
 }: {
   params: { slug: string };
 }) {
+  const locale = getRequestLocale();
   const project = await getProjectBySlug(params.slug);
   if (!project) notFound();
 
   const galleryImages = dedupeImages([project.coverImage, ...(project.gallery ?? [])]);
   const areaLabel = project.areaLabel ?? (project.areaSqFt ? `${project.areaSqFt} sq ft` : "Size on request");
-  const tags = project.tags.length ? project.tags : [project.status.replaceAll("_", " ")];
+  const tags = ((Array.isArray(project.tags) && project.tags.length
+    ? project.tags
+    : [project.status.replaceAll("_", " ")]) as string[]).filter(Boolean);
 
   return (
     <PageShell>
       <JsonLd
         data={[
           buildBreadcrumbSchema([
-            { name: "Home", path: "/" },
-            { name: "Projects", path: "/properties" },
-            { name: project.title, path: `/properties/${project.slug}` }
+            { name: "Home", path: getLocalizedPath("/", locale) },
+            { name: "Projects", path: getLocalizedPath("/properties", locale) },
+            { name: project.title, path: getLocalizedPath(`/properties/${project.slug}`, locale) }
           ]),
           buildProjectSchema({
             title: project.title,
@@ -84,13 +91,13 @@ export default async function ProjectDetailsPage({
             country: project.country,
             priceRange: project.priceRange,
             tags: project.tags
-          })
+          }, locale)
         ]}
       />
       <section className="container py-16 md:py-20">
         <div className="space-y-8">
           <Button asChild variant="ghost" className="w-fit">
-            <Link href="/properties">
+            <Link href={getLocalizedPath("/properties", locale)}>
               <ArrowLeft className="h-4 w-4" />
               <Translate id="button.backToProjects" defaultText="Back to Projects" />
             </Link>
@@ -154,7 +161,7 @@ export default async function ProjectDetailsPage({
                     <Translate id="project.tags" defaultText="Project Tags" />
                   </p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    {project.tags.map((tag) => (
+                    {tags.map((tag) => (
                       <span
                         key={tag}
                         className="rounded-full border border-black/10 bg-black/[0.03] px-4 py-2 text-sm text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300"

@@ -9,24 +9,32 @@ import { TranslateText } from "@/components/site/translate-text";
 import { Card } from "@/components/ui/card";
 import { getBlogPosts, getSiteContent } from "@/lib/data";
 import { JsonLd, buildBreadcrumbSchema, buildMetadata } from "@/lib/seo";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 import { parseHighlightItems, resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
-export const metadata: Metadata = buildMetadata({
-  title: "Bangalore Real Estate News",
-  description:
-    "Read Jaguar Properties updates, Bangalore real estate insights, plot investment guidance, and market news focused on North Bengaluru growth corridors.",
-  path: "/news",
-  keywords: [
-    "bangalore real estate news",
-    "plot investment news",
-    "north bangalore real estate updates",
-    "property investment insights"
-  ]
-});
+export async function generateMetadata() {
+  const locale = getRequestLocale();
+
+  return buildMetadata({
+    title: "Bangalore Real Estate News",
+    description:
+      "Read Jaguar Properties updates, Bangalore real estate insights, plot investment guidance, and market news focused on North Bengaluru growth corridors.",
+    path: "/news",
+    locale,
+    keywords: [
+      "bangalore real estate news",
+      "plot investment news",
+      "north bangalore real estate updates",
+      "property investment insights"
+    ]
+  });
+}
 
 export default async function NewsPage() {
+  const locale = getRequestLocale();
   const [posts, rawSiteContent] = await Promise.all([getBlogPosts(), getSiteContent()]);
   const siteContent = resolveSiteContent(rawSiteContent);
   const editorialTracks = parseHighlightItems(siteContent.newsHighlights);
@@ -36,8 +44,8 @@ export default async function NewsPage() {
     <PageShell>
       <JsonLd
         data={buildBreadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "News", path: "/news" }
+          { name: "Home", path: getLocalizedPath("/", locale) },
+          { name: "News", path: getLocalizedPath("/news", locale) }
         ])}
       />
       <section className="container py-16 md:py-20">

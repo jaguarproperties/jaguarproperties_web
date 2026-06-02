@@ -5,6 +5,8 @@ import "./globals.css";
 
 import { Toaster } from "@/components/ui/sonner";
 import { LanguageProvider } from "@/components/layout/language-provider";
+import { getDirection } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 import {
   JsonLd,
   absoluteUrl,
@@ -80,15 +82,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const locale = getRequestLocale();
 
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang={locale} dir={getDirection(locale)} className="dark" suppressHydrationWarning>
       <head>
         <JsonLd
           data={[
             buildOrganizationSchema(),
             buildRealEstateAgentSchema(),
-            buildWebSiteSchema()
+            buildWebSiteSchema(locale)
           ]}
         />
         {gaId ? (

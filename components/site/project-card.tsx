@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/card";
 import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 type ProjectCardRecord = {
   title: string;
@@ -28,6 +30,7 @@ function getPrimaryTag(project: Pick<ProjectCardRecord, "tags" | "status">) {
 }
 
 export function ProjectCard({ project }: { project: ProjectCardRecord }) {
+  const locale = getRequestLocale();
   const coverImageSrc = resolveImageSrc(project.coverImage);
   const areaLabel = project.areaLabel ?? (project.areaSqFt ? `${project.areaSqFt} sq ft` : "Size on request");
   const tags = project.tags ?? [];
@@ -36,7 +39,7 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
     <Card className="overflow-hidden">
       <div className="relative h-72">
         <Link
-          href={`/properties/${project.slug}`}
+          href={getLocalizedPath(`/properties/${project.slug}`, locale)}
           aria-label={`View ${project.title} project details`}
           className="absolute inset-0 block"
         >
@@ -60,7 +63,7 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
             <TranslateText text={project.location} />, <TranslateText text={project.city} />
           </p>
           <h3 className="mt-2 font-display text-3xl text-foreground">
-            <Link href={`/properties/${project.slug}`} className="hover:text-primary">
+            <Link href={getLocalizedPath(`/properties/${project.slug}`, locale)} className="hover:text-primary">
               <TranslateText text={project.title} />
             </Link>
           </h3>
@@ -78,13 +81,24 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
             <MapPin className="h-4 w-4 text-primary" />
             <span><TranslateText text={project.location} /></span>
           </span>
-          {tags.length ? <span>{tags.map((tag) => tag).join(" • ")}</span> : null}
+          {tags.length ? (
+            <span>
+              {tags.map((tag, index) => (
+                <span key={tag}>
+                  {index > 0 ? " • " : ""}
+                  <TranslateText text={tag} />
+                </span>
+              ))}
+            </span>
+          ) : null}
         </div>
 
         <div className="flex items-center justify-between gap-4">
-          <span className="text-xl font-semibold text-foreground">{project.priceRange}</span>
+          <span className="text-xl font-semibold text-foreground">
+            <TranslateText text={project.priceRange} />
+          </span>
           <Button asChild variant="secondary">
-            <Link href={`/properties/${project.slug}`}>
+            <Link href={getLocalizedPath(`/properties/${project.slug}`, locale)}>
               <Translate id="property.viewDetails" defaultText="View Details" />
               <ArrowRight className="h-4 w-4" />
             </Link>

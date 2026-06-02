@@ -7,6 +7,8 @@ import { TranslateText } from "@/components/site/translate-text";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
+import { getLocalizedPath } from "@/lib/i18n";
+import { getRequestLocale } from "@/lib/request-locale";
 
 export function Hero({
   title,
@@ -34,6 +36,7 @@ export function Hero({
     price: string;
   };
 }) {
+  const locale = getRequestLocale();
   const resolvedImage = resolveImageSrc(image);
   const isAnimatedAsset = /\.(gif|webp|apng)(\?.*)?$/i.test(resolvedImage);
   const heroAlt = imageAlt?.trim() || "Jaguar Properties premium plotted development in North Bengaluru";
@@ -83,11 +86,15 @@ export function Hero({
               <p className="text-xs uppercase tracking-[0.45em] text-primary">
                 <Translate id="hero.brand" defaultText="Jaguar Properties" />
               </p>
-              <h1 className="mt-6 max-w-4xl font-display text-4xl leading-[1.02] text-white md:text-5xl xl:text-6xl">{title}</h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-200 md:text-lg">{subtitle}</p>
+              <h1 className="mt-6 max-w-4xl font-display text-4xl leading-[1.02] text-white md:text-5xl xl:text-6xl">
+                {typeof title === "string" ? <TranslateText text={title} /> : title}
+              </h1>
+              <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-200 md:text-lg">
+                {typeof subtitle === "string" ? <TranslateText text={subtitle} /> : subtitle}
+              </p>
               <div className="mt-10 flex flex-wrap gap-3 sm:gap-4">
                 <Button asChild size="lg">
-                  <Link href={primaryCta.href}>
+                  <Link href={getLocalizedPath(primaryCta.href, locale)}>
                     <Translate id="hero.viewProjects" defaultText={primaryCta.label} />
                   </Link>
                 </Button>
@@ -97,7 +104,7 @@ export function Hero({
                   size="lg"
                   className="border-white/20 bg-white/5 text-white hover:bg-white/10"
                 >
-                  <Link href={secondaryCta.href}>
+                  <Link href={getLocalizedPath(secondaryCta.href, locale)}>
                     <Translate id="hero.contactUs" defaultText={secondaryCta.label} />
                   </Link>
                 </Button>
