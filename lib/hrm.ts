@@ -380,6 +380,11 @@ function getDocumentAvailability(record: {
   };
 }
 
+function getStringField(record: Record<string, unknown> | null | undefined, fieldName: string) {
+  const value = record?.[fieldName];
+  return typeof value === "string" ? value : undefined;
+}
+
 async function getFallbackEmployees(viewer: ViewerSession) {
   const fallbackRecord = {
     id: viewer.id,
@@ -507,6 +512,7 @@ export async function getHrmWorkspace(
     getMonthlyAttendanceMap(viewer, month)
   ]);
   const letterheadSampleUrl = await getStoredLetterheadSample(String(siteContent?.id ?? "") || null);
+  const footerCopyright = getStringField(siteContent, "footerCopyright");
 
   const records = employees.map((employee) => {
     const attendance = attendanceByEmployee.get(employee.id);
@@ -576,10 +582,10 @@ export async function getHrmWorkspace(
     month,
     monthLabel,
     letterhead: {
-      companyName: siteContent?.footerCopyright?.replace(/^©\s*\d{4}\s*/u, "").split(".")[0]?.trim() || "Jaguar Properties",
-      address: siteContent?.officeAddress ?? "5, First Main Road, Second Floor, KHB Layout, Yelahanka New Town, Bengaluru",
-      email: siteContent?.contactEmail ?? "info@jaguarproperties.in",
-      phone: siteContent?.contactPhone ?? "+91 78299 56789",
+      companyName: footerCopyright?.replace(/^©\s*\d{4}\s*/u, "").split(".")[0]?.trim() || "Jaguar Properties",
+      address: getStringField(siteContent, "officeAddress") ?? "5, First Main Road, Second Floor, KHB Layout, Yelahanka New Town, Bengaluru",
+      email: getStringField(siteContent, "contactEmail") ?? "info@jaguarproperties.in",
+      phone: getStringField(siteContent, "contactPhone") ?? "+91 78299 56789",
       logoUrl: "/images/jaguar-properties-logo.svg",
       sampleUrl: letterheadSampleUrl,
       supportNote: "Letterhead details are pulled into every generated HRM document automatically."

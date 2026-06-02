@@ -4,8 +4,10 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Card } from "@/components/ui/card";
+import { useLanguage } from "@/components/layout/language-provider";
 import { Translate } from "@/components/site/translate";
 import { TranslateText } from "@/components/site/translate-text";
+import { getDirection } from "@/lib/i18n";
 import { resolveImageSrc, shouldBypassImageOptimization } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
@@ -17,27 +19,37 @@ type Testimonial = {
 };
 
 export function TestimonialsMarquee({ testimonials }: { testimonials: Testimonial[] }) {
+  const { language } = useLanguage();
+  const cardDirection = getDirection(language);
+
   if (!testimonials.length) return null;
 
   const items = testimonials.length > 1 ? [...testimonials, ...testimonials] : testimonials;
 
   return (
-    <div className="mt-10 overflow-hidden">
+    <div className="mt-10 overflow-hidden" dir="ltr">
       <div
+        dir="ltr"
         className={cn(
           "flex gap-6",
           testimonials.length > 1 ? "testimonial-marquee-track w-max" : "justify-center"
         )}
       >
         {items.map((testimonial, index) => (
-          <TestimonialCard key={`${testimonial.id}-${index}`} testimonial={testimonial} />
+          <TestimonialCard key={`${testimonial.id}-${index}`} testimonial={testimonial} direction={cardDirection} />
         ))}
       </div>
     </div>
   );
 }
 
-function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
+function TestimonialCard({
+  testimonial,
+  direction
+}: {
+  testimonial: Testimonial;
+  direction: "ltr" | "rtl";
+}) {
   const messageRef = useRef<HTMLParagraphElement | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [canExpand, setCanExpand] = useState(false);
@@ -75,7 +87,10 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   }, [testimonial.id, testimonial.image]);
 
   return (
-    <Card className="w-[calc(100vw-2.5rem)] max-w-[300px] shrink-0 rounded-[28px] border-black/10 bg-white/70 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] sm:w-[300px] sm:max-w-none sm:p-6 md:w-[360px]">
+    <Card
+      dir={direction}
+      className="w-[calc(100vw-2.5rem)] max-w-[300px] shrink-0 rounded-[28px] border-black/10 bg-white/70 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] backdrop-blur dark:border-white/10 dark:bg-white/[0.04] sm:w-[300px] sm:max-w-none sm:p-6 md:w-[360px]"
+    >
       <div className="flex items-start gap-4">
         <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/15 via-primary/10 to-amber-100 text-lg font-semibold text-primary">
           {imageSrc && !hasImageError ? (
