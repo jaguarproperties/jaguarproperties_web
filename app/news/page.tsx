@@ -28,7 +28,13 @@ export async function generateMetadata() {
       "bangalore real estate news",
       "plot investment news",
       "north bangalore real estate updates",
-      "property investment insights"
+      "property investment insights",
+      "premium plots in bangalore",
+      "residential plots in bangalore",
+      "investment plots in bangalore",
+      "land investment in bangalore",
+      "future growth areas in bangalore",
+      "safe real estate investment"
     ]
   });
 }

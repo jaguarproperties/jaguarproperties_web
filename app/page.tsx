@@ -26,6 +26,7 @@ import {
   parseStatItems,
   resolveSiteContent
 } from "@/lib/site-content";
+import { getLocalizedSeoLandingPages } from "@/lib/seo-landing-pages";
 
 export const revalidate = 300;
 
@@ -33,16 +34,30 @@ export async function generateMetadata() {
   const locale = getRequestLocale();
 
   return buildMetadata({
-    title: "Plots in Bangalore & North Bengaluru",
+    title: "Premium Plots in Bangalore & Plots for Sale Near Me",
     description:
-      "Explore premium residential plots, gated community layouts, and investment plots in Bangalore and North Bengaluru with Jaguar Properties.",
+      "Explore premium plots near me, residential plots in Bangalore, investment plots, villa plots, gated community plots, and secure land investment with Jaguar Properties.",
     path: "/",
     locale,
     keywords: [
+      "premium plots near me",
+      "plots near me",
+      "buy plot near me",
+      "premium residential plots",
       "plots in bangalore",
       "plots near north bangalore",
       "premium plots in bangalore",
-      "investment plots in bangalore"
+      "residential plots in bangalore",
+      "plots for sale in bangalore",
+      "buy plot in bangalore",
+      "investment plots in bangalore",
+      "best plot developers in bangalore",
+      "land investment in bangalore",
+      "premium villa plots",
+      "gated community plots",
+      "premium plots in calicut",
+      "property investment qatar",
+      "property investment dubai"
     ]
   });
 }
@@ -93,6 +108,7 @@ export default async function HomePage() {
   const marketHighlights = parseStatItems(siteContent.homeStats);
   const homeLocations = parseLocationItems(siteContent.homePresenceLocations);
   const featuredVideoEmbedUrl = getYoutubeEmbedUrl(siteContent.homeFeaturedVideoUrl);
+  const localizedSeoLandingPages = getLocalizedSeoLandingPages(locale);
 
   return (
     <PageShell>
@@ -102,11 +118,24 @@ export default async function HomePage() {
           {
             "@context": "https://schema.org",
             "@type": "ItemList",
+            name: "Featured Jaguar Properties projects",
             itemListElement: projects.map((project, index) => ({
               "@type": "ListItem",
               position: index + 1,
               url: absoluteUrl(getLocalizedPath(`/properties/${project.slug}`, locale)),
               name: project.title
+            }))
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            name: "Plot investment location resources",
+            itemListElement: localizedSeoLandingPages.map((page, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: absoluteUrl(getLocalizedPath(`/${page.slug}`, locale)),
+              name: page.title,
+              description: page.metaDescription
             }))
           }
         ]}
@@ -115,7 +144,7 @@ export default async function HomePage() {
         title={siteContent.heroTitle}
         subtitle={siteContent.heroSubtitle}
         image={siteContent.heroImage}
-        imageAlt="Jaguar Properties premium residential plots and plotted development in North Bengaluru"
+        imageAlt="Jaguar Properties premium residential plots, villa plots, and gated community plots in North Bengaluru"
         primaryCta={{
           label: siteContent.homePrimaryCtaLabel,
           href: siteContent.homePrimaryCtaHref

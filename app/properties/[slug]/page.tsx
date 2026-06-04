@@ -50,8 +50,20 @@ export async function generateMetadata({
       project.title,
       `${project.title} plots`,
       `${project.location} plots`,
+      `${project.location} plot for sale`,
+      `${project.location} land investment`,
       `${project.city} real estate`,
-      "plot investment"
+      `${project.city} property investment`,
+      "premium residential plots",
+      "investment plots",
+      "plot purchase",
+      "plot for sale",
+      "land for sale",
+      "villa plots",
+      "gated community plots",
+      "premium villa plots",
+      "secure land investment",
+      "trusted real estate developer"
     ]
   });
 }

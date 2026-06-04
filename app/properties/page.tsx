@@ -25,16 +25,28 @@ export async function generateMetadata() {
   const locale = getRequestLocale();
 
   return buildMetadata({
-    title: "Plots in North Bangalore",
+    title: "Premium Plot Projects, Residential Plots & Villa Plots",
     description:
-      "Browse Jaguar Properties projects offering premium plots in Bangalore, North Bengaluru, and high-growth plotted developments for buyers and investors.",
+      "Browse plots for sale near me, premium residential plots, villa plots, gated community plots, and investment plots from Jaguar Properties.",
     path: "/properties",
     locale,
     keywords: [
+      "premium plot projects",
+      "plots for sale near me",
+      "buy plot near me",
       "plots in north bangalore",
       "residential plots in bangalore",
+      "plots for sale in bangalore",
+      "buy plot in bangalore",
       "premium plots",
-      "dtcp plots bangalore"
+      "premium villa plots",
+      "dtcp plots bangalore",
+      "bmrda approved plots bangalore",
+      "investment plots",
+      "gated community plots",
+      "residential land for sale",
+      "best plot developers in bangalore",
+      "land investment in bangalore"
     ]
   });
 }

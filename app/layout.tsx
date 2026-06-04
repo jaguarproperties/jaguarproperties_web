@@ -10,6 +10,7 @@ import { getRequestLocale } from "@/lib/request-locale";
 import {
   JsonLd,
   absoluteUrl,
+  buildLocalBusinessSchema,
   buildOrganizationSchema,
   buildRealEstateAgentSchema,
   buildWebSiteSchema,
@@ -18,11 +19,11 @@ import {
 
 export const metadata: Metadata = {
   title: {
-    default: "Plots in Bangalore | Jaguar Properties",
+    default: "Premium Residential Plots & Land Investment | Jaguar Properties",
     template: "%s | Jaguar Properties"
   },
   description:
-    "Explore premium plots in Bangalore and North Bengaluru with Jaguar Properties. Discover residential plots, investment opportunities, and gated community developments.",
+    "Explore premium residential plots, investment plots, villa plots, gated community plots, and land investment opportunities in Bengaluru, Calicut, Qatar, and Dubai.",
   metadataBase: new URL(siteConfig.baseUrl),
   applicationName: siteConfig.name,
   keywords: [...siteConfig.defaultKeywords],
@@ -44,9 +45,9 @@ export const metadata: Metadata = {
     locale: "en_IN",
     url: absoluteUrl("/"),
     siteName: siteConfig.name,
-    title: "Plots in Bangalore | Jaguar Properties",
+    title: "Premium Residential Plots & Land Investment | Jaguar Properties",
     description:
-      "Explore premium plots in Bangalore and North Bengaluru with Jaguar Properties. Discover residential plots, investment opportunities, and gated community developments.",
+      "Explore premium residential plots, investment plots, villa plots, gated community plots, and land investment opportunities in Bengaluru, Calicut, Qatar, and Dubai.",
     images: [
       {
         url: absoluteUrl(siteConfig.defaultOgImage),
@@ -58,9 +59,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Plots in Bangalore | Jaguar Properties",
+    title: "Premium Residential Plots & Land Investment | Jaguar Properties",
     description:
-      "Explore premium plots in Bangalore and North Bengaluru with Jaguar Properties. Discover residential plots, investment opportunities, and gated community developments.",
+      "Explore premium residential plots, investment plots, villa plots, gated community plots, and land investment opportunities in Bengaluru, Calicut, Qatar, and Dubai.",
     images: [absoluteUrl(siteConfig.defaultOgImage)]
   },
   robots: {
@@ -90,6 +91,7 @@ export default function RootLayout({
         <JsonLd
           data={[
             buildOrganizationSchema(),
+            buildLocalBusinessSchema(),
             buildRealEstateAgentSchema(),
             buildWebSiteSchema(locale)
           ]}

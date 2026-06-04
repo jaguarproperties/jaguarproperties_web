@@ -5,6 +5,124 @@ import { defaultLocale, getLocalizedPath, locales, type Locale } from "@/lib/i18
 
 const fallbackSiteUrl = "https://jaguarproperties.in";
 
+export const primarySeoKeywords = [
+  "Premium Plots Near Me",
+  "Plots for Sale Near Me",
+  "Residential Plots Near Me",
+  "Buy Plot Near Me",
+  "Premium Residential Plots",
+  "Investment Plots",
+  "Plot Purchase",
+  "Land for Sale",
+  "Plot for Sale",
+  "Villa Plots",
+  "Gated Community Plots",
+  "Premium Villa Plots",
+  "Best Plot Developers",
+  "Real Estate Developers",
+  "Land Investment",
+  "Property Investment",
+  "Residential Land for Sale"
+] as const;
+
+export const locationSeoKeywords = [
+  "Premium Plots in Bangalore",
+  "Residential Plots in Bangalore",
+  "Investment Plots in Bangalore",
+  "Plots for Sale in Bangalore",
+  "Buy Plot in Bangalore",
+  "Villa Plots in Bangalore",
+  "Premium Plots in North Bangalore",
+  "Best Plot Developers in Bangalore",
+  "BMRDA Approved Plots Bangalore",
+  "DTCP Approved Plots Bangalore",
+  "Land Investment in Bangalore",
+  "Bangalore Property Investment",
+  "Real Estate Company Bangalore",
+  "Premium Plots in Calicut",
+  "Residential Plots in Calicut",
+  "Land for Sale in Calicut",
+  "Plot Projects in Calicut",
+  "Property Investment in Calicut",
+  "Villa Plots in Calicut",
+  "Real Estate Company in Calicut",
+  "Property Investment Qatar",
+  "Real Estate Company Qatar",
+  "Property Developers Qatar",
+  "Investment Property Qatar",
+  "Premium Property Qatar",
+  "Property Consultant Qatar",
+  "Property Investment Dubai",
+  "Dubai Real Estate",
+  "Luxury Property Dubai",
+  "Real Estate Company Dubai",
+  "Dubai Investment Properties",
+  "Property Consultant Dubai"
+] as const;
+
+export const longTailSeoKeywords = [
+  "Best Premium Plots Near Me",
+  "Premium Plots for Sale in Bangalore",
+  "Best Investment Plots in Bangalore",
+  "Buy Residential Plot in Bangalore",
+  "Premium Plots for Dream Home",
+  "High Return Investment Plots",
+  "Residential Plots with Clear Title",
+  "Safe Real Estate Investment",
+  "Premium Gated Community Plots",
+  "Future Growth Areas in Bangalore",
+  "Premium Land Investment Opportunities"
+] as const;
+
+export const siteWideSeoKeywords = [
+  "Premium Plots",
+  "Residential Plots",
+  "Investment Plots",
+  "Plot Purchase",
+  "Plot for Sale",
+  "Land Investment",
+  "Villa Plots",
+  "Gated Community Plots",
+  "Premium Plot Development",
+  "Trusted Real Estate Developer",
+  "Smart Property Investment",
+  "Premium Residential Community",
+  "Secure Land Investment",
+  "Future Growth Investment",
+  "Dream Home Plot"
+] as const;
+
+export const highestValueSeoKeywords = [
+  "Premium Plots in Bangalore",
+  "Residential Plots in Bangalore",
+  "Plots for Sale in Bangalore",
+  "Investment Plots in Bangalore",
+  "Premium Plots Near Me",
+  "Buy Plot Near Me",
+  "Best Plot Developers in Bangalore",
+  "Land Investment in Bangalore",
+  "Premium Villa Plots",
+  "Gated Community Plots"
+] as const;
+
+export const seoFocusKeywords = [
+  ...highestValueSeoKeywords,
+  ...primarySeoKeywords,
+  ...locationSeoKeywords,
+  ...longTailSeoKeywords,
+  ...siteWideSeoKeywords
+] as const;
+
+function dedupeSeoKeywords(keywords: readonly string[]) {
+  const seen = new Set<string>();
+  return keywords.filter((keyword) => {
+    const normalized = keyword.trim().toLowerCase();
+    if (!normalized || seen.has(normalized)) return false;
+    seen.add(normalized);
+    return true;
+  });
+}
+
 export const siteConfig = {
   name: "Jaguar Properties",
   legalName: "Jaguar Properties",
@@ -30,26 +148,39 @@ export const siteConfig = {
     "https://x.com/JPDevelopers",
     "https://www.youtube.com/@JaguarProperties"
   ],
-  defaultKeywords: [
+  defaultKeywords: dedupeSeoKeywords([
     "jaguar properties",
     "jaguarproperties",
     "jaguar",
+    ...seoFocusKeywords,
+    "premium plots near me",
+    "plots near me",
+    "buy plot near me",
+    "premium residential plots",
     "plots in bangalore",
     "residential plots",
+    "residential land for sale",
     "plots for sale",
     "investment plots",
+    "plot purchase",
     "real estate bangalore",
     "premium plots",
     "plot investment",
+    "land investment",
+    "villa plots",
+    "gated community plots",
+    "plot developers",
+    "best plot developers",
+    "real estate developers",
+    "property investment",
     "plots near north bangalore",
     "dtcp plots bangalore",
     "buy plots in bangalore",
     "land investment bangalore",
-    "gated community plots",
     "north bangalore real estate",
     "doddaballapura plots",
     "real estate developer bangalore"
-  ]
+  ])
 } as const;
 
 export function absoluteUrl(path = "/") {
@@ -86,7 +217,7 @@ export function buildMetadata({
   return {
     title,
     description,
-    keywords: [...siteConfig.defaultKeywords, ...keywords],
+    keywords: dedupeSeoKeywords([...siteConfig.defaultKeywords, ...keywords]),
     alternates: {
       canonical: url,
       languages: alternateLanguages
@@ -168,6 +299,8 @@ export function buildOrganizationSchema() {
     url: absoluteUrl("/"),
     logo: absoluteUrl(siteMedia.jaguarPropertiesLogo),
     sameAs: siteConfig.socialProfiles,
+    keywords: dedupeSeoKeywords(seoFocusKeywords).join(", "),
+    knowsAbout: dedupeSeoKeywords(seoFocusKeywords),
     email: siteConfig.companyEmail,
     telephone: siteConfig.companyPhone,
     address: {
@@ -179,9 +312,37 @@ export function buildOrganizationSchema() {
       contactType: "sales",
       email: siteConfig.companyEmail,
       telephone: siteConfig.companyPhone,
-      areaServed: ["Bengaluru", "North Bengaluru", "Karnataka", "India"],
+      areaServed: ["Bengaluru", "Calicut", "Qatar", "Dubai", "Karnataka", "India", "UAE"],
       availableLanguage: ["English", "Arabic"]
     }
+  };
+}
+
+export function buildLocalBusinessSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": `${absoluteUrl("/")}#local-business`,
+    name: siteConfig.name,
+    image: absoluteUrl(siteConfig.defaultOgImage),
+    logo: absoluteUrl(siteMedia.jaguarPropertiesLogo),
+    url: absoluteUrl("/"),
+    telephone: siteConfig.companyPhone,
+    email: siteConfig.companyEmail,
+    priceRange: "$$",
+    keywords: dedupeSeoKeywords(seoFocusKeywords).join(", "),
+    knowsAbout: dedupeSeoKeywords(seoFocusKeywords),
+    address: {
+      "@type": "PostalAddress",
+      ...siteConfig.address
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: siteConfig.geo.latitude,
+      longitude: siteConfig.geo.longitude
+    },
+    areaServed: ["Bengaluru", "Calicut", "Qatar", "Dubai", "North Bengaluru"],
+    sameAs: siteConfig.socialProfiles
   };
 }
 
@@ -195,10 +356,24 @@ export function buildRealEstateAgentSchema() {
     image: absoluteUrl(siteConfig.defaultOgImage),
     logo: absoluteUrl(siteMedia.jaguarPropertiesLogo),
     priceRange: "$$",
+    keywords: dedupeSeoKeywords(seoFocusKeywords).join(", "),
+    knowsAbout: dedupeSeoKeywords(seoFocusKeywords),
     areaServed: [
       {
         "@type": "City",
         name: "Bengaluru"
+      },
+      {
+        "@type": "City",
+        name: "Calicut"
+      },
+      {
+        "@type": "Country",
+        name: "Qatar"
+      },
+      {
+        "@type": "City",
+        name: "Dubai"
       },
       {
         "@type": "Place",
@@ -228,6 +403,26 @@ export function buildRealEstateAgentSchema() {
   };
 }
 
+type FaqItem = {
+  question: string;
+  answer: string;
+};
+
+export function buildFaqSchema(items: FaqItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer
+      }
+    }))
+  };
+}
+
 export function buildWebSiteSchema(locale: Locale = defaultLocale) {
   return {
     "@context": "https://schema.org",
@@ -238,6 +433,7 @@ export function buildWebSiteSchema(locale: Locale = defaultLocale) {
     publisher: {
       "@id": `${absoluteUrl(getLocalizedPath("/", locale))}#organization`
     },
+    keywords: dedupeSeoKeywords(seoFocusKeywords).join(", "),
     inLanguage: locale === "ar" ? "ar-AE" : "en-IN",
     potentialAction: {
       "@type": "SearchAction",
@@ -267,6 +463,13 @@ export function buildProjectSchema(project: ProjectSchemaInput, locale: Locale =
     name: project.title,
     description: project.description || project.summary,
     category: "Residential plots",
+    keywords: dedupeSeoKeywords([
+      project.title,
+      `${project.location} plots`,
+      `${project.city} real estate`,
+      ...(project.tags ?? []),
+      ...seoFocusKeywords
+    ]).join(", "),
     brand: {
       "@type": "Brand",
       name: siteConfig.name
@@ -313,6 +516,7 @@ export function buildArticleSchema(article: ArticleSchemaInput, locale: Locale =
     "@type": "Article",
     headline: article.title,
     description: article.description,
+    keywords: dedupeSeoKeywords([article.title, ...seoFocusKeywords]).join(", "),
     datePublished: new Date(article.publishedAt).toISOString(),
     dateModified: new Date(article.publishedAt).toISOString(),
     mainEntityOfPage: absoluteUrl(getLocalizedPath(`/news/${article.slug}`, locale)),

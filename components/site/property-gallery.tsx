@@ -59,7 +59,7 @@ export function PropertyGallery({
       >
         <Image
           src={resolvedGallery[activeIndex]}
-          alt={`${title} image ${activeIndex + 1}`}
+          alt={`${title} premium plot project image ${activeIndex + 1}`}
           fill
           sizes="(max-width: 1024px) 100vw, 60vw"
           className="object-cover"
@@ -121,7 +121,7 @@ export function PropertyGallery({
             >
               <Image
                 src={image}
-                alt={`${title} thumbnail ${index + 1}`}
+                alt={`${title} premium plot project thumbnail ${index + 1}`}
                 fill
                 sizes="160px"
                 className="object-cover"

@@ -50,7 +50,15 @@ export async function generateMetadata({
       post.title,
       "bangalore real estate",
       "property investment",
-      "plot investment"
+      "plot investment",
+      "premium plots",
+      "residential plots",
+      "investment plots",
+      "land investment",
+      "premium plot development",
+      "trusted real estate developer",
+      "secure land investment",
+      "future growth investment"
     ]
   });
 }

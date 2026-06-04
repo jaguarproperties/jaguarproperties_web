@@ -45,7 +45,7 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
         >
           <Image
             src={coverImageSrc}
-            alt={`${project.title} premium plotted development in ${project.location}, ${project.city}`}
+            alt={`${project.title} premium residential plots, villa plots, and gated community plots in ${project.location}, ${project.city}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
             className="object-cover"

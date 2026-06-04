@@ -4,6 +4,7 @@ import { getBlogPosts, getProjects } from "@/lib/data";
 import { getCareerOpenings } from "@/lib/careers";
 import { footerPages } from "@/lib/footer-pages";
 import { absoluteUrl } from "@/lib/seo";
+import { seoLandingPages } from "@/lib/seo-landing-pages";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, posts, careers] = await Promise.all([
@@ -46,6 +47,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.55
   }));
 
+  const seoLandingRoutes: MetadataRoute.Sitemap = seoLandingPages.map((page) => ({
+    url: absoluteUrl(`/${page.slug}`),
+    changeFrequency: "weekly",
+    priority: 0.92
+  }));
+
   const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
     url: absoluteUrl(`/properties/${project.slug}`),
     lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
@@ -66,5 +73,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5
   }));
 
-  return [...staticRoutes, ...projectRoutes, ...postRoutes, ...careerRoutes, ...footerRoutes];
+  return [
+    ...staticRoutes,
+    ...seoLandingRoutes,
+    ...projectRoutes,
+    ...postRoutes,
+    ...careerRoutes,
+    ...footerRoutes
+  ];
 }
