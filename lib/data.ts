@@ -60,6 +60,24 @@ type AdminJobPosting = {
   updatedAt: Date;
 };
 
+function coerceDate(value: unknown, fallback = new Date()) {
+  const date = value instanceof Date ? value : new Date(String(value ?? ""));
+  return Number.isNaN(date.getTime()) ? fallback : date;
+}
+
+function normalizeAdminJobPosting(job: AdminJobPosting) {
+  const createdAt = coerceDate(job.createdAt);
+
+  return {
+    ...job,
+    openings: Number(job.openings || 1),
+    postedAt: coerceDate(job.postedAt, createdAt),
+    expiresAt: job.expiresAt ? coerceDate(job.expiresAt) : null,
+    createdAt,
+    updatedAt: coerceDate(job.updatedAt, createdAt)
+  };
+}
+
 type DashboardOverview = {
   leads: number;
   properties: number;
@@ -831,20 +849,26 @@ export async function getAdminDashboardPreview() {
 
 export async function getAdminJobPostings(): Promise<AdminJobPosting[]> {
   return withFallback(
-    () =>
-      prisma.jobPosting.findMany({
+    async () => {
+      const jobs = await prisma.jobPosting.findMany({
         orderBy: { createdAt: "desc" }
-      }),
+      });
+
+      return jobs.map(normalizeAdminJobPosting);
+    },
     []
   );
 }
 
 export async function getAdminJobPostingById(id: string): Promise<AdminJobPosting | null> {
   return withFallback(
-    () =>
-      prisma.jobPosting.findUnique({
+    async () => {
+      const job = await prisma.jobPosting.findUnique({
         where: { id }
-      }),
+      });
+
+      return job ? normalizeAdminJobPosting(job) : null;
+    },
     null
   );
 }

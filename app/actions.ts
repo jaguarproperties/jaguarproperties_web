@@ -991,36 +991,52 @@ export async function createOrUpdateJobPosting(formData: FormData) {
     redirect("/admin/jobs?error=invalid-job-posting");
   }
 
+  const { id, ...jobPayload } = parsed.data;
+  const postedAt = parsed.data.postedAt ? new Date(parsed.data.postedAt) : new Date();
+
+  if (Number.isNaN(postedAt.getTime())) {
+    redirect("/admin/jobs?error=invalid-job-posting-date");
+  }
+
   const data = {
-    ...parsed.data,
-    postedAt: parsed.data.postedAt ? new Date(parsed.data.postedAt) : new Date(),
+    ...jobPayload,
+    postedAt,
     expiresAt: null
   };
 
-  if (parsed.data.id) {
-    await prisma.jobPosting.update({
-      where: { id: parsed.data.id },
-      data
-    });
-  } else {
-    await prisma.jobPosting.create({ data });
+  try {
+    if (id) {
+      await prisma.jobPosting.update({
+        where: { id },
+        data
+      });
+    } else {
+      await prisma.jobPosting.create({ data });
+    }
+
+    await syncTranslationFields(data, [
+      "title",
+      "department",
+      "location",
+      "description",
+      "requirements",
+      "qualification",
+      "experience",
+      "salary"
+    ]);
+
+    revalidatePath("/admin");
+    revalidatePath("/admin/jobs");
+    revalidatePath("/careers");
+    redirect("/admin/jobs");
+  } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    const message = formatDatabaseConnectionError(error);
+    redirect(id ? `/admin/jobs/${id}?error=${encodeURIComponent(message)}` : `/admin/jobs?error=${encodeURIComponent(message)}`);
   }
-
-  await syncTranslationFields(data, [
-    "title",
-    "department",
-    "location",
-    "description",
-    "requirements",
-    "qualification",
-    "experience",
-    "salary"
-  ]);
-
-  revalidatePath("/admin");
-  revalidatePath("/admin/jobs");
-  revalidatePath("/careers");
-  redirect("/admin/jobs");
 }
 
 export async function deleteJobPosting(formData: FormData) {
