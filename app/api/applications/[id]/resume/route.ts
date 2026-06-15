@@ -49,6 +49,24 @@ export async function GET(
     return NextResponse.json({ error: "Application not found" }, { status: 404 });
   }
 
+  const storedResume = await prisma.applicationResume.findUnique({
+    where: { applicationId: params.id },
+    select: {
+      filename: true,
+      contentType: true,
+      data: true
+    }
+  });
+
+  if (storedResume) {
+    return new NextResponse(new Uint8Array(storedResume.data), {
+      headers: {
+        "Content-Type": storedResume.contentType || getMimeType(storedResume.filename),
+        "Content-Disposition": `attachment; filename="${storedResume.filename.replace(/"/g, "")}"`
+      }
+    });
+  }
+
   const storedFilename = path.basename(application.resumeUrl);
   const candidatePaths = [
     getPrivateResumePath(storedFilename),

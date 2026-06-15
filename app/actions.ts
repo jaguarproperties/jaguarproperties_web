@@ -370,30 +370,60 @@ export async function submitCareerApplication(
   }
 
   const transporter = getTransporter();
-  const job = await getCareerBySlug(slugify(parsed.data.role));
-  const bytes = await resume.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+  const job = await getCareerBySlug(slugify(parsed.data.role)).catch(() => null);
+  const buffer = Buffer.from(await resume.arrayBuffer());
   const extension = resume.name.split(".").pop() || "pdf";
   const filename = `${randomUUID()}.${extension}`;
-  const resumeDir = getResumeStorageDir();
-  await mkdir(resumeDir, { recursive: true });
-  const filePath = path.join(resumeDir, filename);
-  await writeFile(filePath, buffer);
   const resumeUrl = filename;
 
-  if (isDatabaseEnabled() && (process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
-    await prisma.jobApplication.create({
+  try {
+    const resumeDir = getResumeStorageDir();
+    await mkdir(resumeDir, { recursive: true });
+    await writeFile(path.join(resumeDir, filename), buffer);
+  } catch (error) {
+    console.error("Unable to store career application resume.", error);
+  }
+
+  if (!isDatabaseEnabled() || !(process.env.DATABASE_DIRECT_URL || process.env.DATABASE_URL)) {
+    return {
+      success: false,
+      message: "Application storage is not configured. Add DATABASE_URL to store job applications."
+    };
+  }
+
+  const joinDate = new Date(parsed.data.joinDate);
+  if (Number.isNaN(joinDate.getTime())) {
+    return { success: false, message: "Please choose a valid joining date." };
+  }
+
+  try {
+    const application = await prisma.jobApplication.create({
       data: {
         role: parsed.data.role,
         fullName: parsed.data.fullName,
         email: parsed.data.email,
         location: parsed.data.location,
         phone: parsed.data.phone,
-        joinDate: new Date(parsed.data.joinDate),
+        joinDate,
         resumeUrl,
         resumeName: resume.name
       }
     });
+
+    await prisma.applicationResume.create({
+      data: {
+        applicationId: application.id,
+        filename: resume.name,
+        contentType: resume.type || "application/octet-stream",
+        data: buffer
+      }
+    });
+  } catch (error) {
+    console.error("Unable to store career application.", error);
+    return {
+      success: false,
+      message: `We could not submit your application right now. ${formatDatabaseConnectionError(error)}`
+    };
   }
 
   const jobRequirements = Array.isArray(job?.requirements) ? (job.requirements as string[]) : [];
@@ -404,31 +434,36 @@ export async function submitCareerApplication(
   let message = "Application submitted successfully. Our team will review it shortly.";
 
   if (transporter) {
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
-      to: "amanrajgrow@gmail.com",
-      subject: `Applying for ${parsed.data.role}`,
-      text: [
-        `Role: ${parsed.data.role}`,
-        `Candidate Name: ${parsed.data.fullName}`,
-        `Email: ${parsed.data.email}`,
-        `Location: ${parsed.data.location}`,
-        `Phone: ${parsed.data.phone}`,
-        `Joining Date: ${parsed.data.joinDate}`,
-        "",
-        "Job Description:",
-        requirementText,
-        "",
-        `Qualification: ${job?.qualification ?? "N/A"}`,
-        `Experience: ${job?.experience ?? "N/A"}`
-      ].join("\n"),
-      attachments: [
-        {
-          filename: resume.name,
-          content: buffer
-        }
-      ]
-    });
+    try {
+      await transporter.sendMail({
+        from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
+        to: "amanrajgrow@gmail.com",
+        subject: `Applying for ${parsed.data.role}`,
+        text: [
+          `Role: ${parsed.data.role}`,
+          `Candidate Name: ${parsed.data.fullName}`,
+          `Email: ${parsed.data.email}`,
+          `Location: ${parsed.data.location}`,
+          `Phone: ${parsed.data.phone}`,
+          `Joining Date: ${parsed.data.joinDate}`,
+          "",
+          "Job Description:",
+          requirementText,
+          "",
+          `Qualification: ${job?.qualification ?? "N/A"}`,
+          `Experience: ${job?.experience ?? "N/A"}`
+        ].join("\n"),
+        attachments: [
+          {
+            filename: resume.name,
+            content: buffer
+          }
+        ]
+      });
+    } catch (error) {
+      console.error("Unable to send career application email.", error);
+      message = "Application submitted successfully. Email delivery failed, but the application is saved in the admin panel.";
+    }
   } else {
     message = "Application submitted successfully. Email delivery is disabled because SMTP is not configured. Add SMTP settings in .env to enable email notifications.";
   }

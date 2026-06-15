@@ -374,6 +374,15 @@ model JobApplication {
   createdAt   DateTime @default(now())
 }
 
+model ApplicationResume {
+  id            String   @id @default(cuid()) @map("_id")
+  applicationId String   @unique
+  filename      String
+  contentType   String
+  data          Bytes
+  createdAt     DateTime @default(now())
+}
+
 model JobPosting {
   id            String   @id @default(cuid()) @map("_id")
   title         String
