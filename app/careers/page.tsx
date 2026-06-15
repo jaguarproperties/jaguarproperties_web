@@ -17,6 +17,18 @@ import { resolveSiteContent } from "@/lib/site-content";
 
 export const revalidate = 300;
 
+const employmentTypeLabels: Record<string, string> = {
+  FULL_TIME: "Full Time",
+  PART_TIME: "Part Time",
+  CONTRACT: "Contract",
+  INTERNSHIP: "Internship"
+};
+
+function formatEmploymentType(type?: string | null) {
+  if (!type) return "Full Time";
+  return employmentTypeLabels[type] ?? type.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 const careerCulturePoints = [
   {
     id: "careers.culture.1",
@@ -63,6 +75,8 @@ export default async function CareersPage() {
     requirements: string[];
     qualification: string;
     experience: string;
+    salary?: string | null;
+    type?: string | null;
   }>;
   const siteContent = resolveSiteContent(rawSiteContent);
 
@@ -106,6 +120,8 @@ export default async function CareersPage() {
                 <div className="mt-6 space-y-4 text-sm leading-7 text-zinc-700 dark:text-zinc-300">
                   <p><span className="font-semibold text-foreground dark:text-white"><Translate id="career.qualifications" defaultText="Qualification:" /></span> <Translate id={job.qualification} defaultText={job.qualification} /></p>
                   <p><span className="font-semibold text-foreground dark:text-white"><Translate id="career.experience" defaultText="Experience:" /></span> <Translate id={job.experience} defaultText={job.experience} /></p>
+                  <p><span className="font-semibold text-foreground dark:text-white"><Translate id="career.salary" defaultText="Salary Range:" /></span> <Translate id={job.salary ?? "Salary range will be shared during screening."} defaultText={job.salary ?? "Salary range will be shared during screening."} /></p>
+                  <p><span className="font-semibold text-foreground dark:text-white"><Translate id="career.employmentType" defaultText="Employment Type:" /></span> <Translate id={formatEmploymentType(job.type)} defaultText={formatEmploymentType(job.type)} /></p>
                   <div>
                     <p className="font-semibold text-foreground dark:text-white">
                       <Translate id="career.requirements" defaultText="Requirements" />

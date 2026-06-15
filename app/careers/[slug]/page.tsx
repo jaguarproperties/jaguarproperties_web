@@ -13,6 +13,18 @@ import { getRequestLocale } from "@/lib/request-locale";
 
 export const revalidate = 300;
 
+const employmentTypeLabels: Record<string, string> = {
+  FULL_TIME: "Full Time",
+  PART_TIME: "Part Time",
+  CONTRACT: "Contract",
+  INTERNSHIP: "Internship"
+};
+
+function formatEmploymentType(type?: string | null) {
+  if (!type) return "Full Time";
+  return employmentTypeLabels[type] ?? type.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export async function generateStaticParams() {
   return careerOpenings.map((job) => ({ slug: job.slug }));
 }
@@ -54,6 +66,8 @@ export default async function CareerDetailPage({
         requirements: string[];
         qualification: string;
         experience: string;
+        salary?: string | null;
+        type?: string | null;
       }
     | null;
   if (!job) notFound();
@@ -105,6 +119,21 @@ export default async function CareerDetailPage({
                     <Translate id="career.experience" defaultText="Experience:" />
                   </span>{" "}
                   <Translate id={job.experience} defaultText={job.experience} />
+                </p>
+                <p>
+                  <span className="font-semibold text-foreground dark:text-white">
+                    <Translate id="career.salary" defaultText="Salary Range:" />
+                  </span>{" "}
+                  <Translate
+                    id={job.salary ?? "Salary range will be shared during screening."}
+                    defaultText={job.salary ?? "Salary range will be shared during screening."}
+                  />
+                </p>
+                <p>
+                  <span className="font-semibold text-foreground dark:text-white">
+                    <Translate id="career.employmentType" defaultText="Employment Type:" />
+                  </span>{" "}
+                  <Translate id={formatEmploymentType(job.type)} defaultText={formatEmploymentType(job.type)} />
                 </p>
               </div>
             </Card>

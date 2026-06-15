@@ -10,6 +10,8 @@ type StaticCareer = {
   requirements: string[];
   qualification: string;
   experience: string;
+  salary?: string | null;
+  type?: string | null;
 };
 
 export type CareerOpening = StaticCareer & {
@@ -93,6 +95,8 @@ type JobPostingSource = {
   openings?: number | null;
   qualification?: string | null;
   experience?: string | null;
+  salary?: string | null;
+  type?: string | null;
 };
 
 function normalizeCareerJob(job: JobPostingSource): CareerOpening {
@@ -108,6 +112,8 @@ function normalizeCareerJob(job: JobPostingSource): CareerOpening {
     openings: job.openings ?? 1,
     qualification: job.qualification ?? "Qualification details will be shared during screening.",
     experience: job.experience ?? "Experience requirements will be shared during screening.",
+    salary: job.salary ?? "Salary range will be shared during screening.",
+    type: job.type ?? "FULL_TIME",
     requirements,
     slug: slugify(job.title)
   };
@@ -132,7 +138,8 @@ export async function getCareerOpenings() {
             "title",
             "requirements",
             "qualification",
-            "experience"
+            "experience",
+            "salary"
           ])) ?? normalizeCareerJob(job)
         )
       );
@@ -164,7 +171,8 @@ export async function getCareerBySlug(slug: string) {
         "title",
         "requirements",
         "qualification",
-        "experience"
+        "experience",
+        "salary"
       ])) ?? normalized;
     } catch {
       const job = careerOpenings.find((item) => item.slug === slug) ?? null;
@@ -172,7 +180,8 @@ export async function getCareerBySlug(slug: string) {
         "title",
         "requirements",
         "qualification",
-        "experience"
+        "experience",
+        "salary"
       ])) ?? job;
     }
   }
@@ -182,6 +191,7 @@ export async function getCareerBySlug(slug: string) {
     "title",
     "requirements",
     "qualification",
-    "experience"
+    "experience",
+    "salary"
   ])) ?? job;
 }
