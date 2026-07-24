@@ -24,15 +24,15 @@ export async function SiteFooter() {
 
   return (
     <footer className="border-t border-black/10 bg-black/[0.04] dark:border-white/10 dark:bg-black/30">
-      <div className="container grid gap-10 py-16 lg:grid-cols-[1.1fr_1fr_0.9fr]">
+      <div className="container grid gap-8 py-12 sm:py-16 lg:grid-cols-[1.1fr_1fr_0.9fr] lg:gap-10">
         <div className="max-w-md">
-          <p className="font-display text-3xl tracking-[0.12em] text-foreground">JAGUAR PROPERTIES</p>
+          <p className="font-display text-2xl tracking-[0.08em] text-foreground sm:text-3xl sm:tracking-[0.12em]">JAGUAR PROPERTIES</p>
           <p className="mt-5 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
             <TranslateText text={content?.footerBlurb} />
           </p>
         </div>
-        <div className="rounded-[28px] border border-black/10 bg-white/40 p-6 dark:border-white/10 dark:bg-white/5">
-          <p className="text-sm uppercase tracking-[0.25em] text-primary">
+        <div className="rounded-[22px] border border-black/10 bg-white/40 p-5 dark:border-white/10 dark:bg-white/5 sm:rounded-[28px] sm:p-6">
+          <p className="text-sm uppercase tracking-[0.18em] text-primary sm:tracking-[0.25em]">
             <Translate id="contact.offices" defaultText="OUR BRANCHES" />
           </p>
           <ul className="mt-4 space-y-5 text-sm leading-7 text-zinc-700 dark:text-zinc-300">
@@ -53,8 +53,8 @@ export async function SiteFooter() {
             ))}
           </ul>
         </div>
-        <div className="rounded-[28px] border border-black/10 bg-white/40 p-6 dark:border-white/10 dark:bg-white/5">
-          <p className="text-sm uppercase tracking-[0.25em] text-primary">
+        <div className="rounded-[22px] border border-black/10 bg-white/40 p-5 dark:border-white/10 dark:bg-white/5 sm:rounded-[28px] sm:p-6">
+          <p className="text-sm uppercase tracking-[0.18em] text-primary sm:tracking-[0.25em]">
             <Translate id="contact.connect" defaultText="Connect" />
           </p>
           <div className="mt-4 space-y-3 text-sm text-zinc-700 dark:text-zinc-300">
@@ -72,10 +72,10 @@ export async function SiteFooter() {
         </div>
       </div>
       <div className="container pb-4">
-        <div className="grid gap-8 border-t border-black/10 py-12 dark:border-white/10 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-8 border-t border-black/10 py-10 dark:border-white/10 md:grid-cols-2 xl:grid-cols-4">
           {footerNavigationColumns.map((column) => (
             <div key={column.title}>
-              <p className="text-sm uppercase tracking-[0.28em] text-primary">
+              <p className="text-sm uppercase tracking-[0.18em] text-primary sm:tracking-[0.28em]">
                 <Translate id={column.title} defaultText={column.title} />
               </p>
               <div className="mt-5 space-y-3">
@@ -92,7 +92,7 @@ export async function SiteFooter() {
             </div>
           ))}
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-3 pb-8 pt-2 md:gap-4">
+        <div className="grid grid-cols-2 gap-3 pb-8 pt-2 sm:flex sm:flex-wrap sm:items-center sm:justify-center md:gap-4">
           {socialLinks.map((item) => {
             const Icon = item.icon;
             return (
@@ -101,10 +101,10 @@ export async function SiteFooter() {
                 href={item.href ?? "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-3 rounded-full border border-black/10 bg-white/50 px-5 py-3 text-sm font-semibold text-zinc-700 transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 md:px-6 md:py-4 md:text-base"
+                className="inline-flex min-w-0 items-center justify-center gap-2 rounded-full border border-black/10 bg-white/50 px-3 py-3 text-sm font-semibold text-zinc-700 transition hover:border-primary hover:text-primary dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 sm:gap-3 sm:px-5 md:px-6 md:py-4 md:text-base"
               >
                 <Icon className="h-5 w-5" />
-                <span>
+                <span className="truncate sm:whitespace-normal">
                   <Translate
                     id={`social.${item.label === "Twitter / X" ? "twitter" : item.label.toLowerCase()}`}
                     defaultText={item.label}

@@ -37,7 +37,7 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="relative h-72">
+      <div className="relative h-56 sm:h-72">
         <Link
           href={getLocalizedPath(`/properties/${project.slug}`, locale)}
           aria-label={`View ${project.title} project details`}
@@ -52,17 +52,17 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
             unoptimized={shouldBypassImageOptimization(coverImageSrc)}
           />
         </Link>
-        <div className="absolute left-5 top-5 rounded-full bg-primary px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-primary-foreground">
+        <div className="absolute left-4 top-4 max-w-[calc(100%-2rem)] rounded-full bg-primary px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-primary-foreground sm:left-5 sm:top-5 sm:px-4 sm:tracking-[0.28em]">
           <TranslateText text={getPrimaryTag(project)} />
         </div>
       </div>
 
-      <div className="space-y-5 p-6">
+      <div className="space-y-5 p-5 sm:p-6">
         <div>
           <p className="text-sm font-medium text-primary">
             <TranslateText text={project.location} />, <TranslateText text={project.city} />
           </p>
-          <h3 className="mt-2 font-display text-3xl text-foreground">
+          <h3 className="mt-2 font-display text-2xl text-foreground sm:text-3xl">
             <Link href={getLocalizedPath(`/properties/${project.slug}`, locale)} className="hover:text-primary">
               <TranslateText text={project.title} />
             </Link>
@@ -93,11 +93,11 @@ export function ProjectCard({ project }: { project: ProjectCardRecord }) {
           ) : null}
         </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <span className="text-xl font-semibold text-foreground">
+        <div className="flex flex-col gap-4 min-[430px]:flex-row min-[430px]:items-center min-[430px]:justify-between">
+          <span className="text-lg font-semibold text-foreground sm:text-xl">
             <TranslateText text={project.priceRange} />
           </span>
-          <Button asChild variant="secondary">
+          <Button asChild variant="secondary" className="w-full min-[430px]:w-auto">
             <Link href={getLocalizedPath(`/properties/${project.slug}`, locale)}>
               <Translate id="property.viewDetails" defaultText="View Details" />
               <ArrowRight className="h-4 w-4" />

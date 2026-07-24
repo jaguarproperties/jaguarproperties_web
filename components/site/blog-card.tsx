@@ -13,9 +13,9 @@ export function BlogCard({ post }: { post: BlogPost }) {
 
   return (
     <Card className="overflow-hidden">
-      <div className="p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-primary">{format(post.publishedAt, "dd MMM yyyy")}</p>
-        <h3 className="mt-3 font-display text-3xl text-foreground">
+      <div className="p-5 sm:p-6">
+        <p className="text-xs uppercase tracking-[0.2em] text-primary sm:tracking-[0.3em]">{format(post.publishedAt, "dd MMM yyyy")}</p>
+        <h3 className="mt-3 font-display text-2xl text-foreground sm:text-3xl">
           <Link href={getLocalizedPath(`/news/${post.slug}`, locale)} className="hover:text-primary">
             <TranslateText text={post.title} />
           </Link>

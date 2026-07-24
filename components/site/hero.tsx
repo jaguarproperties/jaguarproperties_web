@@ -79,21 +79,21 @@ export function Hero({
       <div className="absolute inset-0 bg-hero-gradient opacity-90" />
       <div className="animate-pulse-glow absolute left-[8%] top-24 h-44 w-44 rounded-full bg-primary/10 blur-3xl" />
       <div className="animate-float-soft absolute bottom-20 right-[10%] h-56 w-56 rounded-full bg-primary/10 blur-3xl" />
-      <div className="container relative flex min-h-[70vh] items-center py-14 sm:py-16 lg:min-h-[76vh]">
+      <div className="container relative flex min-h-[calc(100svh-76px)] items-center py-12 sm:min-h-[calc(100svh-88px)] sm:py-14 lg:min-h-[76vh] lg:py-16">
         <div className="grid w-full items-center gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)] lg:gap-10">
           <FadeIn>
             <div className="max-w-3xl">
-              <p className="text-xs uppercase tracking-[0.45em] text-primary">
+              <p className="text-xs uppercase tracking-[0.24em] text-primary sm:tracking-[0.45em]">
                 <Translate id="hero.brand" defaultText="Jaguar Properties" />
               </p>
-              <h1 className="mt-6 max-w-4xl font-display text-4xl leading-[1.02] text-white md:text-5xl xl:text-6xl">
+              <h1 className="mt-5 max-w-4xl font-display text-4xl leading-[1.05] text-white sm:text-5xl xl:text-6xl">
                 {typeof title === "string" ? <TranslateText text={title} /> : title}
               </h1>
-              <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-200 md:text-lg">
+              <p className="mt-5 max-w-2xl text-sm leading-7 text-zinc-200 sm:text-base sm:leading-8 md:text-lg">
                 {typeof subtitle === "string" ? <TranslateText text={subtitle} /> : subtitle}
               </p>
-              <div className="mt-10 flex flex-wrap gap-3 sm:gap-4">
-                <Button asChild size="lg">
+              <div className="mt-8 flex flex-col gap-3 min-[420px]:flex-row min-[420px]:flex-wrap sm:mt-10 sm:gap-4">
+                <Button asChild size="lg" className="w-full min-[420px]:w-auto">
                   <Link href={getLocalizedPath(primaryCta.href, locale)}>
                     <Translate id="hero.viewProjects" defaultText={primaryCta.label} />
                   </Link>
@@ -102,7 +102,7 @@ export function Hero({
                   asChild
                   variant="secondary"
                   size="lg"
-                  className="border-white/20 bg-white/5 text-white hover:bg-white/10"
+                  className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 min-[420px]:w-auto"
                 >
                   <Link href={getLocalizedPath(secondaryCta.href, locale)}>
                     <Translate id="hero.contactUs" defaultText={secondaryCta.label} />
@@ -150,9 +150,9 @@ export function Hero({
             </div>
           </FadeIn>
         </div>
-        <div className="mt-8 grid gap-4 lg:hidden">
+        <div className="mt-8 grid min-w-0 gap-4 lg:hidden">
           <div className="rounded-[24px] border border-white/15 bg-black/30 p-5 shadow-2xl backdrop-blur-xl">
-            <p className="text-xs uppercase tracking-[0.3em] text-primary">
+            <p className="text-xs uppercase tracking-[0.2em] text-primary sm:tracking-[0.3em]">
               <Translate id="hero.presence" defaultText="Presence" />
             </p>
             <div className="mt-3 space-y-2 text-sm text-zinc-100">
@@ -164,7 +164,7 @@ export function Hero({
             </div>
           </div>
           <div className="rounded-[24px] border border-white/15 bg-black/30 p-5 shadow-2xl backdrop-blur-xl">
-            <p className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-primary">
+            <p className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-primary sm:tracking-[0.3em]">
               <Sparkles className="h-4 w-4" />
               <Translate id="hero.signatureLiving" defaultText="Signature Living" />
             </p>
@@ -173,15 +173,15 @@ export function Hero({
             </p>
           </div>
           <div className="rounded-[24px] border border-white/15 bg-black/30 p-5 shadow-2xl backdrop-blur-xl">
-            <div className="flex items-center gap-3 text-sm uppercase tracking-[0.3em] text-primary">
+            <div className="flex items-center gap-3 text-sm uppercase tracking-[0.18em] text-primary sm:tracking-[0.3em]">
               <Building2 className="h-5 w-5" />
               <span><TranslateText text={spotlight.label} /></span>
             </div>
             <div className="mt-4 rounded-[24px] bg-white/10 p-4 text-zinc-100 shadow-xl">
-              <p className="text-xs uppercase tracking-[0.3em] text-zinc-300">
+              <p className="text-xs uppercase tracking-[0.18em] text-zinc-300 sm:tracking-[0.3em]">
                 <TranslateText text={spotlight.label} />
               </p>
-              <p className="mt-3 whitespace-pre-line text-3xl font-semibold leading-tight text-white sm:text-4xl">
+              <p className="mt-3 whitespace-pre-line text-2xl font-semibold leading-tight text-white sm:text-4xl">
                 <TranslateText text={spotlight.title} />
               </p>
               <p className="mt-3 text-sm leading-7 text-zinc-300">

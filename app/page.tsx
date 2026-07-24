@@ -271,8 +271,8 @@ export default async function HomePage() {
               />
             }
           />
-          <Card className="mt-10 overflow-hidden p-3 sm:p-4">
-            <div className="aspect-video overflow-hidden rounded-[24px] bg-black">
+          <Card className="mt-10 overflow-hidden p-2 sm:p-4">
+            <div className="aspect-video overflow-hidden rounded-[18px] bg-black sm:rounded-[24px]">
               <iframe
                 className="h-full w-full"
                 src={featuredVideoEmbedUrl}
@@ -304,17 +304,17 @@ export default async function HomePage() {
       </section>
 
       <section id="concierge" className="container scroll-mt-32 pb-20 md:pb-24">
-        <Card className="flex flex-col items-start justify-between gap-6 p-10 md:flex-row md:items-center">
+        <Card className="flex flex-col items-start justify-between gap-6 p-6 sm:p-8 md:flex-row md:items-center md:p-10">
           <div>
-            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.35em] text-primary">
+            <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-primary sm:tracking-[0.35em]">
               <Newspaper className="h-4 w-4" />
               <Translate id="home.concierge.eyebrow" defaultText="Concierge Support" />
             </p>
-            <h2 className="mt-4 font-display text-4xl text-foreground dark:text-white">
+            <h2 className="mt-4 font-display text-3xl leading-tight text-foreground dark:text-white sm:text-4xl">
               <TranslateText text={siteContent.homeConciergeTitle} />
             </h2>
           </div>
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-full sm:w-auto">
             <a href={siteContent.homeConciergeButtonHref}>
               <TranslateText text={siteContent.homeConciergeButtonLabel} />
             </a>

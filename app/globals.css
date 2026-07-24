@@ -47,13 +47,21 @@ html {
 body {
   @apply bg-background text-foreground antialiased font-medium;
   overflow-x: hidden;
+  word-break: normal;
+  overflow-wrap: anywhere;
   background-image:
     radial-gradient(circle at top left, rgba(220, 206, 182, 0.45), transparent 28%),
     linear-gradient(180deg, rgba(244, 238, 228, 0.99), rgba(236, 229, 217, 1));
 }
 
 .container {
-  @apply mx-auto w-full max-w-[1280px] px-5 sm:px-6 lg:px-8;
+  @apply mx-auto w-full max-w-[1280px] px-4 sm:px-6 lg:px-8;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
 }
 
 .dark body {
@@ -199,6 +207,10 @@ a {
 }
 
 @media (max-width: 768px) {
+  html {
+    font-size: 100%;
+  }
+
   .hero-animated-backdrop,
   .hero-animated-grid,
   .hero-animated-sweep,

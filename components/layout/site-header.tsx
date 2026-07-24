@@ -27,15 +27,18 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-black/10 bg-background/88 backdrop-blur-2xl dark:border-white/10">
-      <div className="container flex min-h-[96px] items-center justify-between gap-3 py-0 sm:gap-4 md:min-h-[128px] md:gap-6">
-        <Link href={getLocalizedPath("/", locale)} className="flex h-[96px] items-center md:h-[128px]">
+      <div className="container flex min-h-[76px] items-center justify-between gap-2 py-0 sm:min-h-[88px] sm:gap-4 lg:min-h-[112px] lg:gap-6 xl:min-h-[128px]">
+        <Link
+          href={getLocalizedPath("/", locale)}
+          className="flex h-[76px] min-w-0 shrink items-center sm:h-[88px] lg:h-[112px] xl:h-[128px]"
+        >
           <Image
             src="/uploads/site-media/jaguarlogo.png"
             alt="Jaguar Properties"
             width={1536}
             height={1024}
             priority
-            className="h-full w-auto max-w-none object-contain"
+            className="h-full w-auto max-w-[46vw] object-contain sm:max-w-none"
             unoptimized
           />
         </Link>
@@ -50,12 +53,12 @@ export async function SiteHeader() {
             </Link>
           ))}
         </nav>
-        <div className="relative flex shrink-0 items-center gap-2">
+        <div className="relative flex shrink-0 items-center gap-1.5 sm:gap-2">
           <details className="group lg:hidden">
-            <summary className="flex h-11 cursor-pointer list-none items-center rounded-full border border-black/10 bg-black/[0.03] px-4 text-sm font-semibold text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200">
+            <summary className="flex h-10 cursor-pointer list-none items-center rounded-full border border-black/10 bg-black/[0.03] px-3 text-sm font-semibold text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 sm:h-11 sm:px-4">
               <Translate id="nav.menu" defaultText="Menu" />
             </summary>
-            <div className="scrollbar-thin absolute right-5 top-[calc(100%-0.25rem)] z-50 mt-3 max-h-[75vh] w-[min(92vw,360px)] overflow-y-auto rounded-[28px] border border-black/10 bg-background/95 p-5 shadow-2xl dark:border-white/10">
+            <div className="scrollbar-thin absolute right-0 top-[calc(100%-0.25rem)] z-50 mt-3 max-h-[75vh] w-[min(92vw,360px)] overflow-y-auto rounded-[22px] border border-black/10 bg-background/95 p-4 shadow-2xl dark:border-white/10 sm:rounded-[28px] sm:p-5">
               <div className="space-y-2">
                 {navItems.map((item) => (
                   <Link

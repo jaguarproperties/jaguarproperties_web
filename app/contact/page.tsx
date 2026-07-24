@@ -85,7 +85,7 @@ export default async function ContactPage() {
                 );
               })}
             </div>
-            <div className="mt-8 rounded-[28px] border border-black/10 bg-white/35 p-6 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300">
+            <div className="mt-8 rounded-[22px] border border-black/10 bg-white/35 p-5 text-sm leading-7 text-zinc-700 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 sm:rounded-[28px] sm:p-6">
               <p>{siteContent?.contactEmail}</p>
               <p>
                 <bdi dir="ltr">{siteContent?.contactPhone}</bdi>
@@ -117,24 +117,24 @@ export default async function ContactPage() {
               href={jaguarMapsLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative mt-8 block overflow-hidden rounded-[28px] border border-black/10 dark:border-white/10"
+              className="group relative mt-8 block overflow-hidden rounded-[22px] border border-black/10 dark:border-white/10 sm:rounded-[28px]"
               aria-label="Open Jaguar Properties location in Google Maps"
             >
               <iframe
                 src={siteContent?.mapEmbedUrl}
                 width="100%"
-                height="360"
+                height="320"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                className="pointer-events-none min-h-[360px] w-full"
+                className="pointer-events-none min-h-[320px] w-full sm:min-h-[360px]"
               />
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-black/65 px-5 py-3 text-sm text-white backdrop-blur-sm transition group-hover:bg-black/75">
+              <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-black/65 px-4 py-3 text-sm text-white backdrop-blur-sm transition group-hover:bg-black/75 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                 <span><Translate id="contact.map.open" defaultText="Open Jaguar Properties in Google Maps" /></span>
                 <span className="font-semibold text-primary"><Translate id="contact.map.viewLocation" defaultText="View location" /></span>
               </div>
             </a>
           </div>
-          <Card className="order-1 p-6 sm:p-8 lg:order-2">
+          <Card className="order-1 p-5 sm:p-8 lg:order-2">
             <LeadForm />
           </Card>
         </div>
