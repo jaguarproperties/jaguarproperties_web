@@ -17,6 +17,19 @@ function shouldBypass(pathname: string) {
   return bypassPrefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
+function shouldRedirectToHttps(request: NextRequest) {
+  if (process.env.NODE_ENV !== "production") {
+    return false;
+  }
+
+  const host = request.headers.get("host") ?? request.nextUrl.host;
+  const protocol = request.headers.get("x-forwarded-proto") ?? request.nextUrl.protocol.replace(":", "");
+  const isLocalhost =
+    host.startsWith("localhost") || host.startsWith("127.0.0.1") || host.startsWith("[::1]");
+
+  return protocol === "http" && !isLocalhost;
+}
+
 function getRequestedLocale(request: NextRequest, pathname: string) {
   const pathLocale = getLocaleFromPathname(pathname);
   if (isLocale(pathLocale)) {
@@ -33,6 +46,13 @@ function getRequestedLocale(request: NextRequest, pathname: string) {
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (shouldRedirectToHttps(request)) {
+    const httpsUrl = request.nextUrl.clone();
+    httpsUrl.protocol = "https:";
+
+    return NextResponse.redirect(httpsUrl, 301);
+  }
 
   if (shouldBypass(pathname)) {
     return NextResponse.next();
@@ -77,5 +97,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  matcher: ["/:path*"]
 };

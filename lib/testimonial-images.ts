@@ -49,8 +49,9 @@ export function getStoredTestimonialImageIdFromUrl(url: string | null | undefine
     return null;
   }
 
-  const pathOnly = normalized.startsWith("http://") || normalized.startsWith("https://")
-    ? new URL(normalized).pathname
+  const parsedUrl = URL.canParse(normalized) ? new URL(normalized) : null;
+  const pathOnly = parsedUrl?.protocol === "http:" || parsedUrl?.protocol === "https:"
+    ? parsedUrl.pathname
     : normalized;
 
   const sanitizedPath = pathOnly.replace(/[?#].*$/, "").replace(/\/+$/, "");

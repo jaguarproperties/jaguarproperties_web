@@ -62,10 +62,10 @@ export function getStoredSiteMediaFilenameFromUrl(url: string | null | undefined
     return null;
   }
 
-  const pathOnly =
-    normalized.startsWith("http://") || normalized.startsWith("https://")
-      ? new URL(normalized).pathname
-      : normalized;
+  const parsedUrl = URL.canParse(normalized) ? new URL(normalized) : null;
+  const pathOnly = parsedUrl?.protocol === "http:" || parsedUrl?.protocol === "https:"
+    ? parsedUrl.pathname
+    : normalized;
 
   const sanitizedPath = pathOnly.replace(/[?#].*$/, "").replace(/\/+$/, "");
 

@@ -88,6 +88,7 @@ export default function RootLayout({
   return (
     <html lang={locale} dir={getDirection(locale)} className="dark" suppressHydrationWarning>
       <head>
+        <meta httpEquiv="Content-Security-Policy" content="upgrade-insecure-requests" />
         <JsonLd
           data={[
             buildOrganizationSchema(),
